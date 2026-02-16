@@ -13,6 +13,22 @@ This fork includes several modifications and optimizations:
 - **Docker Containerization:** The bot runs in Docker containers based on Debian 11 and Python 3.10, ensuring compatibility with legacy dependencies while maintaining stability
 - **Proven Stability:** Since I first encountered this bot in 2021, the adaptations made to work around YouTube's restrictions, combined with the optimizations from 2021/2022, have proven to be excellent and reliable
 
+## 🎵 YouTube Music Support
+
+This fork includes optimized support for **YouTube Music** alongside regular YouTube:
+
+- **YouTube Search API Integration:** Uses the YouTube Search API for fast and reliable music discovery
+- **Optimized Library:** The original `youtubesearch` Python library has been replaced with a faster, more up-to-date version
+- **Performance Focus:** Designed to run with minimal bottlenecks, ensuring smooth playback and quick search results
+- **Unified Cookie System:** Both YouTube and YouTube Music use the same cookies configuration for authentication
+
+Switch between services using the `sv` command:
+- `sv yt` - Switch to YouTube
+- `sv ytm` - Switch to YouTube Music
+
+> [!NOTE]
+> **Exclusive Feature:** YouTube Music support is exclusive to this fork and is not available in the original TTMediaBot project.
+
 ## 🚀 Easy Installation (Recommended)
 
 This script will automatically install Git (if needed), clone the repository, and set up the Docker environment.
@@ -172,6 +188,9 @@ Comprehensive bot management submenu with 10 options:
 - Preview changes before applying
 - Updates all bot `config.json` files
 
+> [!WARNING]
+> **Important:** This feature is designed for bots on the **same server**. If you have bots connected to multiple different TeamTalk servers, you'll need to update them manually. Using this feature will configure all bots with the same server settings.
+
 **2.10. Return to Main Menu**
 
 #### 3. Uninstall Everything
@@ -197,13 +216,13 @@ The script automatically:
 
 ---
 
-## 🍪 YouTube Cookies Configuration
+## 🍪 YouTube & YouTube Music Cookies Configuration
 
-YouTube cookies are **essential** for the bot to play music from YouTube due to platform restrictions.
+Cookies are **essential** for the bot to play music from both **YouTube** and **YouTube Music** due to platform restrictions.
 
 ### Why Cookies Are Needed
 
-YouTube has implemented restrictions that require authentication to access certain content. Cookies from an authenticated browser session allow the bot to bypass these restrictions.
+YouTube and YouTube Music have implemented restrictions that require authentication to access certain content. Cookies from an authenticated browser session allow the bot to bypass these restrictions and play music from both services.
 
 ### How to Obtain Cookies
 
