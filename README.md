@@ -4,6 +4,15 @@
 
 A feature-rich media streaming bot for TeamTalk 5, capable of playing music from various services (YouTube, YouTube Music, local files, URLs) with advanced control features.
 
+## 📋 Changes from Original
+
+This fork includes several modifications and optimizations:
+
+- **Removed Services:** Yandex Music and VK integration have been removed
+- **TeamTalk SDK Upgrade:** Updated to TeamTalk SDK 5.8.1 for improved performance
+- **Docker Containerization:** The bot runs in Docker containers based on Debian 11 and Python 3.10, ensuring compatibility with legacy dependencies while maintaining stability
+- **Proven Stability:** Since I first encountered this bot in 2021, the adaptations made to work around YouTube's restrictions, combined with the optimizations from 2021/2022, have proven to be excellent and reliable
+
 ## 🚀 Easy Installation (Recommended)
 
 This script will install Git (if needed), clone the repository, and automatically launch the Docker manager to complete the installation.
