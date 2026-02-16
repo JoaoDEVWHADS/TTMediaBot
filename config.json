@@ -49,18 +49,13 @@
         }
     },
     "services": {
-        "default_service": "vk",
-        "vk": {
-            "enabled": true,
-            "token": ""
-        },
-        "yam": {
-            "enabled": true,
-            "token": ""
-        },
+        "default_service": "yt",
         "yt": {
             "enabled": true,
-            "cookiefile_path": ""
+            "cookiefile_path": "/home/ubuntu/cookies.txt"
+        },
+        "ytm": {
+            "enabled": true
         }
     },
     "logger": {
