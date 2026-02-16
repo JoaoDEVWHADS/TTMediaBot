@@ -540,3 +540,25 @@ class DownloadCommand(Command):
                 return self.translator.translate("Live streams cannot be downloaded")
         else:
             return self.translator.translate("Nothing is playing")
+
+
+class JoinChannelCommand(Command):
+    @property
+    def help(self) -> str:
+        return self.translator.translate("Makes the bot join your current channel")
+
+    def __call__(self, arg: str, user: User) -> Optional[str]:
+        # Get user's current channel
+        user_channel = user.channel
+        
+        # Join the user's channel
+        try:
+            self.ttclient.join_channel(user_channel.id, "")
+            
+            # Track this user for monitoring
+            self._bot.jc_requested_by_user_id = user.id
+            
+            return self.translator.translate("Joining channel: {}").format(user_channel.name)
+        except Exception as e:
+            return self.translator.translate("Failed to join channel: {}").format(str(e))
+

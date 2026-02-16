@@ -55,28 +55,23 @@ class TeamTalkModel(BaseModel):
     event_handling: EventHandlingModel = EventHandlingModel()
 
 
-class VkModel(BaseModel):
-    enabled: bool = True
-    token: str = ""
 
 
-class YtModel(BaseModel):
-    enabled: bool = True
 class YtModel(BaseModel):
     enabled: bool = True
     cookiefile_path: str = ""
 
 
-class YamModel(BaseModel):
+
+
+class YtmModel(BaseModel):
     enabled: bool = True
-    token: str = ""
 
 
 class ServicesModel(BaseModel):
-    default_service: str = "vk"
-    vk: VkModel = VkModel()
-    yam: YamModel = YamModel()
+    default_service: str = "yt"
     yt: YtModel = YtModel()
+    ytm: YtmModel = YtmModel()
 
 
 class LoggerModel(BaseModel):

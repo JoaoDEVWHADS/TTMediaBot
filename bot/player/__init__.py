@@ -2,6 +2,9 @@ from __future__ import annotations
 import html
 import logging
 import time
+import logging
+import time
+import threading
 from typing import Any, Dict, Callable, List, Optional, TYPE_CHECKING
 import random
 
@@ -105,6 +108,42 @@ class Player:
             self.cache_manager.save()
         self._player.pause = False
         self._player.play(arg)
+        # Prefetch next track to ensure gapless-like playback
+        # Delay slightly to let the current track buffering / playback start smoothly first
+        threading.Timer(6.0, self._prefetch_next_track).start()
+
+    def _prefetch_next_track(self):
+        """Identifies and fetches the stream URL for the next track in background."""
+        try:
+            if not self.track_list:
+                return
+                
+            next_index = -1
+            if self.mode == Mode.Random:
+                try:
+                    current_pos = self._index_list.index(self.track_index)
+                    if current_pos + 1 < len(self._index_list):
+                        next_index = self._index_list[current_pos + 1]
+                except (ValueError, IndexError, AttributeError):
+                    pass
+            elif self.mode == Mode.RepeatTrack:
+                next_index = self.track_index
+            else:
+                if self.track_index + 1 < len(self.track_list):
+                    next_index = self.track_index + 1
+                elif self.mode == Mode.RepeatTrackList and len(self.track_list) > 0:
+                    next_index = 0
+            
+            if next_index != -1 and next_index < len(self.track_list):
+                next_track = self.track_list[next_index]
+                # Accessing .url property triggers the fetch/download/extraction if not already done
+                # verifying if it needs fetching is done inside the property
+                if not next_track._is_fetched:
+                    logging.info(f"Prefetching next track: {next_track.name}")
+                    _ = next_track.url 
+                    logging.info(f"Prefetch completed for: {next_track.name}")
+        except Exception as e:
+            logging.warning(f"Prefetch failed: {e}")
 
     def next(self) -> None:
         track_index = self.track_index

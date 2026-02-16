@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import bs4
 import patoolib
 import requests
 
@@ -32,29 +31,29 @@ def get_url_suffix_from_platform() -> str:
             sys.exit("Native Windows on ARM is not supported")
     elif sys.platform == "darwin":
         sys.exit("Darwin is not supported")
-    else:
+    elif sys.platform.startswith("linux"):
+        machine = platform.machine()
         if machine == "AMD64" or machine == "x86_64":
+            # Debian 11/12 are compatible with the Ubuntu 22 build of the SDK
             return "ubuntu22_x86_64"
-        elif "arm" in machine:
+        elif "arm" in machine or "aarch64" in machine:
             return "raspbian_armhf"
         else:
-            sys.exit("Your architecture is not supported")
+            sys.exit(f"Your architecture ({machine}) is not supported on Linux")
+    else:
+        sys.exit(f"Your platform ({sys.platform}) is not supported")
 
 
 def download() -> None:
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
-    r = requests.get(url, headers=headers)
-    page = bs4.BeautifulSoup(r.text, features="html.parser")
-    # The last tested version series is v5.15x
-    versions = page.find_all("li")
-    version = [i for i in versions if "5.15" in i.text][-1].a.get("href")[0:-1]
-    download_url = (
-        url
-        + "/"
-        + version
-        + "/"
-        + "tt5sdk_{v}_{p}.7z".format(v=version, p=get_url_suffix_from_platform())
-    )
+    # Hardcoded version to prevent scraping errors
+    version = "v5.15.0"
+    base_url = "https://bearware.dk/teamtalksdk"
+    
+    # Determine platform suffix
+    suffix = get_url_suffix_from_platform()
+    
+    download_url = f"{base_url}/{version}/tt5sdk_{version}_{suffix}.7z"
+    
     print("Downloading from " + download_url)
     downloader.download_file(download_url, os.path.join(os.getcwd(), "ttsdk.7z"))
 
@@ -72,7 +71,13 @@ def extract() -> None:
 def move() -> None:
     path = os.path.join(os.getcwd(), "ttsdk", os.listdir(os.path.join(os.getcwd(), "ttsdk"))[0])
     libraries = ["TeamTalk_DLL", "TeamTalkPy"]
-    dest_dir = os.path.join(os.getcwd(), os.pardir) if os.path.basename(os.getcwd()) == "tools" else os.getcwd()
+    # Dentro do Docker, o script é rodado como `python tools/ttsdk_downloader.py`. 
+    # O CWD (Current Working Directory) é /home/ttbot/TTMediaBot (definido no WORKDIR).
+    # Portanto, queremos que as pastas fiquem no CWD, não no diretório pai.
+    # O script original tenta adivinhar se está em 'tools' ou não, mas no Docker isso pode confundir.
+    
+    # Se o script for rodado da raiz (como fazemos no Dockerfile), os arquivos devem ficar na raiz.
+    dest_dir = os.getcwd()
     for library in libraries:
         try:
             os.rename(
@@ -99,18 +104,41 @@ def clean() -> None:
     shutil.rmtree(os.path.join(os.getcwd(), "ttsdk"))
 
 
+def check_local_files() -> bool:
+    """Check if SDK files already exist in the user's directory."""
+    required = ["TeamTalk_DLL", "TeamTalkPy"]
+    # We check in the current working directory, which is where we expect them in Docker
+    cwd = os.getcwd()
+    missing = [f for f in required if not os.path.exists(os.path.join(cwd, f))]
+    
+    if not missing:
+        print("SDK files found locally. Skipping download.")
+        return True
+    return False
+
 def install() -> None:
     print("Installing TeamTalk sdk components")
-    print("Downloading latest sdk version")
-    download()
-    print("Downloaded. extracting")
-    extract()
-    print("Extracted. moving")
-    move()
-    print("moved. cleaning")
-    clean()
-    print("cleaned.")
-    print("Installed, exiting.")
+    
+    try:
+        print("Downloading latest sdk version")
+        download()
+        print("Downloaded. extracting")
+        extract()
+        print("Extracted. moving")
+        move()
+        print("moved. cleaning")
+        clean()
+        print("cleaned.")
+        print("Installed, exiting.")
+    except Exception as e:
+        print(f"Download or extraction failed: {e}")
+        print("Checking for local backup files...")
+        if check_local_files():
+            print("Local files are present. Build can proceed using cached SDK.")
+            sys.exit(0) # Success (0) because we have the files
+        else:
+            print("No local files found. Installation failed.")
+            sys.exit(1) # Fail (1) because we have nothing
 
 if __name__ == "__main__":
     install()

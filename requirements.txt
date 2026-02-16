@@ -5,7 +5,6 @@ portalocker
 pydantic
 pyshorteners
 requests
-vk-api
-yandex_music
-youtube-search-python
 yt-dlp
+ytmusicapi
+py-yt-search

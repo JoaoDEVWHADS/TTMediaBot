@@ -1,14 +1,20 @@
 from __future__ import annotations
 import logging
+import time
 import os
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
+import asyncio
+import shutil
+import tempfile
+from contextlib import contextmanager
+from typing import Any, Dict, List, Optional, TYPE_CHECKING, Generator
 
 if TYPE_CHECKING:
     from bot import Bot
 
 from yt_dlp import YoutubeDL
 from yt_dlp.downloader import get_suitable_downloader
-from youtubesearchpython import VideosSearch
+from py_yt.search import VideosSearch
+
 
 from bot.config.models import YtModel
 
@@ -36,19 +42,54 @@ class YtService(_Service):
             "format": "m4a/bestaudio/best[protocol!=m3u8_native]/best",
             "socket_timeout": 5,
             "logger": logging.getLogger("root"),
+            "js_runtimes": {"node": {}},
+            "extract_flat": True,
+            "quiet": True,
+            "no_warnings": True,
+            "nocheckcertificate": True,
+            "geo_bypass": True,
         }
 
         if self.config.cookiefile_path and os.path.isfile(self.config.cookiefile_path):
             self._ydl_config |= {"cookiefile": self.config.cookiefile_path}
             
+    @contextmanager
+    def _get_safe_config(self) -> Generator[Dict[str, Any], None, None]:
+        if self.config.cookiefile_path and os.path.isfile(self.config.cookiefile_path):
+            # Define temp directory specific to the bot
+            temp_dir = os.path.join(os.getcwd(), "temp")
+            if not os.path.exists(temp_dir):
+                os.makedirs(temp_dir, exist_ok=True)
+                
+            with tempfile.NamedTemporaryFile(mode='w+', dir=temp_dir, delete=False) as temp_cookie:
+                temp_cookie_path = temp_cookie.name
+                shutil.copy(self.config.cookiefile_path, temp_cookie_path)
+            
+            safe_config = self._ydl_config.copy()
+            safe_config["cookiefile"] = temp_cookie_path
+            try:
+                yield safe_config
+            finally:
+                if os.path.exists(temp_cookie_path):
+                    os.remove(temp_cookie_path)
+        else:
+            yield self._ydl_config
+
     def download(self, track: Track, file_path: str) -> None:
+        start_time = time.perf_counter()
         info = track.extra_info
         if not info:
             super().download(track, file_path)
+            duration = (time.perf_counter() - start_time) * 1000
+            logging.info(f"YT Download finished in {duration:.2f}ms for {track.name}")
             return
-        with YoutubeDL(self._ydl_config) as ydl:
-            dl = get_suitable_downloader(info)(ydl, self._ydl_config)
-            dl.download(file_path, info)
+        
+        with self._get_safe_config() as config:
+            with YoutubeDL(config) as ydl:
+                dl = get_suitable_downloader(info)(ydl, config)
+                dl.download(file_path, info)
+        duration = (time.perf_counter() - start_time) * 1000
+        logging.info(f"YT Download finished in {duration:.2f}ms for {track.name}")
 
     def get(
         self,
@@ -56,57 +97,97 @@ class YtService(_Service):
         extra_info: Optional[Dict[str, Any]] = None,
         process: bool = False,
     ) -> List[Track]:
+        start_time = time.perf_counter()
         if not (url or extra_info):
             raise errors.InvalidArgumentError()
-        with YoutubeDL(self._ydl_config) as ydl:
-            if not extra_info:
-                info = ydl.extract_info(url, process=False)
-            else:
-                info = extra_info
-            info_type = None
-            if "_type" in info:
-                info_type = info["_type"]
-            if info_type == "url" and not info["ie_key"]:
-                return self.get(info["url"], process=False)
-            elif info_type == "playlist":
-                tracks: List[Track] = []
-                for entry in info["entries"]:
-                    data = self.get("", extra_info=entry, process=False)
-                    tracks += data
-                return tracks
-            if not process:
+        
+        with self._get_safe_config() as config:
+            with YoutubeDL(config) as ydl:
+                if not extra_info:
+                    info = ydl.extract_info(url, process=False)
+                else:
+                    info = extra_info
+                info_type = None
+                if "_type" in info:
+                    info_type = info["_type"]
+                if info_type == "url" and not info["ie_key"]:
+                    return self.get(info["url"], process=False)
+                elif info_type == "playlist":
+                    tracks: List[Track] = []
+                    for entry in info["entries"]:
+                        data = self.get("", extra_info=entry, process=False)
+                        tracks += data
+                    duration = (time.perf_counter() - start_time) * 1000
+                    logging.info(f"YT Get (Playlist) finished in {duration:.2f}ms for {url}")
+                    return tracks
+                if not process:
+                    duration = (time.perf_counter() - start_time) * 1000
+                    logging.info(f"YT Get (No Process) finished in {duration:.2f}ms for {url}")
+                    return [
+                        Track(service=self.name, extra_info=info, type=TrackType.Dynamic)
+                    ]
+                try:
+                    stream = ydl.process_ie_result(info)
+                except Exception:
+                    raise errors.ServiceError()
+                if "url" in stream:
+                    url = stream["url"]
+                else:
+                    raise errors.ServiceError()
+                title = stream["title"]
+                if "uploader" in stream:
+                    title += " - {}".format(stream["uploader"])
+                format = stream["ext"]
+                if "is_live" in stream and stream["is_live"]:
+                    type = TrackType.Live
+                else:
+                    type = TrackType.Default
+                
+                duration = (time.perf_counter() - start_time) * 1000
+                logging.info(f"YT Get (Process) finished in {duration:.2f}ms for {title}")
                 return [
-                    Track(service=self.name, extra_info=info, type=TrackType.Dynamic)
+                    Track(service=self.name, url=url, name=title, format=format, type=type, extra_info=stream)
                 ]
-            try:
-                stream = ydl.process_ie_result(info)
-            except Exception:
-                raise errors.ServiceError()
-            if "url" in stream:
-                url = stream["url"]
-            else:
-                raise errors.ServiceError()
-            title = stream["title"]
-            if "uploader" in stream:
-                title += " - {}".format(stream["uploader"])
-            format = stream["ext"]
-            if "is_live" in stream and stream["is_live"]:
-                type = TrackType.Live
-            else:
-                type = TrackType.Default
-            return [
-                Track(service=self.name, url=url, name=title, format=format, type=type, extra_info=stream)
-            ]
 
     def search(self, query: str) -> List[Track]:
-        search = VideosSearch(query, limit=300).result()
-        if search["result"]:
-            tracks: List[Track] = []
-            for video in search["result"]:
-                track = Track(
-                    service=self.name, url=video["link"], type=TrackType.Dynamic
-                )
-                tracks.append(track)
-            return tracks
-        else:
+        start_time = time.perf_counter()
+        # py-yt-search usage (async method)
+        try:
+            # The library is designed to be async. using .result() might be synchronous wrapper 
+            # but using .next() via asyncio.run is safer as per examples.
+            search_obj = VideosSearch(query, limit=10)
+            search = asyncio.run(search_obj.next())
+            
+            # Check structure: it seems to return {'result': [Items...]}
+            if search and "result" in search and search["result"]:
+                tracks: List[Track] = []
+                for video in search["result"]:
+                    # Handle potential key differences between libraries
+                    # Standard py-yt-search likely uses 'link' or 'url', or 'id'
+                    # We fallback to constructing URL from ID if link is missing
+                    url = video.get("link") or video.get("url")
+                    if not url and video.get("id"):
+                         url = f"https://www.youtube.com/watch?v={video.get('id')}"
+                    
+                    if not url:
+                         continue
+
+                    # Title handling
+                    title = video.get("title", "Unknown Title")
+                    
+                    track = Track(
+                        service=self.name, url=url, name=title, type=TrackType.Dynamic, extra_info=None
+                    )
+                    tracks.append(track)
+                
+                if not tracks:
+                     raise errors.NothingFoundError("")
+                
+                duration = (time.perf_counter() - start_time) * 1000
+                logging.info(f"YT Search finished in {duration:.2f}ms for query: {query}")
+                return tracks
+            else:
+                raise errors.NothingFoundError("")
+        except Exception as e:
+            logging.error(f"YT Search failed: {e}")
             raise errors.NothingFoundError("")

@@ -73,6 +73,10 @@ class Bot:
         self.service_manager = services.ServiceManager(self)
         self.module_manager = modules.ModuleManager(self)
         self.command_processor = commands.CommandProcessor(self)
+        
+        # JC command tracking
+        self.jc_requested_by_user_id: Optional[int] = None
+        self.default_channel = self.config.teamtalk.channel
 
     def initialize(self):
         if self.config.logger.log:

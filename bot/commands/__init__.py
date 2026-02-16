@@ -51,6 +51,7 @@ class CommandProcessor:
             "gl": user_commands.GetLinkCommand,
             "dl": user_commands.DownloadCommand,
             "r": user_commands.RecentsCommand,
+            "jc": user_commands.JoinChannelCommand,
         }
         self.admin_commands_dict = {
             "cg": admin_commands.ChangeGenderCommand,
@@ -59,7 +60,7 @@ class CommandProcessor:
             "cs": admin_commands.ChangeStatusCommand,
             "cc": admin_commands.ClearCacheCommand,
             "cm": admin_commands.ChannelMessagesCommand,
-            "jc": admin_commands.JoinChannelCommand,
+            "ajc": admin_commands.JoinChannelCommand,
             "bc": admin_commands.BlockCommandCommand,
             # "ts": TaskSchedulerCommand,
             "l": admin_commands.LockCommand,

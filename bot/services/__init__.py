@@ -42,18 +42,16 @@ class Service(ABC):
         ...
 
 
-from bot.services.vk import VkService
-from bot.services.yam import YamService
 from bot.services.yt import YtService
+from bot.services.ytm import YtmService
 
 
 class ServiceManager:
     def __init__(self, bot: Bot) -> None:
         self.config = bot.config.services
         self.services: Dict[str, Service] = {
-            "vk": VkService(bot, self.config.vk),
-            "yam": YamService(bot, self.config.yam),
             "yt": YtService(bot, self.config.yt),
+            "ytm": YtmService(bot, self.config.ytm),
         }
         self.service: Service = self.services[self.config.default_service]
         self.fallback_service = app_vars.fallback_service

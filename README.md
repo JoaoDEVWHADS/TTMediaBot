@@ -1,76 +1,75 @@
 # TTMediaBot
-A media streaming bot for TeamTalk.
 
-## Installation and usage
-### Requirements
-* To use the bot, you need to install Python 3.7 or later;
-* The bot requires the TeamTalk SDK component to be downloaded using the integrated tool from the command line. In order to download and extract the mentioned component, on Linux, you need to install p7zip or p7zip-full, or if you want to run the bot on Windows, 7Zip must be installed;
-* If you are going to use Linux as your main system for a bot, you will need pulseaudio and libmpv  to route and play audio, but if you re using Windows, PulseAudio is not available, so you will need a virtual audio cable driver, such as VBCable and of course, the mpv player library must also be installed. on Windows this library can be installed using an integrated tool. On Debian-based systems the required package is libmpv1.
+> **Note:** This repository is a fork of the [original TTMediaBot](https://github.com/gumerov-amir/TTMediaBot).
 
-### Installation
-* Download TTMediaBot;
-* install all python requirements from requirements.txt, using the "pip3 install -r requirements.txt" or just "pip install -r requirements.txt" command, without quotes;;
-* Run ttsdk_downloader.py from the tools folder;
-* If you're using Windows run libmpv_win_downloader.py from the tools folder;
-* Copy or rename config_default.json to config.json;
-* Fill in all required fields in config.json (Config description will be there later);
-* On Linux run TTMediaBot.sh --devices to list all available devices and their numbers;
-* On Windows run TTMediaBot.py --devices to list all available devices with their numbers;
-* Edit config.json (change device numbers appropriately for your purposes);
+A feature-rich media streaming bot for TeamTalk 5, capable of playing music from various services (YouTube, YouTube Music, local files, URLs) with advanced control features.
 
-### Usage
-* On Linux run ./TTMediaBot.sh;
-* On Windows run python TTMediaBot.py directly.
+## 🚀 Easy Installation (Recommended)
 
-### Running in Docker
-You can also run the bot in a Docker container.
-First of all, You should build an image from the provided Dockerfile:
-```sh
-docker build -t ttmediabot .
-```
-Note: The first run could take some time.
+This script will install Git (if needed), clone the repository, and automatically launch the Docker manager to complete the installation.
 
-Then you can run the Docker container with the following command:
-```sh
-docker run --rm --name ttmb_1 -dv <path/to/data/directory>:/home/ttbot/data ttmediabot
-```
-<path/to/data/directory> here means a directory where config.json file will be stored. It should not contain any other unrelated data.
-The cache and  log files will be stored in the specified directory.
+1.  **Download and run the installer:**
+    ```bash
+    wget https://raw.githubusercontent.com/JoaoDEVWHADS/TTMediaBot/master/install_git_clone.sh
+    sudo chmod +x install_git_clone.sh
+    sudo ./install_git_clone.sh
+    ```
 
-## Startup options
-* --devices - Shows the list of all available input and output audio devices;
-* -c PATH - Sets the path to the configuration file.
+2.  **Follow the on-screen menu:**
+    *   Select **Install Dependencies** (if you don't have Docker).
+    *   The script will then guide you through creating your first bot.
+    *   You can manage multiple bots, update code, and change configurations all from within this menu.
 
-## Config file options
-* language - Sets the bot's interface language. Warning! to select a language you need an appropriate language folder inside the "locale" folder;
-* sound devices - Here you have to enter audio device numbers. Devices should be connected to each other (like Virtual audio cable or pulseaudio);
-* player - This section sets the configuration for the player such as default volume, maximum volume, etc;
-* teamtalk - here are main options for bot to connect and login to your TeamTalk server;
-* Services - Here you should configure available services for music search and playback;
-* logger - Here you can configure various logging related options.
+---
 
-## Pulse audio or VB cable settings
-### Linux variant
-* Install pulseaudio.
-* type $pulseaudio --start
-* Next command creates null sink and this sink can be monitored by default pulse input device.
-$pacmd load-module module-null-sink
-* then run ./TTMediaBot.sh --devices and check its numbers.
-output should be null audio output, input should be pulse.
-* put this numbers to your config.json.
+## 🎮 Commands
 
-### windows variant
-* install VB-cable, run "TTMediaBot.py --devices" and check numbers of VB-cable devices
-* put this numbers to your config.json.
+Send these commands to the bot via private message (PM) or in the channel (if enabled).
 
-## Some notes about the Windows variant
-* When listing input and output devices in the Windows variant of TTMediaBot, please note, that the input device will be doubled, i.e., if the output device is line 1 with number 3, the input device for line 1 will be listed twice, at number 5 and, for example, at number 7.
-* The correct number will be the last one as input, that is, if we selected the output as line 1 with the number 3, the input device would be line 1 with number 7 of the two options, number 5 and number 7.
-* The same method applies to all numbers and all Input / Outputs.
+### User Commands
+| Command | Arguments | Description |
+| :--- | :--- | :--- |
+| **h** | | Shows command help. |
+| **p** | `[query]` | Plays tracks found for query. If no query, pauses/resumes. |
+| **u** | `[url]` | Plays a stream/file from a direct URL. |
+| **s** | | Stops playback. |
+| **n** | | Plays the next track. |
+| **b** | | Plays the previous track. |
+| **v** | `[0-100]` | Sets volume. No arg shows current volume. |
+| **sb** | `[seconds]` | Seeks backward. Default step if no arg. |
+| **sf** | `[seconds]` | Seeks forward. Default step if no arg. |
+| **c** | `[number]` | Selects a track by number from search results. |
+| **m** | `[mode]` | Sets playback mode: `SingleTrack`, `RepeatTrack`, `TrackList`, `RepeatTrackList`, `Random`. |
+| **sp** | `[0.25-4]` | Sets playback speed. |
+| **sv** | `[service]` | Switches service (e.g., `sv yt`, `sv ytm`). |
+| **f** | `[+/-][num]` | Favorites management. `f` lists. `f +` adds current. `f -` removes. `f [num]` plays. |
+| **gl** | | Gets a direct link to the current track. |
+| **dl** | | Downloads current track and uploads to channel. |
+| **r** | `[number]` | Plays from Recents. `r` lists recents. |
+| **jc** | | Makes the bot join your current channel. |
+| **a** | | Shows about info. |
 
-# support us
-* yoomoney: https://yoomoney.ru/to/4100117354062028
+### Admin Commands
+*Requires admin privileges defined in `config.json`.*
 
-# contacts
-* telegram channel: https://t.me/TTMediaBot_chat
-* E-mail: TTMediaBot@gmail.com
+| Command | Arguments | Description |
+| :--- | :--- | :--- |
+| **cg** | `[n/m/f]` | Changes bot gender. |
+| **cl** | `[code]` | Changes language (e.g., `en`, `ru`, `pt_BR`). |
+| **cn** | `[name]` | Changes bot nickname. |
+| **cs** | `[text]` | Changes bot status text. |
+| **cc** | `[r/f]` | Clears cache (`r`=recents, `f`=favorites). |
+| **cm** | | Toggles sending channel messages. |
+| **ajc** | `[id] [pass]` | Force join channel by ID. |
+| **bc** | `[+/-cmd]` | Blocks/Unblocks a command. |
+| **l** | | Locks/Unlocks the bot (only admins can use it). |
+| **ua** | `[+/-user]` | Adds/Removes admin users. |
+| **ub** | `[+/-user]` | Adds/Removes banned users. |
+| **eh** | | Toggles internal event handling. |
+| **sc** | | Saves current configuration to file. |
+| **va** | | Toggles voice transmission. |
+| **rs** | | Restarts the bot. |
+| **q** | | Quits the bot. |
+| **gcid** | | Gets the current channel ID. |
+
+
