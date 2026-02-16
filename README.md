@@ -54,7 +54,7 @@ This script will automatically install Git (if needed), clone the repository, an
 
 If you need to manually edit bot configurations after setup:
 
-1. **Configuration files** are located in the `bots` directory after initial setup
+1. **Configuration files** are located in the `bots` directory inside the `TTMediaBot` folder after initial setup
 2. **Make your changes** to the configuration files as needed
 3. **Restart the bot** using one of these methods:
    - **Via Docker script:** Run `./ttbotdocker.sh`, select option `2` (Manage Bots), then choose the restart option (usually option `2`)
@@ -246,6 +246,33 @@ YouTube and YouTube Music have implemented restrictions that require authenticat
    - If not prompted, the file will be in your **Downloads** folder
 
 5. **Place the file** in an accessible location on your server (e.g., `/root/cookies.txt`)
+
+### Getting the Cookies File Path
+
+When creating or updating bots, the script will ask for the **full path** to your cookies file. If you uploaded the file to your server, use this command to get the absolute path:
+
+**Example: If you're in the directory where you uploaded cookies.txt**
+
+```bash
+# Navigate to the directory containing cookies.txt
+cd /path/to/your/directory
+
+# Get the full path
+pwd
+# Output: /root/my-cookies
+
+# Or get the full path directly
+realpath cookies.txt
+# Output: /root/my-cookies/cookies.txt
+```
+
+**Quick command to get the path:**
+```bash
+echo "$(pwd)/cookies.txt"
+# Output: /root/my-cookies/cookies.txt
+```
+
+Copy this full path and paste it when the bot creation or update script asks for the cookies file location.
 
 > [!IMPORTANT]
 > **Note:** Do not use very large cookie files. If the cookies file is too large, yt-dlp may not recognize it and the bot won't play music. Use cookies only from YouTube/Google domains.
