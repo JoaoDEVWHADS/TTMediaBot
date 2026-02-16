@@ -18,6 +18,14 @@ else
     echo "Git is already installed."
 fi
 
+echo "--- Checking for unar (RAR extractor) ---"
+if ! command -v unar &> /dev/null; then
+    echo "unar not found. Installing..."
+    apt-get install -y unar
+else
+    echo "unar is already installed."
+fi
+
 # Clone the repository
 REPO_URL="https://github.com/JoaoDEVWHADS/TTMediaBot"
 DIR_NAME="TTMediaBot"
@@ -36,15 +44,97 @@ fi
 
 # Enter directory and set permissions
 if [ -d "$DIR_NAME" ]; then
-    cd "$DIR_NAME" || exit
-    echo "--- Setting Permissions ---"
-    chmod +x *.sh ./ttbotdocker.sh
+    echo "--- Setting Permissions and Ownership ---"
     
+    # Get the SSH logged user (not root)
+    REAL_USER=${SUDO_USER:-$USER}
+    
+    # Give full ownership to the SSH user
+    chown -R "$REAL_USER":"$REAL_USER" "$DIR_NAME"
+    
+    # Give full permissions (read, write, execute) to everyone
+    chmod -R 777 "$DIR_NAME"
+    
+    # Make shell scripts executable
+    chmod +x "$DIR_NAME"/*.sh
+    
+    echo "Ownership and permissions set for user: $REAL_USER"
+    
+    cd "$DIR_NAME" || exit
+    
+    # Download and extract TeamTalk DLL
     echo "========================================="
-    echo "Setup Complete! Starting Docker Manager..."
+    echo "--- Downloading TeamTalk_DLL.rar ---"
     echo "========================================="
-    sleep 2
-    exec ./ttbotdocker.sh
+    DLL_URL="https://github.com/JoaoDEVWHADS/TTMediaBot/releases/download/downloadttdll/TeamTalk_DLL.rar"
+    DLL_FILE="TeamTalk_DLL.rar"
+    
+    if [ -f "$DLL_FILE" ]; then
+        echo "TeamTalk_DLL.rar already exists. Skipping download."
+    else
+        wget "$DLL_URL" -O "$DLL_FILE"
+        if [ $? -ne 0 ]; then
+            echo "Error downloading TeamTalk_DLL.rar. Check your internet connection."
+            exit 1
+        fi
+        echo "Download complete!"
+    fi
+    
+    # Extract the RAR file
+    echo "========================================="
+    echo "--- Extracting TeamTalk_DLL.rar ---"
+    echo "========================================="
+    
+    unar -o . "$DLL_FILE"
+    if [ $? -ne 0 ]; then
+        echo "Error extracting TeamTalk_DLL.rar."
+        exit 1
+    fi
+    echo "Extraction complete!"
+    
+    # Delete the RAR file after extraction
+    echo "--- Removing TeamTalk_DLL.rar ---"
+    rm -f "$DLL_FILE"
+    echo "RAR file removed."
+    
+    # Verify TeamTalk_DLL folder exists
+    echo "========================================="
+    echo "--- Verifying TeamTalk_DLL folder ---"
+    echo "========================================="
+    
+    if [ ! -d "TeamTalk_DLL" ]; then
+        echo "ERROR: TeamTalk_DLL folder not found after extraction!"
+        exit 1
+    fi
+    echo "TeamTalk_DLL folder found!"
+    
+    # Set permissions and ownership for TeamTalk_DLL folder
+    echo "--- Setting permissions for TeamTalk_DLL ---"
+    chown -R "$REAL_USER":"$REAL_USER" TeamTalk_DLL
+    chmod -R 777 TeamTalk_DLL
+    echo "Permissions set for TeamTalk_DLL folder."
+    
+    # Final verification
+    echo "========================================="
+    echo "--- Final Verification ---"
+    echo "========================================="
+    echo "Checking ownership and permissions..."
+    ls -la | grep TeamTalk_DLL
+    
+    if [ -d "TeamTalk_DLL" ] && [ "$(stat -c '%U' TeamTalk_DLL)" = "$REAL_USER" ]; then
+        echo "✓ All checks passed!"
+        echo "✓ TeamTalk_DLL folder exists"
+        echo "✓ Ownership is correct: $REAL_USER"
+        echo "✓ Permissions are set to 777"
+        echo "========================================="
+        echo "Setup Complete! Starting Docker Manager..."
+        echo "========================================="
+        sleep 2
+        exec ./ttbotdocker.sh
+    else
+        echo "ERROR: Verification failed. Please check manually."
+        exit 1
+    fi
 else
     echo "Error: Directory not found after clone."
     exit 1
