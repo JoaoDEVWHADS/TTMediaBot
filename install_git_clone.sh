@@ -18,12 +18,12 @@ else
     echo "Git is already installed."
 fi
 
-echo "--- Checking for unar (RAR extractor) ---"
-if ! command -v unar &> /dev/null; then
-    echo "unar not found. Installing..."
-    apt-get install -y unar
+echo "--- Checking for unzip (ZIP extractor) ---"
+if ! command -v unzip &> /dev/null; then
+    echo "unzip not found. Installing..."
+    apt-get install -y unzip
 else
-    echo "unar is already installed."
+    echo "unzip is already installed."
 fi
 
 # Clone the repository
@@ -64,38 +64,38 @@ if [ -d "$DIR_NAME" ]; then
     
     # Download and extract TeamTalk DLL
     echo "========================================="
-    echo "--- Downloading TeamTalk_DLL.rar ---"
+    echo "--- Downloading TeamTalk_DLL.zip ---"
     echo "========================================="
-    DLL_URL="https://github.com/JoaoDEVWHADS/TTMediaBot/releases/download/downloadttdll/TeamTalk_DLL.rar"
-    DLL_FILE="TeamTalk_DLL.rar"
+    DLL_URL="https://github.com/JoaoDEVWHADS/TTMediaBot/releases/download/downloadttdll/TeamTalk_DLL.zip"
+    DLL_FILE="TeamTalk_DLL.zip"
     
     if [ -f "$DLL_FILE" ]; then
-        echo "TeamTalk_DLL.rar already exists. Skipping download."
+        echo "TeamTalk_DLL.zip already exists. Skipping download."
     else
         wget "$DLL_URL" -O "$DLL_FILE"
         if [ $? -ne 0 ]; then
-            echo "Error downloading TeamTalk_DLL.rar. Check your internet connection."
+            echo "Error downloading TeamTalk_DLL.zip. Check your internet connection."
             exit 1
         fi
         echo "Download complete!"
     fi
     
-    # Extract the RAR file
+    # Extract the ZIP file
     echo "========================================="
-    echo "--- Extracting TeamTalk_DLL.rar ---"
+    echo "--- Extracting TeamTalk_DLL.zip ---"
     echo "========================================="
     
-    unar -o . "$DLL_FILE"
+    unzip -o "$DLL_FILE"
     if [ $? -ne 0 ]; then
-        echo "Error extracting TeamTalk_DLL.rar."
+        echo "Error extracting TeamTalk_DLL.zip."
         exit 1
     fi
     echo "Extraction complete!"
     
-    # Delete the RAR file after extraction
-    echo "--- Removing TeamTalk_DLL.rar ---"
+    # Delete the ZIP file after extraction
+    echo "--- Removing TeamTalk_DLL.zip ---"
     rm -f "$DLL_FILE"
-    echo "RAR file removed."
+    echo "ZIP file removed."
     
     # Verify TeamTalk_DLL folder exists
     echo "========================================="
