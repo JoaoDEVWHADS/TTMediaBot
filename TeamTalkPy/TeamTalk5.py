@@ -1,35 +1,14 @@
-# Copyright (c) 2005-2018, BearWare.dk
-#
-# Contact Information:
-#
-# Bjoern D. Rasmussen
-# Kirketoften 5
-# DK-8260 Viby J
-# Denmark
-# Email: contact@bearware.dk
-# Phone: +45 20 20 54 59
-# Web: http://www.bearware.dk
-#
-# This source code is part of the TeamTalk SDK owned by
-# BearWare.dk. Use of this file, or its compiled unit, requires a
-# TeamTalk SDK License Key issued by BearWare.dk.
-#
-# The TeamTalk SDK License Agreement along with its Terms and
-# Conditions are outlined in the file License.txt included with the
-# TeamTalk SDK distribution.
-
 import sys
 import os
 import ctypes
-from ctypes import cdll, c_int, c_char, c_wchar, c_wchar_p, c_char_p, \
-                   c_longlong, c_uint, c_float, c_void_p, c_uint16, \
-                   Structure, Union, POINTER, byref
+from time import sleep
+from enum import IntEnum
+from ctypes import *
+from ctypes.util import find_library
 
 if sys.platform == "win32":
     if (sys.version_info.major == 3 and sys.version_info.minor >= 8):
         os.add_dll_directory(os.getcwd())
-        # Path relative to TeamTalk SDK's DLL location
-        os.add_dll_directory(os.path.dirname(os.path.abspath(__file__)) + "\\..\\TeamTalk_DLL")
     dll = cdll.TeamTalk5
     TTCHAR = c_wchar
     TTCHAR_P = c_wchar_p
@@ -59,33 +38,9 @@ TT_SAMPLERATES_MAX = 16
 _TTInstance = c_void_p
 _TTSoundLoop = c_void_p
 
-# Encode string to UTF-8. Encoding on Windows is not necessary since
-# string to and from TeamTalk5.dll are UTF-16.
-def ttstr(ttchar_p_str: TTCHAR_P) -> str:
-
-    if sys.platform == "win32":
-        return ttchar_p_str
-
-    if isinstance(ttchar_p_str, bytes):
-        return str(ttchar_p_str, encoding = 'utf-8')
-    if isinstance(ttchar_p_str, str):
-        return ttchar_p_str.encode('utf-8')
-    return ttchar_p_str
+# make functionfactory accepting functionname, restype, argtypes
 
 # bindings
-class StreamType(UINT32):
-    STREAMTYPE_NONE = 0x00000000
-    STREAMTYPE_VOICE = 0x00000001
-    STREAMTYPE_VIDEOCAPTURE = 0x00000002
-    STREAMTYPE_MEDIAFILE_AUDIO = 0x00000004
-    STREAMTYPE_MEDIAFILE_VIDEO = 0x00000008
-    STREAMTYPE_DESKTOP = 0x00000010
-    STREAMTYPE_DESKTOPINPUT = 0x00000020
-    STREAMTYPE_MEDIAFILE = STREAMTYPE_MEDIAFILE_AUDIO | STREAMTYPE_MEDIAFILE_VIDEO
-    STREAMTYPE_CHANNELMSG = 0x00000040
-    STREAMTYPE_LOCALMEDIAPLAYBACK_AUDIO = 0x00000080
-    STREAMTYPE_CLASSROOM_ALL = STREAMTYPE_VOICE | STREAMTYPE_VIDEOCAPTURE | STREAMTYPE_DESKTOP | STREAMTYPE_MEDIAFILE | STREAMTYPE_CHANNELMSG
-
 class SoundSystem(INT32):
     SOUNDSYSTEM_NONE = 0
     SOUNDSYSTEM_WINMM = 1
@@ -95,7 +50,6 @@ class SoundSystem(INT32):
     SOUNDSYSTEM_WASAPI = 5
     SOUNDSYSTEM_OPENSLES_ANDROID = 7
     SOUNDSYSTEM_AUDIOUNIT = 8
-    SOUNDSYSTEM_PULSEAUDIO = 10
 
 class SoundDeviceFeature(UINT32):
     SOUNDDEVICEFEATURE_NONE = 0x0000
@@ -124,14 +78,6 @@ class SoundDevice(Structure):
     def __init__(self):
         assert(DBG_SIZEOF(TTType.SOUNDDEVICE) == ctypes.sizeof(SoundDevice))
 
-TT_SOUNDDEVICE_ID_SHARED_FLAG           = 0x00000800
-TT_SOUNDDEVICE_ID_MASK                  = 0x000007FF
-TT_SOUNDDEVICE_ID_REMOTEIO              = 0
-TT_SOUNDDEVICE_ID_VOICEPREPROCESSINGIO  = (1 | TT_SOUNDDEVICE_ID_SHARED_FLAG)
-TT_SOUNDDEVICE_ID_OPENSLES_DEFAULT      = 0
-TT_SOUNDDEVICE_ID_OPENSLES_VOICECOM     = 1
-TT_SOUNDDEVICE_ID_TEAMTALK_VIRTUAL      = 1978
-
 class SoundDeviceEffects(Structure):
     _fields_ = [
     ("bEnableAGC", BOOL),
@@ -159,14 +105,9 @@ class AudioBlock(Structure):
     ("lpRawAudio", c_void_p),
     ("nSamples", INT32),
     ("uSampleIndex", UINT32),
-    ("uStreamTypes", UINT32),
     ]
     def __init__(self):
         assert(DBG_SIZEOF(TTType.AUDIOBLOCK) == ctypes.sizeof(AudioBlock))
-
-TT_LOCAL_USERID     = 0
-TT_LOCAL_TX_USERID  = 0x1002
-TT_MUXED_USERID     = 0x1001
 
 class MediaFileStatus(INT32):
     MFS_CLOSED = 0
@@ -186,7 +127,6 @@ class AudioFileFormat(INT32):
     AFF_MP3_64KBIT_FORMAT = 5
     AFF_MP3_128KBIT_FORMAT = 6
     AFF_MP3_256KBIT_FORMAT = 7
-    AFF_MP3_320KBIT_FORMAT = 8
 
 class AudioFormat(Structure):
     _fields_ = [
@@ -347,15 +287,6 @@ class SpeexDSP(Structure):
     def __init__(self):
         assert(DBG_SIZEOF(TTType.SPEEXDSP) == ctypes.sizeof(SpeexDSP))
 
-class TTAudioPreprocessor(Structure):
-    _fields_ = [
-    ("nGainLevel", INT32),
-    ("bMuteLeftSpeaker", BOOL),
-    ("bMuteRightSpeaker", BOOL)
-    ]
-    def __init__(self):
-        assert(DBG_SIZEOF(TTType.TTAUDIOPREPROCESSOR) == ctypes.sizeof(TTAudioPreprocessor))
-
 class WebRTCAudioPreprocessor(Structure):
     _fields_ = [
         ("preamplifier_bEnable", BOOL),
@@ -375,6 +306,15 @@ class WebRTCAudioPreprocessor(Structure):
     ]
     def __init__(self):
         assert(DBG_SIZEOF(TTType.WEBRTCAUDIOPREPROCESSOR) == ctypes.sizeof(WebRTCAudioPreprocessor))
+
+class TTAudioPreprocessor(Structure):
+    _fields_ = [
+    ("nGainLevel", INT32),
+    ("bMuteLeftSpeaker", BOOL),
+    ("bMuteRightSpeaker", BOOL)
+    ]
+    def __init__(self):
+        assert(DBG_SIZEOF(TTType.TTAUDIOPREPROCESSOR) == ctypes.sizeof(TTAudioPreprocessor))
 
 class AudioPreprocessorType(INT32):
     NO_AUDIOPREPROCESSOR = 0
@@ -483,8 +423,6 @@ class MediaFilePlayback(Structure):
     def __init__(self):
         assert(DBG_SIZEOF(TTType.MEDIAFILEPLAYBACK) == ctypes.sizeof(MediaFilePlayback))
 
-TT_MEDIAPLAYBACK_OFFSET_IGNORE = 0xFFFFFFFF
-
 class AudioInputProgress(Structure):
     _fields_ = [
     ("nStreamID", INT32),
@@ -492,7 +430,19 @@ class AudioInputProgress(Structure):
     ("uElapsedMSec", UINT32)
     ]
     def __init__(self):
-        assert(DBG_SIZEOF(TTType.AUDIOINPUTPROGRESS) == ctypes.sizeof(AudioInputProgress))
+        assert(DBG_SIZEOF(TTType.AudioInputProgress) == ctypes.sizeof(AudioInputProgress))
+
+class StreamType(UINT32):
+    STREAMTYPE_NONE = 0x00000000
+    STREAMTYPE_VOICE = 0x00000001
+    STREAMTYPE_VIDEOCAPTURE = 0x00000002
+    STREAMTYPE_MEDIAFILE_AUDIO = 0x00000004
+    STREAMTYPE_MEDIAFILE_VIDEO = 0x00000008
+    STREAMTYPE_DESKTOP = 0x00000010
+    STREAMTYPE_DESKTOPINPUT = 0x00000020
+    STREAMTYPE_MEDIAFILE = STREAMTYPE_MEDIAFILE_AUDIO | STREAMTYPE_MEDIAFILE_VIDEO
+    STREAMTYPE_CHANNELMSG = 0x00000040
+    STREAMTYPE_CLASSROOM_ALL = STREAMTYPE_VOICE | STREAMTYPE_VIDEOCAPTURE | STREAMTYPE_DESKTOP | STREAMTYPE_MEDIAFILE | STREAMTYPE_CHANNELMSG
 
 class UserRight(UINT32):
     USERRIGHT_NONE = 0x00000000
@@ -519,36 +469,6 @@ class UserRight(UINT32):
     USERRIGHT_LOCKED_STATUS = 0x00080000
     USERRIGHT_RECORD_VOICE = 0x00100000
     USERRIGHT_VIEW_HIDDEN_CHANNELS = 0x00200000
-    USERRIGHT_TEXTMESSAGE_USER = 0x00400000
-    USERRIGHT_TEXTMESSAGE_CHANNEL = 0x00800000
-
-class ServerLogEvent(UINT32):
-    SERVERLOGEVENT_NONE = 0x00000000
-    SERVERLOGEVENT_USER_CONNECTED = 0x00000001
-    SERVERLOGEVENT_USER_DISCONNECTED = 0x00000002
-    SERVERLOGEVENT_USER_LOGGEDIN = 0x00000004
-    SERVERLOGEVENT_USER_LOGGEDOUT = 0x00000008
-    SERVERLOGEVENT_USER_LOGINFAILED = 0x00000010
-    SERVERLOGEVENT_USER_TIMEDOUT = 0x00000020
-    SERVERLOGEVENT_USER_KICKED = 0x00000040
-    SERVERLOGEVENT_USER_BANNED = 0x00000080
-    SERVERLOGEVENT_USER_UNBANNED = 0x00000100
-    SERVERLOGEVENT_USER_UPDATED = 0x00000200
-    SERVERLOGEVENT_USER_JOINEDCHANNEL = 0x00000400
-    SERVERLOGEVENT_USER_LEFTCHANNEL = 0x00000800
-    SERVERLOGEVENT_USER_MOVED = 0x00001000
-    SERVERLOGEVENT_USER_TEXTMESSAGE_PRIVATE = 0x00002000
-    SERVERLOGEVENT_USER_TEXTMESSAGE_CUSTOM = 0x00004000
-    SERVERLOGEVENT_USER_TEXTMESSAGE_CHANNEL = 0x00008000
-    SERVERLOGEVENT_USER_TEXTMESSAGE_BROADCAST = 0x00010000
-    SERVERLOGEVENT_CHANNEL_CREATED = 0x00020000
-    SERVERLOGEVENT_CHANNEL_UPDATED = 0x00040000
-    SERVERLOGEVENT_CHANNEL_REMOVED = 0x00080000
-    SERVERLOGEVENT_FILE_UPLOADED = 0x00100000
-    SERVERLOGEVENT_FILE_DOWNLOADED = 0x00200000
-    SERVERLOGEVENT_FILE_DELETED = 0x00400000
-    SERVERLOGEVENT_SERVER_UPDATED = 0x00800000
-    SERVERLOGEVENT_SERVER_SAVECONFIG = 0x01000000
 
 class ServerProperties(Structure):
     _fields_ = [
@@ -571,7 +491,6 @@ class ServerProperties(Structure):
     ("szServerProtocolVersion", TTCHAR*TT_STRLEN),
     ("nLoginDelayMSec", INT32),
     ("szAccessToken", TTCHAR*TT_STRLEN),
-    ("uServerLogEvents", UINT32),
     ]
     def __init__(self):
         assert(DBG_SIZEOF(TTType.SERVERPROPERTIES) == ctypes.sizeof(ServerProperties))
@@ -610,8 +529,7 @@ class BannedUser(Structure):
     ("szBanTime", TTCHAR*TT_STRLEN),
     ("szNickname", TTCHAR*TT_STRLEN),
     ("szUsername", TTCHAR*TT_STRLEN),
-    ("uBanTypes", UINT32),
-    ("szOwner", TTCHAR*TT_STRLEN)
+    ("uBanTypes", UINT32)
     ]
     def __init__(self):
         assert(DBG_SIZEOF(TTType.BANNEDUSER) == ctypes.sizeof(BannedUser))
@@ -640,8 +558,7 @@ class UserAccount(Structure):
     ("szInitChannel", TTCHAR*TT_STRLEN),
     ("autoOperatorChannels", INT32*TT_CHANNELS_OPERATOR_MAX),
     ("nAudioCodecBpsLimit", INT32),
-    ("abusePrevent", AbusePrevention),
-    ("szLastModified", TTCHAR*TT_STRLEN),
+    ("abusePrevent", AbusePrevention)
     ]
     def __init__(self):
         assert(DBG_SIZEOF(TTType.USERACCOUNT) == ctypes.sizeof(UserAccount))
@@ -727,7 +644,6 @@ class UserStatistics(Structure):
         assert(DBG_SIZEOF(TTType.USERSTATISTICS) == ctypes.sizeof(UserStatistics))
 
 class TextMsgType(INT32):
-    MSGTYPE_NONE = 0
     MSGTYPE_USER = 1
     MSGTYPE_CHANNEL = 2
     MSGTYPE_BROADCAST = 3
@@ -741,7 +657,6 @@ class TextMessage(Structure):
     ("nToUserID", INT32),
     ("nChannelID", INT32),
     ("szMessage", TTCHAR*TT_STRLEN),
-    ("bMore", BOOL),
     ]
     def __init__(self):
         assert(DBG_SIZEOF(TTType.TEXTMESSAGE) == ctypes.sizeof(TextMessage))
@@ -772,10 +687,7 @@ class Channel(Structure):
     ("audiocodec", AudioCodec),
     ("audiocfg", AudioConfig),
     ("transmitUsers", (INT32*2)*TT_TRANSMITUSERS_MAX),
-    ("transmitUsersQueue", INT32*TT_TRANSMITQUEUE_MAX),
-    ("nTransmitUsersQueueDelayMSec", INT32),
-    ("nTimeOutTimerVoiceMSec", INT32),
-    ("nTimeOutTimerMediaFileMSec", INT32),
+    ("transmitUsersQueue", INT32*TT_TRANSMITQUEUE_MAX)
     ]
     def __init__(self):
         assert(DBG_SIZEOF(TTType.CHANNEL) == ctypes.sizeof(Channel))
@@ -806,8 +718,7 @@ class RemoteFile(Structure):
     ("nFileID", INT32),
     ("szFileName", TTCHAR*TT_STRLEN),
     ("nFileSize", INT64),
-    ("szUsername", TTCHAR*TT_STRLEN),
-    ("szUploadTime", TTCHAR*TT_STRLEN)
+    ("szUsername", TTCHAR*TT_STRLEN)
     ]
     def __init__(self):
         assert(DBG_SIZEOF(TTType.REMOTEFILE) == ctypes.sizeof(RemoteFile))
@@ -866,7 +777,7 @@ class JitterConfig(Structure):
     ("nActiveAdaptiveDelayMSec", INT32)
     ]
     def __init__(self):
-        assert(DBG_SIZEOF(TTType.JITTERCONFIG) == ctypes.sizeof(JitterConfig))
+        assert(DBG_SIZEOF(TTType.JitterConfig) == ctypes.sizeof(JitterConfig))
 
 class ClientError(INT32):
     CMDERR_SUCCESS = 0
@@ -889,7 +800,6 @@ class ClientError(INT32):
     CMDERR_MAX_CHANNELS_EXCEEDED = 2013
     CMDERR_COMMAND_FLOOD = 2014
     CMDERR_CHANNEL_BANNED = 2015
-    CMDERR_MAX_FILETRANSFERS_EXCEEDED = 2016
     CMDERR_NOT_LOGGEDIN = 3000
     CMDERR_ALREADY_LOGGEDIN = 3001
     CMDERR_NOT_IN_CHANNEL = 3002
@@ -925,7 +835,6 @@ class ClientErrorMsg(Structure):
 class ClientEvent(UINT32):
     CLIENTEVENT_NONE = 0
     CLIENTEVENT_CON_SUCCESS = CLIENTEVENT_NONE + 10
-    CLIENTEVENT_CON_CRYPT_ERROR = CLIENTEVENT_NONE + 15
     CLIENTEVENT_CON_FAILED = CLIENTEVENT_NONE + 20
     CLIENTEVENT_CON_LOST = CLIENTEVENT_NONE + 30
     CLIENTEVENT_CON_MAX_PAYLOAD_UPDATED = CLIENTEVENT_NONE + 40
@@ -950,8 +859,6 @@ class ClientEvent(UINT32):
     CLIENTEVENT_CMD_FILE_REMOVE = CLIENTEVENT_NONE + 380
     CLIENTEVENT_CMD_USERACCOUNT = CLIENTEVENT_NONE + 390
     CLIENTEVENT_CMD_BANNEDUSER  = CLIENTEVENT_NONE + 400
-    CLIENTEVENT_CMD_USERACCOUNT_NEW = CLIENTEVENT_NONE + 410
-    CLIENTEVENT_CMD_USERACCOUNT_REMOVE = CLIENTEVENT_NONE + 420
     CLIENTEVENT_USER_STATECHANGE = CLIENTEVENT_NONE + 500
     CLIENTEVENT_USER_VIDEOCAPTURE = CLIENTEVENT_NONE + 510
     CLIENTEVENT_USER_MEDIAFILE_VIDEO = CLIENTEVENT_NONE + 520
@@ -970,13 +877,6 @@ class ClientEvent(UINT32):
     CLIENTEVENT_LOCAL_MEDIAFILE = CLIENTEVENT_NONE + 1070
     CLIENTEVENT_AUDIOINPUT = CLIENTEVENT_NONE + 1080
     CLIENTEVENT_USER_FIRSTVOICESTREAMPACKET = CLIENTEVENT_NONE + 1090
-    CLIENTEVENT_SOUNDDEVICE_ADDED = CLIENTEVENT_NONE + 1100
-    CLIENTEVENT_SOUNDDEVICE_REMOVED = CLIENTEVENT_NONE + 1110
-    CLIENTEVENT_SOUNDDEVICE_UNPLUGGED = CLIENTEVENT_NONE + 1120
-    CLIENTEVENT_SOUNDDEVICE_NEW_DEFAULT_INPUT = CLIENTEVENT_NONE + 1130
-    CLIENTEVENT_SOUNDDEVICE_NEW_DEFAULT_OUTPUT = CLIENTEVENT_NONE + 1140
-    CLIENTEVENT_SOUNDDEVICE_NEW_DEFAULT_INPUT_COMDEVICE = CLIENTEVENT_NONE + 1150
-    CLIENTEVENT_SOUNDDEVICE_NEW_DEFAULT_OUTPUT_COMDEVICE = CLIENTEVENT_NONE + 1160
 
 # Underscore has special meaning in Python, so we remove it
 class TTType(INT32):
@@ -1024,9 +924,6 @@ class TTType(INT32):
     JITTERCONFIG = 41
     WEBRTCAUDIOPREPROCESSOR = 42
     ENCRYPTIONCONTEXT = 43
-    SOUNDDEVICEEFFECTS = 44
-    DESKTOPWINDOW = 45
-    ABUSEPREVENTION = 46
 
 class TTMessageUnion(Union):
     _fields_ = [
@@ -1048,7 +945,6 @@ class TTMessageUnion(Union):
     ("nPayloadSize", INT32),
     ("nStreamType", INT32),
     ("audioinputprogress", AudioInputProgress),
-    ("sounddevice", SoundDevice),
     ("data", c_char*1)
     ]
 
@@ -1087,158 +983,420 @@ class ClientFlags(UINT32):
     CLIENT_STREAM_AUDIO = 0x00010000
     CLIENT_STREAM_VIDEO = 0x00020000
 
-def function_factory(func, signature):
-    func.restype = signature[0]
-    try:
-        func.argtypes = signature[1]
-    except IndexError:
-        pass
-    return func
-
-_GetVersion = function_factory(dll.TT_GetVersion, [TTCHAR_P])
-_InitTeamTalkPoll = function_factory(dll.TT_InitTeamTalkPoll, [_TTInstance])
-_CloseTeamTalk = function_factory(dll.TT_CloseTeamTalk, [BOOL, [_TTInstance]])
-_GetMessage = function_factory(dll.TT_GetMessage, [BOOL, [_TTInstance, POINTER(TTMessage), POINTER(INT32)]])
-_PumpMessage = function_factory(dll.TT_PumpMessage, [BOOL, [_TTInstance, ClientEvent, INT32]])
-_GetFlags = function_factory(dll.TT_GetFlags, [UINT32, [_TTInstance]])
-_SetLicenseInformation = function_factory(dll.TT_SetLicenseInformation, [BOOL, [TTCHAR_P, TTCHAR_P]])
-_GetDefaultSoundDevices = function_factory(dll.TT_GetDefaultSoundDevices, [BOOL, [POINTER(INT32), POINTER(INT32)]])
-_GetDefaultSoundDevicesEx = function_factory(dll.TT_GetDefaultSoundDevicesEx, [BOOL, [SoundSystem, POINTER(INT32), POINTER(INT32)]])
-_GetSoundDevices = function_factory(dll.TT_GetSoundDevices, [BOOL, [POINTER(SoundDevice), POINTER(INT32)]])
-_RestartSoundSystem = function_factory(dll.TT_RestartSoundSystem, [BOOL])
-_StartSoundLoopbackTest = function_factory(dll.TT_StartSoundLoopbackTest, [_TTSoundLoop, [INT32, INT32, INT32, INT32, BOOL, POINTER(SpeexDSP)]])
-_StartSoundLoopbackTestEx = function_factory(dll.TT_StartSoundLoopbackTestEx, [_TTSoundLoop, [INT32, INT32, INT32, INT32, BOOL, POINTER(AudioPreprocessor), POINTER(SoundDeviceEffects)]])
-_CloseSoundLoopbackTest = function_factory(dll.TT_CloseSoundLoopbackTest, [BOOL, [_TTSoundLoop]])
-_InitSoundInputDevice = function_factory(dll.TT_InitSoundInputDevice, [BOOL, [_TTInstance, INT32]])
-_InitSoundInputSharedDevice = function_factory(dll.TT_InitSoundInputSharedDevice, [BOOL, [INT32, INT32, INT32]])
-_InitSoundOutputDevice = function_factory(dll.TT_InitSoundOutputDevice, [BOOL, [_TTInstance, INT32]])
-_InitSoundOutputSharedDevice = function_factory(dll.TT_InitSoundOutputSharedDevice, [BOOL, [INT32, INT32, INT32]])
-_InitSoundDuplexDevices = function_factory(dll.TT_InitSoundDuplexDevices, [BOOL, [_TTInstance, INT32, INT32]])
-_CloseSoundInputDevice = function_factory(dll.TT_CloseSoundInputDevice, [BOOL, [_TTInstance]])
-_CloseSoundOutputDevice = function_factory(dll.TT_CloseSoundOutputDevice, [BOOL, [_TTInstance]])
-_CloseSoundDuplexDevices = function_factory(dll.TT_CloseSoundDuplexDevices, [BOOL, [_TTInstance]])
-_SetSoundDeviceEffects = function_factory(dll.TT_SetSoundDeviceEffects, [BOOL, [_TTInstance, POINTER(SoundDeviceEffects)]])
-_GetSoundDeviceEffects = function_factory(dll.TT_GetSoundDeviceEffects, [BOOL, [_TTInstance, POINTER(SoundDeviceEffects)]])
-_GetSoundInputLevel = function_factory(dll.TT_GetSoundInputLevel, [INT32, [_TTInstance]])
-_SetSoundInputGainLevel = function_factory(dll.TT_SetSoundInputGainLevel, [BOOL, [_TTInstance, INT32]])
-_GetSoundInputGainLevel = function_factory(dll.TT_GetSoundInputGainLevel, [INT32, [_TTInstance]])
-_SetSoundInputPreprocess = function_factory(dll.TT_SetSoundInputPreprocess, [BOOL, [_TTInstance, POINTER(SpeexDSP)]])
-_GetSoundInputPreprocess = function_factory(dll.TT_GetSoundInputPreprocess, [BOOL, [_TTInstance, POINTER(SpeexDSP)]])
-_SetSoundInputPreprocessEx = function_factory(dll.TT_SetSoundInputPreprocessEx, [BOOL, [_TTInstance, POINTER(AudioPreprocessor)]])
-_GetSoundInputPreprocessEx = function_factory(dll.TT_GetSoundInputPreprocessEx, [BOOL, [_TTInstance, POINTER(AudioPreprocessor)]])
-_SetSoundOutputVolume = function_factory(dll.TT_SetSoundOutputVolume, [BOOL, [_TTInstance, INT32]])
-_GetSoundOutputVolume = function_factory(dll.TT_GetSoundOutputVolume, [INT32, [_TTInstance]])
-_SetSoundOutputMute = function_factory(dll.TT_SetSoundOutputMute, [BOOL, [_TTInstance, BOOL]])
-_Enable3DSoundPositioning = function_factory(dll.TT_Enable3DSoundPositioning, [BOOL, [_TTInstance, BOOL]])
-_AutoPositionUsers = function_factory(dll.TT_AutoPositionUsers, [BOOL, [_TTInstance]])
-_EnableAudioBlockEvent = function_factory(dll.TT_EnableAudioBlockEvent, [BOOL, [_TTInstance, INT32, INT32, BOOL]])
-_EnableAudioBlockEventEx = function_factory(dll.TT_EnableAudioBlockEventEx, [BOOL, [_TTInstance, INT32, INT32, POINTER(AudioFormat), BOOL]])
-_InsertAudioBlock = function_factory(dll.TT_InsertAudioBlock, [BOOL, [_TTInstance, POINTER(AudioBlock)]])
-_EnableVoiceTransmission = function_factory(dll.TT_EnableVoiceTransmission, [BOOL, [_TTInstance, BOOL]])
-_EnableVoiceActivation = function_factory(dll.TT_EnableVoiceActivation, [BOOL, [_TTInstance, BOOL]])
-_SetVoiceActivationLevel = function_factory(dll.TT_SetVoiceActivationLevel, [BOOL, [_TTInstance, INT32]])
-_GetVoiceActivationLevel = function_factory(dll.TT_GetVoiceActivationLevel, [INT32, [_TTInstance]])
-_SetVoiceActivationStopDelay = function_factory(dll.TT_SetVoiceActivationStopDelay, [BOOL, [_TTInstance, INT32]])
-_GetVoiceActivationStopDelay = function_factory(dll.TT_GetVoiceActivationStopDelay, [INT32, [_TTInstance]])
-_StartRecordingMuxedAudioFile = function_factory(dll.TT_StartRecordingMuxedAudioFile, [BOOL, [_TTInstance, POINTER(AudioCodec), TTCHAR_P, UINT32]])
-_StartRecordingMuxedAudioFileEx = function_factory(dll.TT_StartRecordingMuxedAudioFileEx, [BOOL, [_TTInstance, INT32, TTCHAR_P, UINT32]])
-_StartRecordingMuxedStreams = function_factory(dll.TT_StartRecordingMuxedStreams, [BOOL, [_TTInstance, UINT32, POINTER(AudioCodec), TTCHAR_P, UINT32]])
-_StopRecordingMuxedAudioFile = function_factory(dll.TT_StopRecordingMuxedAudioFile, [BOOL, [_TTInstance]])
-_StopRecordingMuxedAudioFileEx = function_factory(dll.TT_StopRecordingMuxedAudioFileEx, [BOOL, [_TTInstance, INT32]])
-_StartVideoCaptureTransmission = function_factory(dll.TT_StartVideoCaptureTransmission, [BOOL, [_TTInstance, POINTER(VideoCodec)]])
-_StopVideoCaptureTransmission = function_factory(dll.TT_StopVideoCaptureTransmission, [BOOL, [_TTInstance]])
-_GetVideoCaptureDevices = function_factory(dll.TT_GetVideoCaptureDevices, [BOOL, [POINTER(VideoCaptureDevice), POINTER(INT32)]])
-_InitVideoCaptureDevice = function_factory(dll.TT_InitVideoCaptureDevice, [BOOL, [_TTInstance, TTCHAR_P, POINTER(VideoFormat)]])
-_CloseVideoCaptureDevice = function_factory(dll.TT_CloseVideoCaptureDevice, [BOOL, [_TTInstance]])
-_StartStreamingMediaFileToChannel = function_factory(dll.TT_StartStreamingMediaFileToChannel, [BOOL, [_TTInstance, TTCHAR_P, POINTER(VideoCodec)]])
-_StartStreamingMediaFileToChannelEx = function_factory(dll.TT_StartStreamingMediaFileToChannelEx, [BOOL, [_TTInstance, TTCHAR_P, POINTER(MediaFilePlayback), POINTER(VideoCodec)]])
-_UpdateStreamingMediaFileToChannel = function_factory(dll.TT_UpdateStreamingMediaFileToChannel, [BOOL, [_TTInstance, POINTER(MediaFilePlayback), POINTER(VideoCodec)]])
-_StopStreamingMediaFileToChannel = function_factory(dll.TT_StopStreamingMediaFileToChannel, [BOOL, [_TTInstance]])
-_InitLocalPlayback = function_factory(dll.TT_InitLocalPlayback, [INT32, [_TTInstance, TTCHAR_P, POINTER(MediaFilePlayback)]])
-_UpdateLocalPlayback = function_factory(dll.TT_UpdateLocalPlayback, [BOOL, [_TTInstance, INT32, POINTER(MediaFilePlayback)]])
-_StopLocalPlayback = function_factory(dll.TT_StopLocalPlayback, [BOOL, [_TTInstance, INT32]])
-_GetMediaFileInfo = function_factory(dll.TT_GetMediaFileInfo, [BOOL, [_TTInstance, TTCHAR_P, POINTER(MediaFileInfo)]])
-_SetEncryptionContext = function_factory(dll.TT_SetEncryptionContext, [BOOL, [_TTInstance, POINTER(EncryptionContext)]])
-_Connect = function_factory(dll.TT_Connect, [BOOL, [_TTInstance, TTCHAR_P, INT32, INT32, INT32, INT32, BOOL]])
-_ConnectSysID = function_factory(dll.TT_ConnectSysID, [BOOL, [_TTInstance, TTCHAR_P, INT32, INT32, INT32, INT32, BOOL, TTCHAR_P]])
-_ConnectEx = function_factory(dll.TT_ConnectEx, [BOOL, [_TTInstance, TTCHAR_P, INT32, INT32, TTCHAR_P, INT32, INT32, BOOL]])
-_Disconnect = function_factory(dll.TT_Disconnect, [BOOL, [_TTInstance]])
-_QueryMaxPayload = function_factory(dll.TT_QueryMaxPayload, [BOOL, [_TTInstance, INT32]])
-_GetClientStatistics = function_factory(dll.TT_GetClientStatistics, [BOOL, [_TTInstance, POINTER(ClientStatistics)]])
-_SetClientKeepAlive = function_factory(dll.TT_SetClientKeepAlive, [BOOL, [_TTInstance, POINTER(ClientKeepAlive)]])
-_GetClientKeepAlive = function_factory(dll.TT_GetClientKeepAlive, [BOOL, [_TTInstance, POINTER(ClientKeepAlive)]])
-_DoPing = function_factory(dll.TT_DoPing, [INT32, [_TTInstance]])
-_DoLogin = function_factory(dll.TT_DoLogin, [INT32, [_TTInstance, TTCHAR_P, TTCHAR_P, TTCHAR_P]])
-_DoLoginEx = function_factory(dll.TT_DoLoginEx, [INT32, [_TTInstance, TTCHAR_P, TTCHAR_P, TTCHAR_P, TTCHAR_P]])
-_DoLogout = function_factory(dll.TT_DoLogout, [INT32, [_TTInstance]])
-_DoJoinChannel = function_factory(dll.TT_DoJoinChannel, [INT32, [_TTInstance, POINTER(Channel)]])
-_DoJoinChannelByID = function_factory(dll.TT_DoJoinChannelByID, [INT32, [_TTInstance, INT32, TTCHAR_P]])
-_DoLeaveChannel = function_factory(dll.TT_DoLeaveChannel, [INT32, [_TTInstance]])
-_DoChangeNickname = function_factory(dll.TT_DoChangeNickname, [INT32, [_TTInstance, TTCHAR_P]])
-_DoChangeStatus = function_factory(dll.TT_DoChangeStatus, [INT32, [_TTInstance, INT32, TTCHAR_P]])
-_DoTextMessage = function_factory(dll.TT_DoTextMessage, [INT32, [_TTInstance, POINTER(TextMessage)]])
-_DoChannelOp = function_factory(dll.TT_DoChannelOp, [INT32, [_TTInstance, INT32, INT32, BOOL]])
-_DoChannelOpEx = function_factory(dll.TT_DoChannelOpEx, [INT32, [_TTInstance, INT32, INT32, TTCHAR_P, BOOL]])
-_DoKickUser = function_factory(dll.TT_DoKickUser, [INT32, [_TTInstance, INT32, INT32]])
-_DoSendFile = function_factory(dll.TT_DoSendFile, [INT32, [_TTInstance, INT32, TTCHAR_P]])
-_DoRecvFile = function_factory(dll.TT_DoRecvFile, [INT32, [_TTInstance, INT32, INT32, TTCHAR_P]])
-_DoDeleteFile = function_factory(dll.TT_DoDeleteFile, [INT32, [_TTInstance, INT32, INT32]])
-_DoSubscribe = function_factory(dll.TT_DoSubscribe, [INT32, [_TTInstance, INT32, UINT32]])
-_DoUnsubscribe = function_factory(dll.TT_DoUnsubscribe, [INT32, [_TTInstance, INT32, UINT32]])
-_DoMakeChannel = function_factory(dll.TT_DoMakeChannel, [INT32, [_TTInstance, POINTER(Channel)]])
-_DoUpdateChannel = function_factory(dll.TT_DoUpdateChannel, [INT32, [_TTInstance, POINTER(Channel)]])
-_DoRemoveChannel = function_factory(dll.TT_DoRemoveChannel, [INT32, [_TTInstance, INT32]])
-_DoMoveUser = function_factory(dll.TT_DoMoveUser, [INT32, [_TTInstance, INT32, INT32]])
-_DoUpdateServer = function_factory(dll.TT_DoUpdateServer, [INT32, [_TTInstance, POINTER(ServerProperties)]])
-_DoListUserAccounts = function_factory(dll.TT_DoListUserAccounts, [INT32, [_TTInstance, INT32, INT32]])
-_DoNewUserAccount = function_factory(dll.TT_DoNewUserAccount, [INT32, [_TTInstance, POINTER(UserAccount)]])
-_DoDeleteUserAccount = function_factory(dll.TT_DoDeleteUserAccount, [INT32, [_TTInstance, TTCHAR_P]])
-_DoBanUser = function_factory(dll.TT_DoBanUser, [INT32, [_TTInstance, INT32, INT32]])
-_DoBanUserEx = function_factory(dll.TT_DoBanUserEx, [INT32, [_TTInstance, INT32, UINT32]])
-_DoBan = function_factory(dll.TT_DoBan, [INT32, [_TTInstance, POINTER(BannedUser)]])
-_DoBanIPAddress = function_factory(dll.TT_DoBanIPAddress, [INT32, [_TTInstance, TTCHAR_P, INT32]])
-_DoUnBanUser = function_factory(dll.TT_DoUnBanUser, [INT32, [_TTInstance, TTCHAR_P, INT32]])
-_DoUnBanUserEx = function_factory(dll.TT_DoUnBanUserEx, [INT32, [_TTInstance, POINTER(BannedUser)]])
-_DoListBans = function_factory(dll.TT_DoListBans, [INT32, [_TTInstance, INT32, INT32, INT32]])
-_DoSaveConfig = function_factory(dll.TT_DoSaveConfig, [INT32, [_TTInstance]])
-_DoQueryServerStats = function_factory(dll.TT_DoQueryServerStats, [INT32, [_TTInstance]])
-_DoQuit = function_factory(dll.TT_DoQuit, [INT32, [_TTInstance]])
-_GetServerProperties = function_factory(dll.TT_GetServerProperties, [BOOL, [_TTInstance, POINTER(ServerProperties)]])
-_GetServerUsers = function_factory(dll.TT_GetServerUsers, [BOOL, [_TTInstance, POINTER(User), POINTER(INT32)]])
-_GetRootChannelID = function_factory(dll.TT_GetRootChannelID, [INT32, [_TTInstance]])
-_GetMyChannelID = function_factory(dll.TT_GetMyChannelID, [INT32, [_TTInstance]])
-_GetChannel = function_factory(dll.TT_GetChannel, [BOOL, [_TTInstance, INT32, POINTER(Channel)]])
-_GetChannelPath = function_factory(dll.TT_GetChannelPath, [BOOL, [_TTInstance, INT32, POINTER(TTCHAR*TT_STRLEN)]])
-_GetChannelIDFromPath = function_factory(dll.TT_GetChannelIDFromPath, [INT32, [_TTInstance, TTCHAR_P]])
-_GetChannelUsers = function_factory(dll.TT_GetChannelUsers, [BOOL, [_TTInstance, INT32, POINTER(User), POINTER(INT32)]])
-_GetChannelFiles = function_factory(dll.TT_GetChannelFiles, [BOOL, [_TTInstance, INT32, POINTER(RemoteFile), POINTER(INT32)]])
-_GetChannelFile = function_factory(dll.TT_GetChannelFile, [BOOL, [_TTInstance, INT32, INT32, POINTER(RemoteFile)]])
-_IsChannelOperator = function_factory(dll.TT_IsChannelOperator, [BOOL, [_TTInstance, INT32, INT32]])
-_GetServerChannels = function_factory(dll.TT_GetServerChannels, [BOOL, [_TTInstance, POINTER(Channel), POINTER(INT32)]])
-_GetMyUserID = function_factory(dll.TT_GetMyUserID, [INT32, [_TTInstance]])
-_GetMyUserAccount = function_factory(dll.TT_GetMyUserAccount, [BOOL, [_TTInstance, POINTER(UserAccount)]])
-_GetMyUserType = function_factory(dll.TT_GetMyUserType, [UINT32, [_TTInstance]])
-_GetMyUserRights = function_factory(dll.TT_GetMyUserRights, [UINT32, [_TTInstance]])
-_GetMyUserData = function_factory(dll.TT_GetMyUserData, [INT32, [_TTInstance]])
-_GetUser = function_factory(dll.TT_GetUser, [BOOL, [_TTInstance, INT32, POINTER(User)]])
-_GetUserStatistics = function_factory(dll.TT_GetUserStatistics, [BOOL, [_TTInstance, INT32, POINTER(UserStatistics)]])
-_GetUserByUsername = function_factory(dll.TT_GetUserByUsername, [BOOL, [_TTInstance, TTCHAR_P, POINTER(User)]])
-_SetUserVolume = function_factory(dll.TT_SetUserVolume, [BOOL, [_TTInstance, INT32, INT32, INT32]])
-_SetUserMute = function_factory(dll.TT_SetUserMute, [BOOL, [_TTInstance, INT32, INT32, BOOL, INT32]])
-_SetUserStoppedPlaybackDelay = function_factory(dll.TT_SetUserStoppedPlaybackDelay, [BOOL, [_TTInstance, INT32, INT32, INT32]])
-_SetUserJitterControl = function_factory(dll.TT_SetUserJitterControl, [BOOL, [_TTInstance, INT32, INT32, POINTER(JitterConfig)]])
-_GetUserJitterControl = function_factory(dll.TT_GetUserJitterControl, [BOOL, [_TTInstance, INT32, INT32, POINTER(JitterConfig)]])
-_SetUserPosition = function_factory(dll.TT_SetUserPosition, [BOOL, [_TTInstance, INT32, INT32, c_float, c_float, c_float]])
-_SetUserStereo = function_factory(dll.TT_SetUserStereo, [BOOL, [_TTInstance, INT32, INT32, BOOL, BOOL]])
-_SetUserMediaStorageDir = function_factory(dll.TT_SetUserMediaStorageDir, [BOOL, [_TTInstance, INT32, TTCHAR_P, TTCHAR_P, UINT32]])
-_SetUserMediaStorageDirEx = function_factory(dll.TT_SetUserMediaStorageDirEx, [BOOL, [_TTInstance, INT32, TTCHAR_P, TTCHAR_P, UINT32, UINT32]])
-_SetUserAudioStreamBufferSize = function_factory(dll.TT_SetUserAudioStreamBufferSize, [BOOL, [_TTInstance, INT32, UINT32, INT32]])
-_AcquireUserAudioBlock = function_factory(dll.TT_AcquireUserAudioBlock, [POINTER(AudioBlock), [_TTInstance, StreamType, INT32]])
-_ReleaseUserAudioBlock = function_factory(dll.TT_ReleaseUserAudioBlock, [BOOL, [_TTInstance, POINTER(AudioBlock)]])
-_GetFileTransferInfo = function_factory(dll.TT_GetFileTransferInfo, [BOOL, [_TTInstance, INT32, POINTER(FileTransfer)]])
-_CancelFileTransfer = function_factory(dll.TT_CancelFileTransfer, [BOOL, [_TTInstance, INT32]])
-_GetErrorMessage = function_factory(dll.TT_GetErrorMessage, [c_void_p, [INT32, POINTER(TTCHAR*TT_STRLEN)]])
-_DBG_SIZEOF = function_factory(dll.TT_DBG_SIZEOF, [INT32, [TTType]])
+_GetVersion = dll.TT_GetVersion
+_GetVersion.restype = TTCHAR_P
+_InitTeamTalkPoll = dll.TT_InitTeamTalkPoll
+_InitTeamTalkPoll.restype = _TTInstance
+_CloseTeamTalk = dll.TT_CloseTeamTalk
+_CloseTeamTalk.restype = BOOL
+_CloseTeamTalk.argtypes = [_TTInstance]
+_GetMessage = dll.TT_GetMessage
+_GetMessage.restype = BOOL
+_GetMessage.argtypes = [_TTInstance, POINTER(TTMessage), POINTER(INT32)]
+_PumpMessage = dll.TT_PumpMessage
+_PumpMessage.restype = BOOL
+_PumpMessage.argtypes = [_TTInstance, ClientEvent, INT32]
+_GetFlags = dll.TT_GetFlags
+_GetFlags.restype = UINT32
+_GetFlags.argtypes = [_TTInstance]
+_SetLicenseInformation = dll.TT_SetLicenseInformation
+_SetLicenseInformation.restype = BOOL
+_SetLicenseInformation.argtypes = [TTCHAR_P, TTCHAR_P]
+_GetDefaultSoundDevices = dll.TT_GetDefaultSoundDevices
+_GetDefaultSoundDevices.restype = BOOL
+_GetDefaultSoundDevices.argtypes = [POINTER(INT32), POINTER(INT32)]
+_GetDefaultSoundDevicesEx = dll.TT_GetDefaultSoundDevicesEx
+_GetDefaultSoundDevicesEx.restype = BOOL
+_GetDefaultSoundDevicesEx.argtypes = [SoundSystem, POINTER(INT32), POINTER(INT32)]
+_GetSoundDevices = dll.TT_GetSoundDevices
+_GetSoundDevices.restype = BOOL
+_GetSoundDevices.argtypes = [POINTER(SoundDevice), POINTER(INT32)]
+_RestartSoundSystem = dll.TT_RestartSoundSystem
+_RestartSoundSystem.restype = BOOL
+_StartSoundLoopbackTest = dll.TT_StartSoundLoopbackTest
+_StartSoundLoopbackTest.restype = _TTSoundLoop
+_StartSoundLoopbackTest.argtypes = [INT32, INT32, INT32, INT32, BOOL, POINTER(SpeexDSP)]
+_StartSoundLoopbackTestEx = dll.TT_StartSoundLoopbackTestEx
+_StartSoundLoopbackTestEx.restype = _TTSoundLoop
+_StartSoundLoopbackTestEx.argtypes = [INT32, INT32, INT32, INT32, BOOL, POINTER(AudioPreprocessor), POINTER(SoundDeviceEffects)]
+_CloseSoundLoopbackTest = dll.TT_CloseSoundLoopbackTest
+_CloseSoundLoopbackTest.restype = BOOL
+_CloseSoundLoopbackTest.argtypes = [_TTSoundLoop]
+_InitSoundInputDevice = dll.TT_InitSoundInputDevice
+_InitSoundInputDevice.restype = BOOL
+_InitSoundInputDevice.argtypes = [_TTInstance, INT32]
+_InitSoundInputSharedDevice = dll.TT_InitSoundInputSharedDevice
+_InitSoundInputSharedDevice.restype = BOOL
+_InitSoundInputSharedDevice.argtypes = [INT32, INT32, INT32]
+_InitSoundOutputDevice = dll.TT_InitSoundOutputDevice
+_InitSoundOutputDevice.restype = BOOL
+_InitSoundOutputDevice.argtypes = [_TTInstance, INT32]
+_InitSoundOutputSharedDevice = dll.TT_InitSoundOutputSharedDevice
+_InitSoundOutputSharedDevice.restype = BOOL
+_InitSoundOutputSharedDevice.argtypes = [INT32, INT32, INT32]
+_InitSoundDuplexDevices = dll.TT_InitSoundDuplexDevices
+_InitSoundDuplexDevices.restype = BOOL
+_InitSoundDuplexDevices.argtypes = [_TTInstance, INT32, INT32]
+_CloseSoundInputDevice = dll.TT_CloseSoundInputDevice
+_CloseSoundInputDevice.restype = BOOL
+_CloseSoundInputDevice.argtypes = [_TTInstance]
+_CloseSoundOutputDevice = dll.TT_CloseSoundOutputDevice
+_CloseSoundOutputDevice.restype = BOOL
+_CloseSoundOutputDevice.argtypes = [_TTInstance]
+_CloseSoundDuplexDevices = dll.TT_CloseSoundDuplexDevices
+_CloseSoundDuplexDevices.restype = BOOL
+_CloseSoundDuplexDevices.argtypes = [_TTInstance]
+_SetSoundDeviceEffects = dll.TT_SetSoundDeviceEffects
+_SetSoundDeviceEffects.restype = BOOL
+_SetSoundDeviceEffects.argtypes = [_TTInstance, POINTER(SoundDeviceEffects)]
+_GetSoundDeviceEffects = dll.TT_GetSoundDeviceEffects
+_GetSoundDeviceEffects.restype = BOOL
+_GetSoundDeviceEffects.argtypes = [_TTInstance, POINTER(SoundDeviceEffects)]
+_GetSoundInputLevel = dll.TT_GetSoundInputLevel
+_GetSoundInputLevel.restype = INT32
+_GetSoundInputLevel.argtypes = [_TTInstance]
+_SetSoundInputGainLevel = dll.TT_SetSoundInputGainLevel
+_SetSoundInputGainLevel.restype = BOOL
+_SetSoundInputGainLevel.argtypes = [_TTInstance, INT32]
+_GetSoundInputGainLevel = dll.TT_GetSoundInputGainLevel
+_GetSoundInputGainLevel.restype = INT32
+_GetSoundInputGainLevel.argtypes = [_TTInstance]
+_SetSoundInputPreprocess = dll.TT_SetSoundInputPreprocess
+_SetSoundInputPreprocess.restype = BOOL
+_SetSoundInputPreprocess.argtypes = [_TTInstance, POINTER(SpeexDSP)]
+_GetSoundInputPreprocess = dll.TT_GetSoundInputPreprocess
+_GetSoundInputPreprocess.restype = BOOL
+_GetSoundInputPreprocess.argtypes = [_TTInstance, POINTER(SpeexDSP)]
+_SetSoundInputPreprocessEx = dll.TT_SetSoundInputPreprocessEx
+_SetSoundInputPreprocessEx.restype = BOOL
+_SetSoundInputPreprocessEx.argtypes = [_TTInstance, POINTER(AudioPreprocessor)]
+_GetSoundInputPreprocessEx = dll.TT_GetSoundInputPreprocessEx
+_GetSoundInputPreprocessEx.restype = BOOL
+_GetSoundInputPreprocessEx.argtypes = [_TTInstance, POINTER(AudioPreprocessor)]
+_SetSoundOutputVolume = dll.TT_SetSoundOutputVolume
+_SetSoundOutputVolume.restype = BOOL
+_SetSoundOutputVolume.argtypes = [_TTInstance, INT32]
+_GetSoundOutputVolume = dll.TT_GetSoundOutputVolume
+_GetSoundOutputVolume.restype = INT32
+_GetSoundOutputVolume.argtypes = [_TTInstance]
+_SetSoundOutputMute = dll.TT_SetSoundOutputMute
+_SetSoundOutputMute.restype = BOOL
+_SetSoundOutputMute.argtypes = [_TTInstance, BOOL]
+_Enable3DSoundPositioning = dll.TT_Enable3DSoundPositioning
+_Enable3DSoundPositioning.restype = BOOL
+_Enable3DSoundPositioning.argtypes = [_TTInstance, BOOL]
+_AutoPositionUsers = dll.TT_AutoPositionUsers
+_AutoPositionUsers.restype = BOOL
+_AutoPositionUsers.argtypes = [_TTInstance]
+_EnableAudioBlockEvent = dll.TT_EnableAudioBlockEvent
+_EnableAudioBlockEvent.restype = BOOL
+_EnableAudioBlockEvent.argtypes = [_TTInstance, INT32, INT32, BOOL]
+_EnableAudioBlockEventEx = dll.TT_EnableAudioBlockEventEx
+_EnableAudioBlockEventEx.restype = BOOL
+_EnableAudioBlockEventEx.argtypes = [_TTInstance, INT32, INT32, POINTER(AudioFormat), BOOL]
+_InsertAudioBlock = dll.TT_InsertAudioBlock
+_InsertAudioBlock.restype = BOOL
+_InsertAudioBlock.argtypes = [_TTInstance, POINTER(AudioBlock)]
+_EnableVoiceTransmission = dll.TT_EnableVoiceTransmission
+_EnableVoiceTransmission.restype = BOOL
+_EnableVoiceTransmission.argtypes = [_TTInstance, BOOL]
+_EnableVoiceActivation = dll.TT_EnableVoiceActivation
+_EnableVoiceActivation.restype = BOOL
+_EnableVoiceActivation.argtypes = [_TTInstance, BOOL]
+_SetVoiceActivationLevel = dll.TT_SetVoiceActivationLevel
+_SetVoiceActivationLevel.restype = BOOL
+_SetVoiceActivationLevel.argtypes = [_TTInstance, INT32]
+_GetVoiceActivationLevel = dll.TT_GetVoiceActivationLevel
+_GetVoiceActivationLevel.restype = INT32
+_GetVoiceActivationLevel.argtypes = [_TTInstance]
+_SetVoiceActivationStopDelay = dll.TT_SetVoiceActivationStopDelay
+_SetVoiceActivationStopDelay.restype = BOOL
+_SetVoiceActivationStopDelay.argtypes = [_TTInstance, INT32]
+_GetVoiceActivationStopDelay = dll.TT_GetVoiceActivationStopDelay
+_GetVoiceActivationStopDelay.restype = INT32
+_GetVoiceActivationStopDelay.argtypes = [_TTInstance]
+_StartRecordingMuxedAudioFile = dll.TT_StartRecordingMuxedAudioFile
+_StartRecordingMuxedAudioFile.restype = BOOL
+_StartRecordingMuxedAudioFile.argtypes = [_TTInstance, POINTER(AudioCodec), TTCHAR_P, UINT32]
+_StartRecordingMuxedAudioFileEx = dll.TT_StartRecordingMuxedAudioFileEx
+_StartRecordingMuxedAudioFileEx.restype = BOOL
+_StartRecordingMuxedAudioFileEx.argtypes = [_TTInstance, INT32, TTCHAR_P, UINT32]
+_StopRecordingMuxedAudioFile = dll.TT_StopRecordingMuxedAudioFile
+_StopRecordingMuxedAudioFile.restype = BOOL
+_StopRecordingMuxedAudioFile.argtypes = [_TTInstance]
+_StopRecordingMuxedAudioFileEx = dll.TT_StopRecordingMuxedAudioFileEx
+_StopRecordingMuxedAudioFileEx.restype = BOOL
+_StopRecordingMuxedAudioFileEx.argtypes = [_TTInstance, INT32]
+_StartVideoCaptureTransmission = dll.TT_StartVideoCaptureTransmission
+_StartVideoCaptureTransmission.restype = BOOL
+_StartVideoCaptureTransmission.argtypes = [_TTInstance, POINTER(VideoCodec)]
+_StopVideoCaptureTransmission = dll.TT_StopVideoCaptureTransmission
+_StopVideoCaptureTransmission.restype = BOOL
+_StopVideoCaptureTransmission.argtypes = [_TTInstance]
+_GetVideoCaptureDevices = dll.TT_GetVideoCaptureDevices
+_GetVideoCaptureDevices.restype = BOOL
+_GetVideoCaptureDevices.argtypes = [POINTER(VideoCaptureDevice), POINTER(INT32)]
+_InitVideoCaptureDevice = dll.TT_InitVideoCaptureDevice
+_InitVideoCaptureDevice.restype = BOOL
+_InitVideoCaptureDevice.argtypes = [_TTInstance, TTCHAR_P, POINTER(VideoFormat)]
+_CloseVideoCaptureDevice = dll.TT_CloseVideoCaptureDevice
+_CloseVideoCaptureDevice.restype = BOOL
+_CloseVideoCaptureDevice.argtypes = [_TTInstance]
+_StartStreamingMediaFileToChannel = dll.TT_StartStreamingMediaFileToChannel
+_StartStreamingMediaFileToChannel.restype = BOOL
+_StartStreamingMediaFileToChannel.argtypes = [_TTInstance, TTCHAR_P, POINTER(VideoFormat)]
+_StartStreamingMediaFileToChannelEx = dll.TT_StartStreamingMediaFileToChannelEx
+_StartStreamingMediaFileToChannelEx.restype = BOOL
+_StartStreamingMediaFileToChannelEx.argtypes = [_TTInstance, TTCHAR_P, POINTER(MediaFilePlayback), POINTER(VideoFormat)]
+_UpdateStreamingMediaFileToChannel = dll.TT_UpdateStreamingMediaFileToChannel
+_UpdateStreamingMediaFileToChannel.restype = BOOL
+_UpdateStreamingMediaFileToChannel.argtypes = [_TTInstance, POINTER(MediaFilePlayback), POINTER(VideoFormat)]
+_StopStreamingMediaFileToChannel = dll.TT_StopStreamingMediaFileToChannel
+_StopStreamingMediaFileToChannel.restype = BOOL
+_StopStreamingMediaFileToChannel.argtypes = [_TTInstance]
+_InitLocalPlayback = dll.TT_InitLocalPlayback
+_InitLocalPlayback.restype = INT32
+_InitLocalPlayback.argtypes = [_TTInstance, TTCHAR_P, POINTER(MediaFilePlayback)]
+_UpdateLocalPlayback = dll.TT_UpdateLocalPlayback
+_UpdateLocalPlayback.restype = BOOL
+_UpdateLocalPlayback.argtypes = [_TTInstance, INT32, POINTER(MediaFilePlayback)]
+_StopLocalPlayback = dll.TT_StopLocalPlayback
+_StopLocalPlayback.restype = BOOL
+_StopLocalPlayback.argtypes = [_TTInstance, INT32]
+_GetMediaFileInfo = dll.TT_GetMediaFileInfo
+_GetMediaFileInfo.restype = BOOL
+_GetMediaFileInfo.argtypes = [_TTInstance, TTCHAR_P, POINTER(MediaFileInfo)]
+_SetEncryptionContext = dll.TT_SetEncryptionContext
+_SetEncryptionContext.restype = BOOL
+_SetEncryptionContext.argtypes = [_TTInstance, POINTER(EncryptionContext)]
+_Connect = dll.TT_Connect
+_Connect.restype = BOOL
+_Connect.argtypes = [_TTInstance, TTCHAR_P, INT32, INT32, INT32, INT32, BOOL]
+_ConnectSysID = dll.TT_ConnectSysID
+_ConnectSysID.restype = BOOL
+_ConnectSysID.argtypes = [_TTInstance, TTCHAR_P, INT32, INT32, INT32, INT32, BOOL, TTCHAR_P]
+_ConnectEx = dll.TT_ConnectEx
+_ConnectEx.restype = BOOL
+_ConnectEx.argtypes = [_TTInstance, TTCHAR_P, INT32, INT32, TTCHAR_P, INT32, INT32, BOOL]
+_Disconnect = dll.TT_Disconnect
+_Disconnect.restype = BOOL
+_Disconnect.argtypes = [_TTInstance]
+_QueryMaxPayload = dll.TT_QueryMaxPayload
+_QueryMaxPayload.restype = BOOL
+_QueryMaxPayload.argtypes = [_TTInstance, INT32]
+_GetClientStatistics = dll.TT_GetClientStatistics
+_GetClientStatistics.restype = BOOL
+_GetClientStatistics.argtypes = [_TTInstance, POINTER(ClientStatistics)]
+_SetClientKeepAlive = dll.TT_SetClientKeepAlive
+_SetClientKeepAlive.restype = BOOL
+_SetClientKeepAlive.argtypes = [_TTInstance, POINTER(ClientKeepAlive)]
+_GetClientKeepAlive = dll.TT_GetClientKeepAlive
+_GetClientKeepAlive.restype = BOOL
+_GetClientKeepAlive.argtypes = [_TTInstance, POINTER(ClientKeepAlive)]
+_DoPing = dll.TT_DoPing
+_DoPing.restype = INT32
+_DoPing.argtypes = [_TTInstance]
+_DoLogin = dll.TT_DoLogin
+_DoLogin.restype = INT32
+_DoLogin.argtypes = [_TTInstance, TTCHAR_P, TTCHAR_P, TTCHAR_P]
+_DoLoginEx = dll.TT_DoLoginEx
+_DoLoginEx.restype = INT32
+_DoLoginEx.argtypes = [_TTInstance, TTCHAR_P, TTCHAR_P, TTCHAR_P, TTCHAR_P]
+_DoLogout = dll.TT_DoLogout
+_DoLogout.restype = INT32
+_DoLogout.argtypes = [_TTInstance]
+_DoJoinChannel = dll.TT_DoJoinChannel
+_DoJoinChannel.restype = INT32
+_DoJoinChannel.argtypes = [_TTInstance, POINTER(Channel)]
+_DoJoinChannelByID = dll.TT_DoJoinChannelByID
+_DoJoinChannelByID.restype = INT32
+_DoJoinChannelByID.argtypes = [_TTInstance, INT32, TTCHAR_P]
+_DoLeaveChannel = dll.TT_DoLeaveChannel
+_DoLeaveChannel.restype = INT32
+_DoLeaveChannel.argtypes = [_TTInstance]
+_DoChangeNickname = dll.TT_DoChangeNickname
+_DoChangeNickname.restype = INT32
+_DoChangeNickname.argtypes = [_TTInstance, TTCHAR_P]
+_DoChangeStatus = dll.TT_DoChangeStatus
+_DoChangeStatus.restype = INT32
+_DoChangeStatus.argtypes = [_TTInstance, INT32, TTCHAR_P]
+_DoTextMessage = dll.TT_DoTextMessage
+_DoTextMessage.restype = INT32
+_DoTextMessage.argtypes = [_TTInstance, POINTER(TextMessage)]
+_DoChannelOp = dll.TT_DoChannelOp
+_DoChannelOp.restype = INT32
+_DoChannelOp.argtypes = [_TTInstance, INT32, INT32, BOOL]
+_DoChannelOpEx = dll.TT_DoChannelOpEx
+_DoChannelOpEx.restype = INT32
+_DoChannelOpEx.argtypes = [_TTInstance, INT32, INT32, TTCHAR_P, BOOL]
+_DoKickUser = dll.TT_DoKickUser
+_DoKickUser.restype = INT32
+_DoKickUser.argtypes = [_TTInstance, INT32, INT32]
+_DoSendFile = dll.TT_DoSendFile
+_DoSendFile.restype = INT32
+_DoSendFile.argtypes = [_TTInstance, INT32, TTCHAR_P]
+_DoRecvFile = dll.TT_DoRecvFile
+_DoRecvFile.restype = INT32
+_DoRecvFile.argtypes = [_TTInstance, INT32, INT32, TTCHAR_P]
+_DoDeleteFile = dll.TT_DoDeleteFile
+_DoDeleteFile.restype = INT32
+_DoDeleteFile.argtypes = [_TTInstance, INT32, INT32]
+_DoSubscribe = dll.TT_DoSubscribe
+_DoSubscribe.restype = INT32
+_DoSubscribe.argtypes = [_TTInstance, INT32, UINT32]
+_DoUnsubscribe = dll.TT_DoUnsubscribe
+_DoUnsubscribe.restype = INT32
+_DoUnsubscribe.argtypes = [_TTInstance, INT32, UINT32]
+_DoMakeChannel = dll.TT_DoMakeChannel
+_DoMakeChannel.restype = INT32
+_DoMakeChannel.argtypes = [_TTInstance, POINTER(Channel)]
+_DoUpdateChannel = dll.TT_DoUpdateChannel
+_DoUpdateChannel.restype = INT32
+_DoUpdateChannel.argtypes = [_TTInstance, POINTER(Channel)]
+_DoRemoveChannel = dll.TT_DoRemoveChannel
+_DoRemoveChannel.restype = INT32
+_DoRemoveChannel.argtypes = [_TTInstance, INT32]
+_DoMoveUser = dll.TT_DoMoveUser
+_DoMoveUser.restype = INT32
+_DoMoveUser.argtypes = [_TTInstance, INT32, INT32]
+_DoUpdateServer = dll.TT_DoUpdateServer
+_DoUpdateServer.restype = INT32
+_DoUpdateServer.argtypes = [_TTInstance, POINTER(ServerProperties)]
+_DoListUserAccounts = dll.TT_DoListUserAccounts
+_DoListUserAccounts.restype = INT32
+_DoListUserAccounts.argtypes = [_TTInstance, INT32, INT32]
+_DoNewUserAccount = dll.TT_DoNewUserAccount
+_DoNewUserAccount.restype = INT32
+_DoNewUserAccount.argtypes = [_TTInstance, POINTER(UserAccount)]
+_DoDeleteUserAccount = dll.TT_DoDeleteUserAccount
+_DoDeleteUserAccount.restype = INT32
+_DoDeleteUserAccount.argtypes = [_TTInstance, TTCHAR_P]
+_DoBanUser = dll.TT_DoBanUser
+_DoBanUser.restype = INT32
+_DoBanUser.argtypes = [_TTInstance, INT32, INT32]
+_DoBanUserEx = dll.TT_DoBanUserEx
+_DoBanUserEx.restype = INT32
+_DoBanUserEx.argtypes = [_TTInstance, INT32, UINT32]
+_DoBan = dll.TT_DoBan
+_DoBan.restype = INT32
+_DoBan.argtypes = [_TTInstance, POINTER(BannedUser)]
+_DoBanIPAddress = dll.TT_DoBanIPAddress
+_DoBanIPAddress.restype = INT32
+_DoBanIPAddress.argtypes = [_TTInstance, TTCHAR_P, INT32]
+_DoUnBanUser = dll.TT_DoUnBanUser
+_DoUnBanUser.restype = INT32
+_DoUnBanUser.argtypes = [_TTInstance, TTCHAR_P, INT32]
+_DoUnBanUserEx = dll.TT_DoUnBanUserEx
+_DoUnBanUserEx.restype = INT32
+_DoUnBanUserEx.argtypes = [_TTInstance, POINTER(BannedUser)]
+_DoListBans = dll.TT_DoListBans
+_DoListBans.restype = INT32
+_DoListBans.argtypes = [_TTInstance, INT32, INT32, INT32]
+_DoSaveConfig = dll.TT_DoSaveConfig
+_DoSaveConfig.restype = INT32
+_DoSaveConfig.argtypes = [_TTInstance]
+_DoQueryServerStats = dll.TT_DoQueryServerStats
+_DoQueryServerStats.restype = INT32
+_DoQueryServerStats.argtypes = [_TTInstance]
+_DoQuit = dll.TT_DoQuit
+_DoQuit.restype = INT32
+_DoQuit.argtypes = [_TTInstance]
+_GetServerProperties = dll.TT_GetServerProperties
+_GetServerProperties.restype = BOOL
+_GetServerProperties.argtypes = [_TTInstance, POINTER(ServerProperties)]
+_GetServerUsers = dll.TT_GetServerUsers
+_GetServerUsers.restype = BOOL
+_GetServerUsers.argtypes = [_TTInstance, POINTER(User), POINTER(INT32)]
+_GetRootChannelID = dll.TT_GetRootChannelID
+_GetRootChannelID.restype = INT32
+_GetRootChannelID.argtypes = [_TTInstance]
+_GetMyChannelID = dll.TT_GetMyChannelID
+_GetMyChannelID.restype = INT32
+_GetMyChannelID.argtypes = [_TTInstance]
+_GetChannel = dll.TT_GetChannel
+_GetChannel.restype = BOOL
+_GetChannel.argtypes = [_TTInstance, INT32, POINTER(Channel)]
+_GetChannelPath = dll.TT_GetChannelPath
+_GetChannelPath.restype = BOOL
+_GetChannelPath.argtypes = [_TTInstance, INT32, POINTER(TTCHAR*TT_STRLEN)]
+_GetChannelIDFromPath = dll.TT_GetChannelIDFromPath
+_GetChannelIDFromPath.restype = INT32
+_GetChannelIDFromPath.argtypes = [_TTInstance, TTCHAR_P]
+_GetChannelUsers = dll.TT_GetChannelUsers
+_GetChannelUsers.restype = BOOL
+_GetChannelUsers.argtypes = [_TTInstance, INT32, POINTER(User), POINTER(INT32)]
+_GetChannelFiles = dll.TT_GetChannelFiles
+_GetChannelFiles.restype = BOOL
+_GetChannelFiles.argtypes = [_TTInstance, INT32, POINTER(RemoteFile), POINTER(INT32)]
+_GetChannelFile = dll.TT_GetChannelFile
+_GetChannelFile.restype = BOOL
+_GetChannelFile.argtypes = [_TTInstance, INT32, INT32, POINTER(RemoteFile)]
+_IsChannelOperator = dll.TT_IsChannelOperator
+_IsChannelOperator.restype = BOOL
+_IsChannelOperator.argtypes = [_TTInstance, INT32, INT32]
+_GetServerChannels = dll.TT_GetServerChannels
+_GetServerChannels.restype = BOOL
+_GetServerChannels.argtypes = [_TTInstance, POINTER(Channel), POINTER(INT32)]
+_GetMyUserID = dll.TT_GetMyUserID
+_GetMyUserID.restype = INT32
+_GetMyUserID.argtypes = [_TTInstance]
+_GetMyUserAccount = dll.TT_GetMyUserAccount
+_GetMyUserAccount.restype = BOOL
+_GetMyUserAccount.argtypes = [_TTInstance, POINTER(UserAccount)]
+_GetMyUserData = dll.TT_GetMyUserData
+_GetMyUserData.restype = INT32
+_GetMyUserData.argtypes = [_TTInstance]
+_GetUser = dll.TT_GetUser
+_GetUser.restype = BOOL
+_GetUser.argtypes = [_TTInstance, INT32, POINTER(User)]
+_GetUserStatistics = dll.TT_GetUserStatistics
+_GetUserStatistics.restype = BOOL
+_GetUserStatistics.argtypes = [_TTInstance, INT32, POINTER(UserStatistics)]
+_GetUserByUsername = dll.TT_GetUserByUsername
+_GetUserByUsername.restype = BOOL
+_GetUserByUsername.argtypes = [_TTInstance, TTCHAR_P, POINTER(User)]
+_SetUserVolume = dll.TT_SetUserVolume
+_SetUserVolume.restype = BOOL
+_SetUserVolume.argtypes = [_TTInstance, INT32, INT32, INT32]
+_SetUserMute = dll.TT_SetUserMute
+_SetUserMute.restype = BOOL
+_SetUserMute.argtypes = [_TTInstance, INT32, INT32, BOOL, INT32]
+_SetUserStoppedPlaybackDelay = dll.TT_SetUserStoppedPlaybackDelay
+_SetUserStoppedPlaybackDelay.restype = BOOL
+_SetUserStoppedPlaybackDelay.argtypes = [_TTInstance, INT32, INT32, INT32]
+_SetUserJitterControl = dll.TT_SetUserJitterControl
+_SetUserJitterControl.restype = BOOL
+_SetUserJitterControl.argtypes = [_TTInstance, INT32, INT32, POINTER(JitterConfig)]
+_GetUserJitterControl = dll.TT_GetUserJitterControl
+_GetUserJitterControl.restype = BOOL
+_GetUserJitterControl.argtypes = [_TTInstance, INT32, INT32, POINTER(JitterConfig)]
+_SetUserPosition = dll.TT_SetUserPosition
+_SetUserPosition.restype = BOOL
+_SetUserPosition.argtypes = [_TTInstance, INT32, INT32, c_float, c_float, c_float]
+_SetUserStereo = dll.TT_SetUserStereo
+_SetUserStereo.restype = BOOL
+_SetUserStereo.argtypes = [_TTInstance, INT32, INT32, BOOL, BOOL]
+_SetUserMediaStorageDir = dll.TT_SetUserMediaStorageDir
+_SetUserMediaStorageDir.restype = BOOL
+_SetUserMediaStorageDir.argtypes = [_TTInstance, INT32, TTCHAR_P, TTCHAR_P, UINT32]
+_SetUserMediaStorageDirEx = dll.TT_SetUserMediaStorageDirEx
+_SetUserMediaStorageDirEx.restype = BOOL
+_SetUserMediaStorageDirEx.argtypes = [_TTInstance, INT32, TTCHAR_P, TTCHAR_P, UINT32, UINT32]
+_SetUserAudioStreamBufferSize = dll.TT_SetUserAudioStreamBufferSize
+_SetUserAudioStreamBufferSize.restype = BOOL
+_SetUserAudioStreamBufferSize.argtypes = [_TTInstance, INT32, UINT32, INT32]
+_GetFileTransferInfo = dll.TT_GetFileTransferInfo
+_GetFileTransferInfo.restype = BOOL
+_GetFileTransferInfo.argtypes = [_TTInstance, INT32, POINTER(FileTransfer)]
+_CancelFileTransfer = dll.TT_CancelFileTransfer
+_CancelFileTransfer.restype = BOOL
+_CancelFileTransfer.argtypes = [_TTInstance, INT32]
+_GetErrorMessage = dll.TT_GetErrorMessage
+_GetErrorMessage.restype = c_void_p
+_GetErrorMessage.argtypes = [INT32, POINTER(TTCHAR*TT_STRLEN)]
+_DBG_SIZEOF = dll.TT_DBG_SIZEOF
+_DBG_SIZEOF.restype = INT32
+_DBG_SIZEOF.argtypes = [TTType]
 
 # main code
 
@@ -1254,27 +1412,6 @@ def DBG_SIZEOF(t):
 class TeamTalkError(Exception):
     pass
 
-# Construct multiple TextMessage objects for text messages longer than TT_STRLEN
-def buildTextMessage(content: str, nMsgType: TextMsgType,
-                     nToUserID: int = 0, nChannelID: int = 0, nFromUserID: int = 0,
-                     szFromUsername: str = "") -> [TextMessage]:
-    result = []
-    converted_content = ttstr(content)
-    while len(converted_content) > 0:
-        textmsg = TextMessage()
-        textmsg.nMsgType = nMsgType
-        textmsg.nFromUserID = nFromUserID
-        textmsg.szFromUsername = ttstr(szFromUsername)
-        textmsg.nToUserID = nToUserID
-        textmsg.nChannelID = nChannelID
-        textmsg.szMessage = converted_content[0:TT_STRLEN-1]
-        converted_content = converted_content[TT_STRLEN-1:]
-        textmsg.bMore = len(converted_content) > 0
-        result.append(textmsg)
-
-    return result
-
-
 class TeamTalk(object):
 
     def __init__(self):
@@ -1288,89 +1425,7 @@ class TeamTalk(object):
     def __del__(self):
         self.closeTeamTalk()
 
-    def runEventLoop(self, nWaitMSec = -1):
-        msg = self.getMessage(nWaitMS = nWaitMSec)
-        event = msg.nClientEvent
-        if event == ClientEvent.CLIENTEVENT_CON_SUCCESS:
-            self.onConnectSuccess()
-        if event == ClientEvent.CLIENTEVENT_CON_CRYPT_ERROR:
-            self.onConnectCryptError(msg.clienterrormsg)
-        if event == ClientEvent.CLIENTEVENT_CON_FAILED:
-            self.onConnectFailed()
-        if event == ClientEvent.CLIENTEVENT_CON_LOST:
-            self.onConnectionLost()
-        if event == ClientEvent.CLIENTEVENT_CMD_PROCESSING:
-            self.onCmdProcessing(msg.nSource, not msg.bActive)
-        if event == ClientEvent.CLIENTEVENT_CMD_ERROR:
-            self.onCmdError(msg.nSource, msg.clienterrormsg)
-        if event == ClientEvent.CLIENTEVENT_CMD_SUCCESS:
-            self.onCmdSuccess(msg.nSource)
-        if event == ClientEvent.CLIENTEVENT_CMD_MYSELF_LOGGEDIN:
-            self.onCmdMyselfLoggedIn(msg.nSource, msg.useraccount)
-        if event == ClientEvent.CLIENTEVENT_CMD_MYSELF_LOGGEDOUT:
-            self.onCmdMyselfLoggedOut()
-        if event == ClientEvent.CLIENTEVENT_CMD_MYSELF_KICKED:
-            self.onCmdMyselfKickedFromChannel(msg.nSource, msg.user)
-        if event == ClientEvent.CLIENTEVENT_CMD_USER_LOGGEDIN:
-            self.onCmdUserLoggedIn(msg.user)
-        if event == ClientEvent.CLIENTEVENT_CMD_USER_LOGGEDOUT:
-            self.onCmdUserLoggedOut(msg.user)
-        if event == ClientEvent.CLIENTEVENT_CMD_USER_UPDATE:
-            self.onCmdUserUpdate(msg.user)
-        if event == ClientEvent.CLIENTEVENT_CMD_USER_JOINED:
-            self.onCmdUserJoinedChannel(msg.user)
-        if event == ClientEvent.CLIENTEVENT_CMD_USER_LEFT:
-            self.onCmdUserLeftChannel(msg.nSource, msg.user)
-        if event == ClientEvent.CLIENTEVENT_CMD_USER_TEXTMSG:
-            self.onCmdUserTextMessage(msg.textmessage)
-        if event == ClientEvent.CLIENTEVENT_CMD_CHANNEL_NEW:
-            self.onCmdChannelNew(msg.channel)
-        if event == ClientEvent.CLIENTEVENT_CMD_CHANNEL_UPDATE:
-            self.onCmdChannelUpdate(msg.channel)
-        if event == ClientEvent.CLIENTEVENT_CMD_CHANNEL_REMOVE:
-            self.onCmdChannelRemove(msg.channel)
-        if event == ClientEvent.CLIENTEVENT_CMD_SERVER_UPDATE:
-            self.onCmdServerUpdate(msg.serverproperties)
-        if event == ClientEvent.CLIENTEVENT_CMD_FILE_NEW:
-            self.onCmdFileNew(msg.remotefile)
-        if event == ClientEvent.CLIENTEVENT_CMD_FILE_REMOVE:
-            self.onCmdFileRemove(msg.remotefile)
-        if event == ClientEvent.CLIENTEVENT_USER_RECORD_MEDIAFILE:
-            self.onUserRecordMediaFile(msg.nSource, msg.mediafileinfo)
-        if event == ClientEvent.CLIENTEVENT_CMD_USERACCOUNT_NEW:
-            self.onUserAccountNew(msg.useraccount)
-        if event == ClientEvent.CLIENTEVENT_CMD_USERACCOUNT_REMOVE:
-            self.onUserAccountRemove(msg.useraccount)
-        if event == ClientEvent.CLIENTEVENT_USER_STATECHANGE:
-            self.onUserStateChange(msg.user)
-        if event == ClientEvent.CLIENTEVENT_USER_AUDIOBLOCK:
-            self.onUserAudioBlock(msg.nSource, msg.nStreamType)
-        if event == ClientEvent.CLIENTEVENT_STREAM_MEDIAFILE:
-            self.onStreamMediaFile(msg.mediafileinfo)
-        if event == ClientEvent.CLIENTEVENT_CMD_USERACCOUNT:
-            self.onUserAccount(msg.useraccount)
-        if event == ClientEvent.CLIENTEVENT_CMD_BANNEDUSER:
-            self.onBannedUser(msg.banneduser)
-        if event == ClientEvent.CLIENTEVENT_CMD_SERVERSTATISTICS:
-            self.onServerStatistics(msg.serverstatistics)
-        if event == ClientEvent.CLIENTEVENT_INTERNAL_ERROR:
-            self.onInternalError(msg.clienterrormsg)
-        if event == ClientEvent.CLIENTEVENT_SOUNDDEVICE_ADDED:
-            self.onSoundDeviceAdded(msg.sounddevice)
-        if event == ClientEvent.CLIENTEVENT_SOUNDDEVICE_REMOVED:
-            self.onSoundDeviceRemoved(msg.sounddevice)
-        if event == ClientEvent.CLIENTEVENT_SOUNDDEVICE_UNPLUGGED:
-            self.onSoundDeviceUnplugged(msg.sounddevice)
-        if event == ClientEvent.CLIENTEVENT_SOUNDDEVICE_NEW_DEFAULT_INPUT:
-            self.onSoundDeviceNewDefaultInput(msg.sounddevice)
-        if event == ClientEvent.CLIENTEVENT_SOUNDDEVICE_NEW_DEFAULT_OUTPUT:
-            self.onSoundDeviceNewDefaultOutput(msg.sounddevice)
-        if event == ClientEvent.CLIENTEVENT_SOUNDDEVICE_NEW_DEFAULT_INPUT_COMDEVICE:
-            self.onSoundDeviceNewDefaultInputComDevice(msg.sounddevice)
-        if event == ClientEvent.CLIENTEVENT_SOUNDDEVICE_NEW_DEFAULT_OUTPUT_COMDEVICE:
-            self.onSoundDeviceNewDefaultOutputComDevice(msg.sounddevice)
-
-    def getMessage(self, nWaitMS: int = -1):
+    def getMessage(self, nWaitMS=-1):
         msg = TTMessage()
         nWaitMS = INT32(nWaitMS)
         _GetMessage(self._tt, byref(msg), byref(nWaitMS))
@@ -1392,130 +1447,55 @@ class TeamTalk(object):
         _GetSoundDevices(soundDevs, byref(count))
         return soundDevs
 
-    def initSoundInputDevice(self, indev: int) -> bool:
+    def initSoundInputDevice(self, indev):
         return _InitSoundInputDevice(self._tt, indev)
 
-    def initSoundOutputDevice(self, outdev: int) -> bool:
+    def initSoundOutputDevice(self, outdev):
         return _InitSoundOutputDevice(self._tt, outdev)
 
-    def enableVoiceTransmission(self, bEnable: bool) -> bool:
+    def enableVoiceTransmission(self, bEnable):
         return _EnableVoiceTransmission(self._tt, bEnable)
 
-    def setEncryptionContext(self, lpEncryptionContext: EncryptionContext) -> bool:
-        return _SetEncryptionContext(self._tt, lpEncryptionContext)
-
-    def connect(self, szHostAddress, nTcpPort: int, nUdpPort: int, nLocalTcpPort: int = 0, nLocalUdpPort:int = 0, bEncrypted: bool = False) -> bool:
+    def connect(self, szHostAddress, nTcpPort, nUdpPort, nLocalTcpPort=0, nLocalUdpPort=0, bEncrypted=False):
         return _Connect(self._tt, szHostAddress, nTcpPort, nUdpPort, nLocalTcpPort, nLocalUdpPort, bEncrypted)
 
     def disconnect(self):
         return _Disconnect(self._tt)
 
-    def doPing(self) -> int:
+    def doPing(self):
         return _DoPing(self._tt)
 
-    def doLogin(self, szNickname, szUsername, szPassword, szClientname) -> int:
+    def doLogin(self, szNickname, szUsername, szPassword, szClientname):
         return _DoLoginEx(self._tt, szNickname, szUsername, szPassword, szClientname)
 
-    def doLogout(self) -> int:
+    def doLogout(self):
         return _DoLogout(self._tt)
 
-    def doJoinChannel(self, channel: Channel) -> int:
-        return _DoJoinChannel(self._tt, channel)
-
-    def doJoinChannelByID(self, nChannelID: int, szPassword) -> int:
+    def doJoinChannelByID(self, nChannelID, szPassword):
         return _DoJoinChannelByID(self._tt, nChannelID, szPassword)
 
-    def doLeaveChannel(self) -> int:
+    def doLeaveChannel(self):
         return _DoLeaveChannel(self._tt)
 
-    def doRemoveChannel(self, nChannelID: int) -> int:
-        return _DoRemoveChannel(self._tt, nChannelID)
-
-    def doSendFile(self, nChannelID: int, szLocalFilePath) -> int:
+    def doSendFile(self, nChannelID, szLocalFilePath):
         return _DoSendFile(self._tt, nChannelID, szLocalFilePath)
 
-    def doRecvFile(self, nChannelID: int, nFileID: int, szLocalFilePath) -> int:
+    def doRecvFile(self, nChannelID, nFileID, szLocalFilePath):
         return _DoRecvFile(self._tt, nChannelID, nFileID, szLocalFilePath)
 
-    def doDeleteFile(self, nChannelID: int, nFileID: int) -> int:
+    def doDeleteFile(self, nChannelID, nFileID):
         return _DoDeleteFile(self._tt, nChannelID, nFileID)
 
-    def doChangeNickname(self, szNewNick) -> int:
+    def doChangeNickname(self, szNewNick):
         return _DoChangeNickname(self._tt, szNewNick)
 
-    def doChangeStatus(self, nStatusMode: int, szStatusMessage):
+    def doChangeStatus(self, nStatusMode, szStatusMessage):
         return _DoChangeStatus(self._tt, nStatusMode, szStatusMessage)
 
-    def doTextMessage(self, msg: TextMessage) -> int:
+    def doTextMessage(self, msg):
         return _DoTextMessage(self._tt, msg)
 
-    def doChannelOp(self, nUserID: int, nChannelID: int, bMakeOperator: bool) -> int:
-        return _DoChannelOp(self._tt, nUserID, nChannelID, bMakeOperator)
-
-    def doChannelOpEx(self, nUserID: int, nChannelID: int, szOpPassword, bMakeOperator: bool):
-        return _DoChannelOpEx(self._tt, nUserID, nChannelID, szOpPassword, bMakeOperator)
-
-    def doKickUser(self, nUserID: int, nChannelID: int) -> int:
-        return _DoKickUser(self._tt, nUserID, nChannelID)
-
-    def doMoveUser(self, nUserID: int, nChannelID: int) -> int:
-        return _DoMoveUser(self._tt, nUserID, nChannelID)
-
-    def doBanUser(self, nUserID: int, nChannelID: int) -> int:
-        return _DoBanUser(self._tt, nUserID, nChannelID)
-
-    def doBanUserEx(self, nUserID: int, uBanTypes: BanType) -> int:
-        return _DoBanUserEx(self._tt, nUserID, uBanTypes)
-
-    def doBan(self, lpBannedUser: BannedUser) -> int:
-        return _DoBan(self._tt, lpBannedUser)
-
-    def doBanIPAddress(self, szIPAddress, nChannelID: int) -> int:
-        return _DoBanIPAddress(self._tt, szIPAddress, nChannelID)
-
-    def doUnBanUser(self, szIPAddress, nChannelID: int) -> int:
-        return _DoUnBanUser(self._tt, szIPAddress, nChannelID)
-
-    def doUnbanUserEx(self, lpBannedUser: BannedUser) -> int:
-        return _DoUnBanUserEx(self._tt, lpBannedUser)
-
-    def doSubscribe(self, nUserID: int, uSubscriptions: Subscription) -> int:
-        return _DoSubscribe(self._tt, nUserID, uSubscriptions)
-
-    def doUnsubscribe(self, nUserID: int, uSubscriptions: Subscription) -> int:
-        return _DoUnsubscribe(self._tt, nUserID, uSubscriptions)
-
-    def doMakeChannel(self, lpChannel: Channel) -> int:
-        return _DoMakeChannel(self._tt, lpChannel)
-
-    def doUpdateChannel(self, lpChannel: Channel) -> int:
-        return _DoUpdateChannel(self._tt, lpChannel)
-
-    def doUpdateServer(self, lpServerProperties: ServerProperties) -> int:
-        return _DoUpdateServer(self._tt, lpServerProperties)
-
-    def doListUserAccounts(self, nIndex: int, nCount: int) -> int:
-        return _DoListUserAccounts(self._tt, nIndex, nCount)
-
-    def doNewUserAccount(self, lpUserAccount: UserAccount):
-        return _DoNewUserAccount(self._tt, lpUserAccount)
-
-    def doDeleteUserAccount(self, szUsername) -> int:
-        return _DoDeleteUserAccount(self._tt, szUsername)
-
-    def doListBans(self, nChannelID: int, nIndex: int, nCount: int) -> int:
-        return _DoListBans(self._tt, nChannelID, nIndex, nCount)
-
-    def doSaveConfig(self) -> int:
-        return _DoSaveConfig(self._tt)
-
-    def doQueryServerStats(self) -> int:
-        return _DoQueryServerStats(self._tt)
-
-    def doQuit(self) -> int:
-        return _DoQuit(self._tt)
-
-    def getServerProperties(self) -> ServerProperties:
+    def getServerProperties(self):
         srvprops = ServerProperties()
         _GetServerProperties(self._tt, srvprops)
         return srvprops
@@ -1527,18 +1507,18 @@ class TeamTalk(object):
         _GetServerUsers(self._tt, users, byref(count))
         return users
 
-    def getRootChannelID(self) -> int:
+    def getRootChannelID(self):
         return _GetRootChannelID(self._tt)
 
-    def getMyChannelID(self) -> int:
+    def getMyChannelID(self):
         return _GetMyChannelID(self._tt)
 
-    def getChannel(self, nChannelID: int) -> Channel:
+    def getChannel(self, nChannelID):
         channel= Channel()
         _GetChannel(self._tt, nChannelID, channel)
         return channel
 
-    def getChannelPath(self, nChannelID: int):
+    def getChannelPath(self, nChannelID):
         szChannelPath = (TTCHAR*TT_STRLEN)()
         _GetChannelPath(self._tt, nChannelID, szChannelPath)
         return szChannelPath.value
@@ -1546,14 +1526,14 @@ class TeamTalk(object):
     def getChannelIDFromPath(self, szChannelPath):
         return _GetChannelIDFromPath(self._tt, szChannelPath)
 
-    def getChannelUsers(self, nChannelID: int):
+    def getChannelUsers(self, nChannelID):
         count = c_int()
         _GetChannelUsers(self._tt, nChannelID, None, byref(count))
         users = (User*count.value)()
         _GetChannelUsers(self._tt, nChannelID, users, byref(count))
         return users
 
-    def getChannelFiles(self, nChannelID: int):
+    def getChannelFiles(self, nChannelID):
         count = c_int()
         _GetChannelFiles(self._tt, nChannelID, None, byref(count))
         files = (RemoteFile*count.value)()
@@ -1578,12 +1558,12 @@ class TeamTalk(object):
     def getMyUserData(self):
         return _GetMyUserData(self._tt)
 
-    def getUser(self, nUserID: int):
+    def getUser(self, nUserID):
         user = User()
         _GetUser(self._tt, nUserID, user)
         return user
 
-    def getUserStatistics(self, nUserID: int):
+    def getUserStatistics(self, nUserID):
         stats = UserStatistics()
         _GetUserStatistics(self._tt, nUserID, stats)
         return stats
@@ -1593,163 +1573,7 @@ class TeamTalk(object):
         _GetUserByUsername(self._tt, szUsername, user)
         return user
 
-    def getErrorMessage(self, nError: int):
+    def getErrorMessage(self, nError):
         szErrorMsg = (TTCHAR*TT_STRLEN)()
         _GetErrorMessage(nError, szErrorMsg)
         return szErrorMsg.value
-
-    def setUserMediaStorageDir(self, nUserID: int, szFolderPath, szFileNameVars, uAFF: AudioFileFormat) -> bool:
-        return _SetUserMediaStorageDir(self._tt, nUserID, szFolderPath, szFileNameVars, uAFF)
-
-    def setUserStoppedPlaybackDelay(self, nUserID: int, nStreamType: StreamType, nDelayMSec: int) -> bool:
-        return _SetUserStoppedPlaybackDelay(self._tt, nUserID, nStreamType, nDelayMSec)
-
-    def startStreamingMediaFileToChannel(self, szMediaFilePath, lpVideoCodec: VideoCodec) -> bool:
-        return _StartStreamingMediaFileToChannel(self._tt, szMediaFilePath, lpVideoCodec)
-
-    def stopStreamingMediaFileToChannel(self) -> bool:
-        return _StopStreamingMediaFileToChannel(self._tt)
-
-    def initLocalPlayback(self, szMediaFilePath, lpMediaFilePlayback: MediaFilePlayback) -> int:
-        return _InitLocalPlayback(self._tt, szMediaFilePath, lpMediaFilePlayback)
-
-    def updateLocalPlayback(self, nPlaybackSessionID: int, lpMediaFilePlayback: MediaFilePlayback) -> bool:
-        return _UpdateLocalPlayback(self._tt, nPlaybackSessionID, lpMediaFilePlayback)
-
-    def stopLocalPlayback(self, nPlaybackSessionID: int) -> bool:
-        return _StopLocalPlayback(self._tt, nPlaybackSessionID)
-
-    def enableAudioBlockEvent(self, nUserID: int, uStreamTypes: int, bEnable: bool) -> bool:
-        return _EnableAudioBlockEvent(self._tt, nUserID, uStreamTypes, bEnable)
-
-    def enableAudioBlockEventEx(self, nUserID: int, uStreamTypes: int, lpAudioFormat: AudioFormat, bEnable: bool) -> bool:
-        return _EnableAudioBlockEventEx(self._tt, nUserID, uStreamTypes, lpAudioFormat, bEnable)
-
-    def insertAudioBlock(self, lpAudioBlock: AudioBlock) -> bool:
-        return _InsertAudioBlock(self._tt, lpAudioBlock)
-
-    def acquireUserAudioBlock(self, uStreamTypes: StreamType, nUserID: int) -> POINTER(AudioBlock):
-        return _AcquireUserAudioBlock(self._tt, uStreamTypes, nUserID)
-
-    def releaseUserAudioBlock(self, lpAudioBlock: POINTER(AudioBlock)) -> bool:
-        return _ReleaseUserAudioBlock(self._tt, lpAudioBlock)
-
-
-    # event handling
-
-    def onConnectSuccess(self):
-        pass
-
-    def onConnectCryptError(self, clienterrormsg: ClientErrorMsg):
-        pass
-
-    def onConnectFailed(self):
-        pass
-
-    def onConnectionLost(self):
-        pass
-
-    def onCmdProcessing(self, cmdId: int, complete: bool):
-        pass
-
-    def onCmdError(self, cmdId: int, errmsg: ClientErrorMsg):
-        pass
-
-    def onCmdSuccess(self, cmdId: int):
-        pass
-
-    def onCmdMyselfLoggedIn(self, userid: int, useraccount: UserAccount):
-        pass
-
-    def onCmdMyselfLoggedOut(self):
-        pass
-
-    def onCmdMyselfKickedFromChannel(self, channelid: int, user: User):
-        pass
-
-    def onCmdUserLoggedIn(self, user: User):
-        pass
-
-    def onCmdUserLoggedOut(self, user: User):
-        pass
-
-    def onCmdUserUpdate(self, user: User):
-        pass
-
-    def onCmdUserJoinedChannel(self, user: User):
-        pass
-
-    def onCmdUserLeftChannel(self, channelid: int, user: User):
-        pass
-
-    def onCmdChannelNew(self, channel: Channel):
-        pass
-
-    def onCmdChannelUpdate(self, channel: Channel):
-        pass
-
-    def onCmdChannelRemove(self, channel: Channel):
-        pass
-
-    def onCmdUserTextMessage(self, textmessage: TextMessage):
-        pass
-
-    def onCmdServerUpdate(self, serverproperties: ServerProperties):
-        pass
-
-    def onCmdFileNew(self, remotefile: RemoteFile):
-        pass
-
-    def onCmdFileRemove(self, remotefile: RemoteFile):
-        pass
-
-    def onUserRecordMediaFile(self, userid: int, mediafileinfo: MediaFileInfo):
-        pass
-
-    def onUserAccountNew(self, useraccount: UserAccount):
-        pass
-
-    def onUserAccountRemove(self, useraccount: UserAccount):
-        pass
-
-    def onUserStateChange(self, user: User):
-        pass
-
-    def onUserAudioBlock(self, nUserID: int, nStreamType: StreamType):
-        pass
-
-    def onStreamMediaFile(self, mediafileinfo: MediaFileInfo):
-        pass
-
-    def onUserAccount(self, useraccount: UserAccount):
-        pass
-
-    def onBannedUser(self, banneduser: BannedUser):
-        pass
-
-    def onServerStatistics(self, serverstatistics: ServerStatistics):
-        pass
-
-    def onInternalError(self, clienterrormsg: ClientErrorMsg):
-        pass
-
-    def onSoundDeviceAdded(self, sounddevice: SoundDevice):
-        pass
-
-    def onSoundDeviceRemoved(self, sounddevice: SoundDevice):
-        pass
-
-    def onSoundDeviceUnplugged(self, sounddevice: SoundDevice):
-        pass
-
-    def onSoundDeviceNewDefaultInput(self, sounddevice: SoundDevice):
-        pass
-
-    def onSoundDeviceNewDefaultOutput(self, sounddevice: SoundDevice):
-        pass
-
-    def onSoundDeviceNewDefaultInputComDevice(self, sounddevice: SoundDevice):
-        pass
-
-    def onSoundDeviceNewDefaultOutputComDevice(self, sounddevice: SoundDevice):
-        pass
