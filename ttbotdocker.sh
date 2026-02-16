@@ -43,6 +43,8 @@ install_dependencies() {
 
         # 2. Add Docker's official GPG key
         mkdir -p /etc/apt/keyrings
+        # Remove existing docker.gpg to avoid replacement prompt
+        rm -f /etc/apt/keyrings/docker.gpg
         curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
         chmod a+r /etc/apt/keyrings/docker.gpg
 
