@@ -110,7 +110,7 @@ class Player:
         self._player.play(arg)
         # Prefetch next track to ensure gapless-like playback
         # Delay slightly to let the current track buffering / playback start smoothly first
-        threading.Timer(6.0, self._prefetch_next_track).start()
+        threading.Timer(1.0, self._prefetch_next_track).start()
 
     def _prefetch_next_track(self):
         """Identifies and fetches the stream URL for the next track in background."""
