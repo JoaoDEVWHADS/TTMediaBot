@@ -18,7 +18,10 @@ This fork includes several modifications and optimizations:
 This fork includes optimized support for **YouTube Music** alongside regular YouTube:
 
 - **YouTube Search API Integration:** Uses the YouTube Search API for fast and reliable music discovery
-- **Optimized Library:** The original `youtubesearch` Python library has been replaced with a faster, more up-to-date version
+- **Optimized Libraries:** 
+  - YouTube uses `py-yt-search` - a fast and modern Python library for YouTube searches
+  - YouTube Music uses `ytmusicapi` - the official YouTube Music API library
+  - Both services use `yt-dlp` for audio extraction
 - **Performance Focus:** Designed to run with minimal bottlenecks, ensuring smooth playback and quick search results
 - **Unified Cookie System:** Both YouTube and YouTube Music use the same cookies configuration for authentication
 
