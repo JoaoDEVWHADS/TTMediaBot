@@ -1486,6 +1486,9 @@ class TeamTalk(object):
     def doDeleteFile(self, nChannelID, nFileID):
         return _DoDeleteFile(self._tt, nChannelID, nFileID)
 
+    def doMoveUser(self, nUserID, nChannelID):
+        return _DoMoveUser(self._tt, nUserID, nChannelID)
+
     def doChangeNickname(self, szNewNick):
         return _DoChangeNickname(self._tt, szNewNick)
 

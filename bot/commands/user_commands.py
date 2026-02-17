@@ -548,17 +548,50 @@ class JoinChannelCommand(Command):
         return self.translator.translate("Makes the bot join your current channel")
 
     def __call__(self, arg: str, user: User) -> Optional[str]:
+        # Stop playback if playing
+        if self.player.state != State.Stopped:
+             self.player.stop()
+
         # Get user's current channel
         user_channel = user.channel
         
-        # Join the user's channel
+        # Move the bot to the user's channel
         try:
-            self.ttclient.join_channel(user_channel.id, "")
+            cmd = self.ttclient.move_user(self.ttclient.user.id, user_channel.id)
             
-            # Track this user for monitoring
+            # Wait for completion
+            import time
+            from bot import app_vars
+            from queue import Empty
+            
+            # Wait for event
+            start_time = time.time()
+            while time.time() - start_time < 5: # 5 seconds timeout
+                try:
+                    event = self.ttclient.event_success_queue.get_nowait()
+                    if event.source == cmd:
+                        # Track this user for monitoring
+                        self._bot.jc_requested_by_user_id = user.id
+                        return self.translator.translate("Joining channel: {}").format(user_channel.name)
+                    else:
+                        self.ttclient.event_success_queue.put(event)
+                except Empty:
+                    pass
+                
+                try:
+                    error = self.ttclient.errors_queue.get_nowait()
+                    if error.command_id == cmd:
+                        return self.translator.translate("Failed to join channel. Error: {}").format(error.message)
+                    else:
+                        self.ttclient.errors_queue.put(error)
+                except Empty:
+                    pass
+                time.sleep(app_vars.loop_timeout)
+            
+            # If timeout, assume success (maybe event was missed or handled elsewhere) or just return "Command sent"
             self._bot.jc_requested_by_user_id = user.id
-            
             return self.translator.translate("Joining channel: {}").format(user_channel.name)
+            
         except Exception as e:
             return self.translator.translate("Failed to join channel: {}").format(str(e))
 

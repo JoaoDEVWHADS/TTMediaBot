@@ -193,6 +193,15 @@ class TeamTalk:
                 raise ValueError()
         return self.tt.doJoinChannelByID(channel_id, _str(password))
 
+    def move_user(self, user_id: int, channel: Union[str, int]) -> int:
+        if isinstance(channel, int):
+            channel_id = channel
+        else:
+            channel_id = self.tt.getChannelIDFromPath(_str(channel))
+            if channel_id == 0:
+                raise ValueError()
+        return self.tt.doMoveUser(user_id, channel_id)
+
     def change_nickname(self, nickname: str) -> None:
         self.tt.doChangeNickname(_str(nickname))
 
