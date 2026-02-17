@@ -141,39 +141,55 @@ build_image() {
         sleep 2
     else
         echo -e "${GREEN}Image '${BOT_IMAGE}' already exists.${NC}"
-        read -p "Do you want to rebuild the image (Update code)? (y/N): " rebuild
-        if [[ "$rebuild" =~ ^[yY]$ ]]; then
-            echo ""
-            echo "Checking running bots..."
-            # Capture NAMES of running bots to restart them later
-            RUNNING_NAMES=$(docker ps --format "{{.Names}}" -f "label=role=ttmediabot")
-            
-            if [ ! -z "$RUNNING_NAMES" ]; then
-                echo -e "${YELLOW}Stopping bots for update...${NC}"
-                echo "$RUNNING_NAMES" | xargs docker stop -t 1 > /dev/null 2>&1
-            fi
-            
-            echo -e "${YELLOW}Building new image (updating code, keeping dependencies in cache)...${NC}"
-            docker build --build-arg CACHEBUST=$(date +%s) -t ${BOT_IMAGE} .
-            
-            if [ $? -eq 0 ]; then
-                 echo -e "${GREEN}Image updated successfully!${NC}"
-                 
-                 # Recreate containers to use new image
-                 recreate_bot_containers
-                 
-                 if [ ! -z "$RUNNING_NAMES" ]; then
-                     echo -e "${YELLOW}Restarting active bots...${NC}"
-                     echo "$RUNNING_NAMES" | xargs docker start > /dev/null 2>&1
-                     echo -e "${GREEN}Bots restarted with the new code.${NC}"
-                 fi
-            else
-                 echo -e "${RED}Error building image!${NC}"
-                 exit 1
-            fi
-            sleep 2
-        fi
+        # No prompt here anymore
+        sleep 1
     fi
+}
+
+# Function: Force Rebuild Image (Menu Option)
+force_rebuild_image() {
+    header
+    echo -e "${YELLOW} --- Rebuild Image / Update Code --- ${NC}"
+    echo "This will pull the latest changes (if you updated files) and rebuild the Docker image."
+    echo ""
+    read -p "Are you sure? (y/N): " confirm
+    
+    if [[ ! "$confirm" =~ ^[yY]$ ]]; then
+        return
+    fi
+
+    echo ""
+    echo "Checking running bots..."
+    # Capture NAMES of running bots to restart them later
+    RUNNING_NAMES=$(docker ps --format "{{.Names}}" -f "label=role=ttmediabot")
+    
+    if [ ! -z "$RUNNING_NAMES" ]; then
+        echo -e "${YELLOW}Stopping bots for update...${NC}"
+        echo "$RUNNING_NAMES" | xargs docker stop -t 1 > /dev/null 2>&1
+    fi
+    
+    echo -e "${YELLOW}Building new image (updating code, keeping dependencies in cache)...${NC}"
+    docker build --build-arg CACHEBUST=$(date +%s) -t ${BOT_IMAGE} .
+    
+    if [ $? -eq 0 ]; then
+         echo -e "${GREEN}Image updated successfully!${NC}"
+         
+         # Recreate containers to use new image
+         recreate_bot_containers
+         
+         if [ ! -z "$RUNNING_NAMES" ]; then
+             echo -e "${YELLOW}Restarting active bots...${NC}"
+             echo "$RUNNING_NAMES" | xargs docker start > /dev/null 2>&1
+             echo -e "${GREEN}Bots restarted with the new code.${NC}"
+         fi
+    else
+         echo -e "${RED}Error building image!${NC}"
+         # Don't exit script, just return to menu
+         read -p "Press Enter to continue..."
+         return
+    fi
+    
+    read -p "Process completed. Press Enter to return..."
 }
 
 # Function: Create Bot
@@ -1327,8 +1343,9 @@ header
 while true; do
     echo "1. Create Bot"
     echo "2. Manage Bots"
-    echo "3. Uninstall Everything (Total Cleanup)"
-    echo "4. Exit"
+    echo "3. Rebuild Image / Update Code"
+    echo "4. Uninstall Everything (Total Cleanup)"
+    echo "5. Exit"
     echo ""
     read -p "Choose an option: " option
     
@@ -1348,9 +1365,13 @@ while true; do
             header
             ;;
         3)
-            uninstall_all
+            force_rebuild_image
+            header
             ;;
         4)
+            uninstall_all
+            ;;
+        5)
             echo "Exiting..."
             exit 0
             ;;

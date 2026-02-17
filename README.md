@@ -196,7 +196,13 @@ Comprehensive bot management submenu with 10 options:
 
 **2.10. Return to Main Menu**
 
-#### 3. Uninstall Everything
+#### 3. Rebuild Image / Update Code
+Updates the bot code and rebuilds the Docker image:
+- Rebuilds Docker image with `CACHEBUST` to ensure fresh code
+- Recreates containers with new image
+- Restarts only previously running bots
+
+#### 4. Uninstall Everything
 Complete cleanup of TTMediaBot installation:
 - Stops all bot containers
 - Removes all containers
@@ -204,18 +210,38 @@ Complete cleanup of TTMediaBot installation:
 - Removes Docker image
 - **Warning:** This is irreversible!
 
-#### 4. Exit
+#### 5. Exit
 Closes the script
 
 ### Automatic Features
 
 The script automatically:
 - **Installs dependencies** (Docker, jq) on first run
-- **Builds Docker image** if not present
+- **Builds Docker image** automatically on first run (if not present)
+- **No startup prompts:** Rebuilding is now a manual menu option (Option 3), making startup faster
 - **Creates `bots` directory** structure
 - **Detects conflicts** (container names, nicknames on same server)
 - **Sets permissions** correctly for Docker volumes
 - **Uses labels** for easy container filtering
+
+---
+
+## 🔄 Standalone Update Script (`update.sh`)
+
+If you already have bots installed and just want to update the code without using the full Docker manager, you can use the standalone `update.sh` script.
+
+**How to use:**
+1. Download the script to your `TTMediaBot` folder:
+   ```bash
+   wget https://raw.githubusercontent.com/JoaoDEVWHADS/TTMediaBot/master/update.sh
+   chmod +x update.sh
+   ```
+2. Run it:
+   ```bash
+   sudo ./update.sh
+   ```
+
+This script will update the repository, rebuild the image, and recreate containers, ensuring everything is up to date.
 
 ---
 
@@ -332,9 +358,11 @@ TTMediaBot supports multiple languages. Change language using the `cl` admin com
    ```
 
 3. **Check bot logs:**
-   ```bash
-   docker logs [bot_name]
-   ```
+   - **Docker logs:**
+     ```bash
+     docker logs [bot_name]
+     ```
+   - **Log file:** Check `bots/[bot_name]/TTMediaBot.log` directly.
 
 ### Bot Won't Connect to Server
 
@@ -352,10 +380,9 @@ TTMediaBot supports multiple languages. Change language using the `cl` admin com
 3. **Check encryption setting:**
    - If server uses encryption, set `"encrypted": true` in config
 
-4. **View container logs:**
-   ```bash
-   docker logs [bot_name]
-   ```
+4. **View logs:**
+   - **Docker:** `docker logs [bot_name]`
+   - **File:** `bots/[bot_name]/TTMediaBot.log`
 
 ### Audio Issues / No Sound
 
@@ -379,9 +406,8 @@ TTMediaBot supports multiple languages. Change language using the `cl` admin com
 
 **Solutions:**
 1. **Check logs:**
-   ```bash
-   docker logs [bot_name]
-   ```
+   - **Docker:** `docker logs [bot_name]`
+   - **File:** `bots/[bot_name]/TTMediaBot.log`
 
 2. **Verify configuration:**
    - Ensure `config.json` is valid JSON
@@ -428,7 +454,7 @@ cp -r bots bots_backup_$(date +%Y%m%d)
 **A:** Check:
 - Network stability
 - Server status
-- Bot logs: `docker logs [bot_name]`
+- Bot logs: `docker logs [bot_name]` or check `bots/[bot_name]/TTMediaBot.log`
 - Increase `reconnection_timeout` in `config.json`
 
 ### Q: How do I change the bot's nickname?
