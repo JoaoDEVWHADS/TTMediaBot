@@ -99,20 +99,15 @@ recreate_bot_containers() {
             # Ensure cookies.txt exists just in case
             if [ ! -f "$d/cookies.txt" ]; then touch "$d/cookies.txt"; fi
             
-            docker create \
-                --name "${bot_name}" \
-                --network host \
-                --label "role=ttmediabot" \
-                --restart always \
-                -v "${d}:/home/ttbot/TTMediaBot/data" \
-                -v "${d}/cookies.txt:/home/ttbot/TTMediaBot/data/cookies.txt" \
-                "${BOT_IMAGE}" > /dev/null 2>&1
-                
-            if [ $? -eq 0 ]; then
-                echo "  ✓ Container '$bot_name' updated"
-            else
-                echo "  ✗ Error updating '$bot_name'"
-            fi
+            docker run -d \
+              --name "$bot_name" \
+              --restart unless-stopped \
+              -v "$d/config.json":/home/ttbot/TTMediaBot/config.json \
+              -v "$d/cookies.txt":/home/ttbot/TTMediaBot/cookies.txt \
+              --label "role=ttmediabot" \
+              "$BOT_IMAGE" >/dev/null 2>&1
+              
+            echo -e "  ${GREEN}✓ Container '$bot_name' updated${NC}"
         fi
     done
 }
@@ -141,38 +136,7 @@ build_image() {
         sleep 2
     else
         echo -e "${GREEN}Image '${BOT_IMAGE}' already exists.${NC}"
-        read -p "Do you want to rebuild the image (Update code)? (y/N): " rebuild
-        if [[ "$rebuild" =~ ^[yY]$ ]]; then
-            echo ""
-            echo "Checking running bots..."
-            # Capture NAMES of running bots to restart them later
-            RUNNING_NAMES=$(docker ps --format "{{.Names}}" -f "label=role=ttmediabot")
-            
-            if [ ! -z "$RUNNING_NAMES" ]; then
-                echo -e "${YELLOW}Stopping bots for update...${NC}"
-                echo "$RUNNING_NAMES" | xargs docker stop -t 1 > /dev/null 2>&1
-            fi
-            
-            echo -e "${YELLOW}Building new image (updating code, keeping dependencies in cache)...${NC}"
-            docker build --build-arg CACHEBUST=$(date +%s) -t ${BOT_IMAGE} .
-            
-            if [ $? -eq 0 ]; then
-                 echo -e "${GREEN}Image updated successfully!${NC}"
-                 
-                 # Recreate containers to use new image
-                 recreate_bot_containers
-                 
-                 if [ ! -z "$RUNNING_NAMES" ]; then
-                     echo -e "${YELLOW}Restarting active bots...${NC}"
-                     echo "$RUNNING_NAMES" | xargs docker start > /dev/null 2>&1
-                     echo -e "${GREEN}Bots restarted with the new code.${NC}"
-                 fi
-            else
-                 echo -e "${RED}Error building image!${NC}"
-                 exit 1
-            fi
-            sleep 2
-        fi
+        # No prompt. User can rebuild via menu option 5.
     fi
 }
 
@@ -204,7 +168,16 @@ create_bot() {
         return
     fi
 
-    # ... inputs ...
+    # Read config template
+    # Here assuming we just copy the template and modify with sed or jq, but a simple interactive way is safer.
+    # The original script used 'sed' on the copied file.
+    
+    mkdir -p "$BOT_DIR"
+    cp "$CONFIG_SOURCE" "$BOT_DIR/config.json"
+    touch "$BOT_DIR/cookies.txt"
+
+    # Minimal Interactive Config
+    echo "Configure Bot Settings:"
     read -p "TeamTalk Server Address: " server_addr
     read -p "TCP Port (Default 10333): " tcp_port
     tcp_port=${tcp_port:-10333}
@@ -234,1086 +207,428 @@ create_bot() {
     container_base=""
     
     if [[ "$batch_create" =~ ^[yY]$ ]]; then
-        read -p "How many ADDITIONAL bots to create (besides the main one)?: " additional_bots
-        if [[ ! "$additional_bots" =~ ^[0-9]+$ ]] || [ "$additional_bots" -lt 0 ]; then
-            echo -e "${RED}Invalid quantity. Creating only the main bot.${NC}"
-            additional_bots=0
-        fi
-        
-        if [ "$additional_bots" -gt 0 ]; then
-            echo -e "${YELLOW}WARNING: Use a different BASE name for containers to avoid conflicts!${NC}"
-            read -p "BASE name for CONTAINERS (Enter = default 'bot'): " container_base
-            if [[ -z "$container_base" ]]; then
-                container_base="bot"
-            fi
-            read -p "BASE name for NICKNAMES (Enter = same as container '$container_base'): " nickname_base
-            if [[ -z "$nickname_base" ]]; then
-                nickname_base="$container_base"
-            fi
-        else
-            # No additional bots, use bot_name as container_base
-            container_base="$bot_name"
-        fi
-    else
-        # Single bot creation - use bot_name as container_base
-        container_base="$bot_name"
+        read -p "How many additional bots? " additional_bots
+        read -p "Base/Prefix for Bot Name (e.g. MyBot -> MyBot1, MyBot2...): " container_base
+        read -p "Base/Prefix for Nickname (e.g. DJ -> DJ1, DJ2...): " nickname_base
     fi
     
-    total_bots=$((additional_bots + 1))
-    echo -e "${YELLOW}Creating $total_bots bot(s)...${NC}"
-    
-    
-    # Find highest existing number for both container names and nicknames
-    highest_num=0
-    base_name_exists=false
-    highest_nickname_num=0
-    nickname_base_exists=false
-    
-    if [ -d "$BOTS_ROOT" ] && [ -n "$container_base" ]; then
-        for d in "$BOTS_ROOT"/*; do
-            if [ -d "$d" ]; then
-                name=$(basename "$d")
-                
-                # Check container names strictly against container_base
-                if [[ "$name" == "$container_base" ]]; then
-                    base_name_exists=true
-                elif [[ "$name" =~ ^${container_base}([0-9]+)$ ]]; then
-                    num="${BASH_REMATCH[1]}"
-                    [ "$num" -gt "$highest_num" ] && highest_num=$num
-                fi
-                
-                # Check nicknames in config.json strictly against nickname_base
-                # BUT ONLY for bots on the SAME SERVER (hostname + port)
-                config_file="$d/config.json"
-                if [ -f "$config_file" ] && [ -n "$nickname_base" ]; then
-                    # Get server info from this bot's config
-                    existing_hostname=$(jq -r '.teamtalk.hostname // ""' "$config_file")
-                    existing_tcp_port=$(jq -r '.teamtalk.tcp_port // 0' "$config_file")
-                    
-                    # Only check nicknames if it's the SAME server
-                    if [[ "$existing_hostname" == "$server_addr" ]] && [[ "$existing_tcp_port" == "$tcp_port" ]]; then
-                        existing_nickname=$(jq -r '.teamtalk.nickname // ""' "$config_file")
-                        
-                        if [[ "$existing_nickname" == "$nickname_base" ]]; then
-                            nickname_base_exists=true
-                        elif [[ "$existing_nickname" =~ ^${nickname_base}([0-9]+)$ ]]; then
-                            nick_num="${BASH_REMATCH[1]}"
-                            [ "$nick_num" -gt "$highest_nickname_num" ] && highest_nickname_num=$nick_num
-                        fi
-                    fi
-                fi
-            fi
-        done
-    fi
-    
-    # Simple sequential counter for naming
-    # When base doesn't exist, we start numbering from 1 (bot, bot1, bot2...)
-    # When base exists, we continue from highest_num + 1
-    if [ "$base_name_exists" == "true" ]; then
-        next_container_num=$((highest_num + 1))
-    else
-        next_container_num=1
-    fi
-    
-    if [ "$nickname_base_exists" == "true" ]; then
-        next_nickname_num=$((highest_nickname_num + 1))
-    else
-        next_nickname_num=1
-    fi
-    
-    # Track if we've used the base name yet
-    container_base_used=$base_name_exists
-    nickname_base_used=$nickname_base_exists
-    
-    # Loop to create bots
-    for i in $(seq 1 $total_bots); do
-        # Determine container name
-        if [ $i -eq 1 ]; then
-            # First bot uses container_base
-            if [ "$container_base_used" == "false" ]; then
-                current_bot_name="$container_base"
-                container_base_used=true
-            else
-                current_bot_name="${container_base}${next_container_num}"
-                next_container_num=$((next_container_num + 1))
-            fi
-            current_nickname="$nickname"
-        else
-            # Additional bots use container_base for container naming
-            # Sequence: bot, bot1, bot2, bot3...
-            if [ "$container_base_used" == "false" ]; then
-                # Base name not used yet, use it now
-                current_bot_name="$container_base"
-                container_base_used=true
-            else
-                # Base name already used, use numbered version
-                current_bot_name="${container_base}${next_container_num}"
-                next_container_num=$((next_container_num + 1))
-            fi
-            
-            # Nickname follows same logic
-            if [ -n "$nickname_base" ]; then
-                if [ "$nickname_base_used" == "false" ]; then
-                    current_nickname="$nickname_base"
-                    nickname_base_used=true
-                else
-                    current_nickname="${nickname_base}${next_nickname_num}"
-                    next_nickname_num=$((next_nickname_num + 1))
-                fi
-            else
-                current_nickname="$current_bot_name"
-            fi
-        fi
-        
-        CURRENT_BOT_DIR="${BOTS_ROOT}/${current_bot_name}"
-        
-        # Check if container exists
-        if [ "$(docker ps -a -q -f name=^/${current_bot_name}$)" ]; then
-            echo -e "${RED}Skipping '$current_bot_name' (container already exists)${NC}"
-            continue
-        fi
-        
-        if [ -d "$CURRENT_BOT_DIR" ]; then
-            echo -e "${RED}Skipping '$current_bot_name' (folder already exists)${NC}"
-            continue
-        fi
-        
-        echo ""
-        echo -e "${YELLOW}Creating bot '$current_bot_name'...${NC}"
-        mkdir -p "$CURRENT_BOT_DIR"
-    
-    # Copy default config
-    cp "$CONFIG_SOURCE" "$CURRENT_BOT_DIR/config.json"
-    
-    # Configure cookies mount
-    COOKIES_MOUNT=""
-    CONTAINER_COOKIE_PATH=""
-    
-    if [ -f "$cookies_path" ]; then
-        echo "Copying cookies file..."
-        cp "$cookies_path" "$CURRENT_BOT_DIR/cookies.txt"
-        COOKIES_MOUNT="-v ${CURRENT_BOT_DIR}/cookies.txt:/home/ttbot/TTMediaBot/data/cookies.txt"
-        CONTAINER_COOKIE_PATH="data/cookies.txt"
-    else
-        echo -e "${RED}Cookies file not found! The bot will be created without specific cookies.${NC}"
-        # Create empty cookies file to avoid mount errors if referenced
-        touch "$CURRENT_BOT_DIR/cookies.txt"
-        COOKIES_MOUNT="-v ${CURRENT_BOT_DIR}/cookies.txt:/home/ttbot/TTMediaBot/data/cookies.txt"
-        CONTAINER_COOKIE_PATH="data/cookies.txt"
-    fi
-    
-    # Update JSON with jq
+    # Use jq to update the main config.json
     tmp_config=$(mktemp)
     jq --arg host "$server_addr" \
-       --argjson tcp "$tcp_port" \
-       --argjson udp "$udp_port" \
+       --arg tcp "$tcp_port" \
+       --arg udp "$udp_port" \
        --argjson enc "$encrypted" \
-       --arg nick "$current_nickname" \
        --arg user "$username" \
        --arg pass "$password" \
-       --arg cookie "$CONTAINER_COOKIE_PATH" \
-       '.teamtalk.hostname = $host | 
-        .teamtalk.tcp_port = $tcp | 
-        .teamtalk.udp_port = $udp | 
-        .teamtalk.encrypted = $enc | 
-        .teamtalk.nickname = $nick | 
-        .teamtalk.username = $user | 
-        .teamtalk.password = $pass |
-        if $cookie != "" then .services.yt.cookiefile_path = $cookie else . end' \
-       "$CURRENT_BOT_DIR/config.json" > "$tmp_config" && mv "$tmp_config" "$CURRENT_BOT_DIR/config.json"
+       --arg nick "$nickname" \
+       '.teamtalk.host = $host | .teamtalk.tcp_port = ($tcp|tonumber) | .teamtalk.udp_port = ($udp|tonumber) | .teamtalk.encrypted = $enc | .teamtalk.username = $user | .teamtalk.password = $pass | .teamtalk.nickname = $nick' \
+       "$BOT_DIR/config.json" > "$tmp_config" && mv "$tmp_config" "$BOT_DIR/config.json"
+       
+    # Handle Cookies
+    if [ -f "$cookies_path" ]; then
+        cp "$cookies_path" "$BOT_DIR/cookies.txt"
+        echo "Cookies copied."
+    fi
 
-    # Fix permissions for container user (uid 1000 is standard for non-root in many images)
-    echo "Adjusting folder permissions..."
-    chown -R 1000:1000 "$CURRENT_BOT_DIR"
-
-    echo -e "${YELLOW}Creating container...${NC}"
-    # Use label to identify bots later since name is variable
-    docker create \
-        --name "${current_bot_name}" \
-        --network host \
-        --label "role=ttmediabot" \
-        --restart always \
-        -v "${CURRENT_BOT_DIR}:/home/ttbot/TTMediaBot/data" \
-        $COOKIES_MOUNT \
-        "${BOT_IMAGE}" > /dev/null 2>&1
-
-
+    echo "Starting container..."
+    docker run -d \
+      --name "$bot_name" \
+      --restart unless-stopped \
+      -v "$BOT_DIR/config.json":/home/ttbot/TTMediaBot/config.json \
+      -v "$BOT_DIR/cookies.txt":/home/ttbot/TTMediaBot/cookies.txt \
+      --label "role=ttmediabot" \
+      "$BOT_IMAGE" >/dev/null 2>&1
+      
     if [ $? -eq 0 ]; then
-        echo "  ✓ Bot '$current_bot_name' created successfully!"
+        echo -e "${GREEN}Bot '$bot_name' created successfully!${NC}"
     else
-        echo "  ✗ Error creating '$current_bot_name'"
+        echo -e "${RED}Failed to create bot container.${NC}"
     fi
-    done
+
+    # Batch creation loop
+    if [[ "$batch_create" =~ ^[yY]$ ]] && [ "$additional_bots" -gt 0 ]; then
+        echo "Creating $additional_bots additional bots..."
+        for ((i=1; i<=additional_bots; i++)); do
+            new_name="${container_base}${i}"
+            new_nick="${nickname_base}${i}"
+            new_dir="${BOTS_ROOT}/${new_name}"
+            
+            echo "Creating $new_name ($new_nick)..."
+            
+             if [ -d "$new_dir" ] || [ "$(docker ps -a -q -f name=^/${new_name}$)" ]; then
+                echo -e "${RED}Skipping '$new_name' (exists).${NC}"
+                continue
+            fi
+            
+            mkdir -p "$new_dir"
+            # Update config with new nickname
+            jq --arg nick "$new_nick" '.teamtalk.nickname = $nick' "$BOT_DIR/config.json" > "$new_dir/config.json"
+            cp "$BOT_DIR/cookies.txt" "$new_dir/cookies.txt"
+            
+            docker run -d \
+              --name "$new_name" \
+              --restart unless-stopped \
+              -v "$new_dir/config.json":/home/ttbot/TTMediaBot/config.json \
+              -v "$new_dir/cookies.txt":/home/ttbot/TTMediaBot/cookies.txt \
+              --label "role=ttmediabot" \
+              "$BOT_IMAGE" >/dev/null 2>&1
+        done
+        echo "Batch creation complete."
+    fi
     
-    echo ""
-    echo -e "${YELLOW}Starting all bots in parallel...${NC}"
-    # Start all newly created bots in parallel
-    docker start $(docker ps -a -q -f "label=role=ttmediabot" -f "status=created") 2>/dev/null
-    
-    echo -e "${GREEN}Creation completed! $total_bots bot(s) created and started.${NC}"
     read -p "Press Enter to return..."
-}
-
-# Function: List Bots
-list_bots() {
-    echo -e "${YELLOW}Existing Bots:${NC}"
-    if [ -d "$BOTS_ROOT" ]; then
-        ls -1 "$BOTS_ROOT"
-    else
-        echo "No bots found."
-    fi
-        echo ""
-}
-
-# Function: Delete Bot
-delete_bot() {
-    # Show menu once
     header
-    while true; do
-        echo -e "${YELLOW} --- Delete Bot --- ${NC}"
-        
-        # Array to store bot names
-        bots=()
-        if [ -d "$BOTS_ROOT" ]; then
-            for d in "$BOTS_ROOT"/*; do
-                if [ -d "$d" ]; then
-                    bots+=("$(basename "$d")")
-                fi
-            done
-        fi
-        
-        if [ ${#bots[@]} -eq 0 ]; then
-            echo "No bots found."
-            read -p "Enter to return..."
-            return
-        fi
-        
-        echo "Bots available for deletion:"
-        for i in "${!bots[@]}"; do
-            # Display 1-based index
-            echo "$((i+1)). ${bots[$i]}"
-        done
-        echo "0. Return"
-        echo ""
-        
-        read -p "Enter the NUMBER of the bot to DELETE: " bot_num
-        
-        # Handle Empty (Enter key) - Just refresh
-        if [[ -z "$bot_num" ]]; then
-            echo ""
-            continue
-        fi
-        
-        # Handle Return
-        if [[ "$bot_num" == "0" ]]; then return; fi
-        
-        # Validate input
-        if [[ ! "$bot_num" =~ ^[0-9]+$ ]] || [ "$bot_num" -lt 1 ] || [ "$bot_num" -gt "${#bots[@]}" ]; then
-            # Invalid option - just reprint menu
-            echo ""
-            continue
-        fi
-        
-        # Get bot name by index (adjust for 1-based input)
-        idx=$((bot_num-1))
-        bot_to_delete="${bots[$idx]}"
-        
-        CONTAINER_NAME="${bot_to_delete}"
-        BOT_DIR="${BOTS_ROOT}/${bot_to_delete}"
-        
-        echo -e "${RED}WARNING: This will delete everything about '$bot_to_delete' (Container and Folder).${NC}"
-        read -p "Are you sure? (y/N): " confirm
-        if [[ "$confirm" =~ ^[yY]$ ]]; then
-            echo "1. Removing Container..."
-            docker stop -t 1 "$CONTAINER_NAME" >/dev/null 2>&1
-            docker rm "$CONTAINER_NAME" >/dev/null 2>&1
-            echo "   OK (If existed)."
-            
-            echo "2. Removing Folder..."
-            if [ -d "$BOT_DIR" ]; then
-                rm -rf "$BOT_DIR"
-                echo "   Folder removed: $BOT_DIR"
-            else
-                echo "   Folder not found (already removed)."
-            fi
-            
-            echo -e "${GREEN}Cleanup completed for '$bot_to_delete'.${NC}"
-            read -p "Press Enter to continue..."
-            # Refresh menu after deletion
-            header
-        else
-            echo "Cancelled."
-            echo ""
-        fi
-    done
-}
-
-# Function: Delete Multiple Bots at Once
-delete_bots_batch() {
-    # Show menu once
-    header
-    while true; do
-        echo -e "${YELLOW} --- Bulk Delete Bots --- ${NC}"
-        
-        # Array to store bot names
-        bots=()
-        if [ -d "$BOTS_ROOT" ]; then
-            for d in "$BOTS_ROOT"/*; do
-                if [ -d "$d" ]; then
-                    bots+=("$(basename "$d")")
-                fi
-            done
-        fi
-        
-        if [ ${#bots[@]} -eq 0 ]; then
-            echo "No bots found."
-            read -p "Enter to return..."
-            return
-        fi
-        
-        echo "Bots available for deletion:"
-        for i in "${!bots[@]}"; do
-            echo "$((i+1)). ${bots[$i]}"
-        done
-        echo "0. Return"
-        echo ""
-        echo -e "${YELLOW}Enter NUMBERS separated by SPACE (ex: 1 2 5):${NC}"
-        read -p "> " bot_nums
-        
-        # Handle Empty (Enter key) - Just refresh
-        if [[ -z "$bot_nums" ]]; then
-            echo ""
-            continue
-        fi
-        
-        # Handle Return
-        if [[ "$bot_nums" == "0" ]]; then return; fi
-        
-        # Parse and validate numbers
-        selected_bots=()
-        invalid=false
-        for num in $bot_nums; do
-            if [[ ! "$num" =~ ^[0-9]+$ ]] || [ "$num" -lt 1 ] || [ "$num" -gt "${#bots[@]}" ]; then
-                echo -e "${RED}Invalid number: $num${NC}"
-                invalid=true
-                break
-            fi
-            idx=$((num-1))
-            selected_bots+=("${bots[$idx]}")
-        done
-        
-        if [ "$invalid" = true ]; then
-            echo ""
-            continue
-        fi
-        
-        # Show summary and confirm
-        echo ""
-        echo -e "${RED}WARNING: You are about to DELETE the following bots:${NC}"
-        for bot in "${selected_bots[@]}"; do
-            echo "  - $bot"
-        done
-        echo ""
-        read -p "Are you sure? (y/N): " confirm
-        
-        if [[ "$confirm" =~ ^[yY]$ ]]; then
-            echo ""
-            echo -e "${YELLOW}Stopping all selected containers...${NC}"
-            # Stop all selected containers at once
-            docker stop -t 1 "${selected_bots[@]}" >/dev/null 2>&1
-            
-            echo -e "${YELLOW}Removing containers...${NC}"
-            # Remove all selected containers at once
-            docker rm "${selected_bots[@]}" >/dev/null 2>&1
-            
-            echo -e "${YELLOW}Removing folders...${NC}"
-            # Remove directories
-            for bot_name in "${selected_bots[@]}"; do
-                BOT_DIR="${BOTS_ROOT}/${bot_name}"
-                if [ -d "$BOT_DIR" ]; then
-                    rm -rf "$BOT_DIR"
-                fi
-            done
-            
-            echo ""
-            echo -e "${GREEN}Bulk cleanup completed! ${#selected_bots[@]} bot(s) deleted.${NC}"
-            read -p "Press Enter to continue..."
-            header
-        else
-            echo "Cancelled."
-            echo ""
-        fi
-    done
-}
-
-# Function: Bulk Update Configuration
-bulk_update_config() {
-    header
-    echo -e "${YELLOW} --- Bulk Update Configuration --- ${NC}"
-    echo ""
-    
-    # Get list of bots
-    bots=()
-    if [ -d "$BOTS_ROOT" ]; then
-        for d in "$BOTS_ROOT"/*; do
-            if [ -d "$d" ]; then
-                bot_name=$(basename "$d")
-                bots+=("$bot_name")
-            fi
-        done
-    fi
-    
-    if [ ${#bots[@]} -eq 0 ]; then
-        echo "No bots found."
-        read -p "Enter to return..."
-        return
-    fi
-    
-    # Read first bot's config as reference
-    first_bot="${bots[0]}"
-    first_config="$BOTS_ROOT/$first_bot/config.json"
-    
-    if [ ! -f "$first_config" ]; then
-        echo -e "${RED}Error: config.json not found.${NC}"
-        read -p "Enter to return..."
-        return
-    fi
-    
-    # Extract current values
-    current_host=$(jq -r '.teamtalk.hostname // "N/A"' "$first_config")
-    current_tcp=$(jq -r '.teamtalk.tcp_port // "N/A"' "$first_config")
-    current_udp=$(jq -r '.teamtalk.udp_port // "N/A"' "$first_config")
-    current_enc=$(jq -r '.teamtalk.encrypted // false' "$first_config")
-    current_user=$(jq -r '.teamtalk.username // "N/A"' "$first_config")
-    
-    echo -e "${GREEN}Current configuration (reference: $first_bot):${NC}"
-    echo "  Server: $current_host"
-    echo "  TCP: $current_tcp"
-    echo "  UDP: $current_udp"
-    echo "  Encryption: $([ "$current_enc" = "true" ] && echo "Yes" || echo "No")"
-    echo "  Username: $current_user"
-    echo ""
-    echo "Total bots: ${#bots[@]}"
-    echo ""
-    
-    # Menu for field selection
-    while true; do
-        echo "What do you want to change?"
-        echo "1. Server (hostname)"
-        echo "2. Ports (TCP/UDP)"
-        echo "3. Encryption"
-        echo "4. Credentials (username/password)"
-        echo "5. Everything"
-        echo "0. Cancel"
-        echo ""
-        read -p "Choose an option: " choice
-        
-        if [[ -z "$choice" ]]; then
-            echo ""
-            continue
-        fi
-        
-        case $choice in
-            0)
-                return
-                ;;
-            1|2|3|4|5)
-                break
-                ;;
-            *)
-                echo ""
-                continue
-                ;;
-        esac
-    done
-    
-    # Collect new values based on choice
-    new_host=""
-    new_tcp=""
-    new_udp=""
-    new_enc=""
-    new_user=""
-    new_pass=""
-    
-    echo ""
-    
-    if [[ "$choice" == "1" || "$choice" == "5" ]]; then
-        read -p "New server (Enter = keep '$current_host'): " new_host
-        new_host=${new_host:-$current_host}
-    fi
-    
-    if [[ "$choice" == "2" || "$choice" == "5" ]]; then
-        read -p "New TCP port (Enter = keep '$current_tcp'): " new_tcp
-        new_tcp=${new_tcp:-$current_tcp}
-        read -p "New UDP port (Enter = keep '$current_udp'): " new_udp
-        new_udp=${new_udp:-$current_udp}
-    fi
-    
-    if [[ "$choice" == "3" || "$choice" == "5" ]]; then
-        read -p "Encryption (y/N): " enc_input
-        if [[ "$enc_input" =~ ^[yY]$ ]]; then
-            new_enc="true"
-        else
-            new_enc="false"
-        fi
-    fi
-    
-    if [[ "$choice" == "4" || "$choice" == "5" ]]; then
-        read -p "New username (Enter = keep '$current_user'): " new_user
-        new_user=${new_user:-$current_user}
-        read -p "New password: " new_pass
-    fi
-    
-    # Show summary
-    echo ""
-    echo -e "${YELLOW}Changes summary:${NC}"
-    [ -n "$new_host" ] && echo "  Server: $new_host"
-    [ -n "$new_tcp" ] && echo "  TCP: $new_tcp"
-    [ -n "$new_udp" ] && echo "  UDP: $new_udp"
-    [ -n "$new_enc" ] && echo "  Encryption: $([ "$new_enc" = "true" ] && echo "Yes" || echo "No")"
-    [ -n "$new_user" ] && echo "  Username: $new_user"
-    [ -n "$new_pass" ] && echo "  Password: ********"
-    echo ""
-    echo "Will be applied to ${#bots[@]} bot(s)"
-    echo ""
-    
-    read -p "Confirm changes? (y/N): " confirm
-    
-    if [[ ! "$confirm" =~ ^[yY]$ ]]; then
-        echo "Cancelled."
-        read -p "Enter to return..."
-        return
-    fi
-    
-    # Update all bot configs
-    echo ""
-    echo -e "${YELLOW}Updating configurations...${NC}"
-    
-    for bot_name in "${bots[@]}"; do
-        config_file="$BOTS_ROOT/$bot_name/config.json"
-        
-        if [ ! -f "$config_file" ]; then
-            echo "  ⚠ Skipping $bot_name (config.json not found)"
-            continue
-        fi
-        
-        tmp_config=$(mktemp)
-        
-        # Build jq command dynamically
-        jq_cmd="."
-        
-        if [ -n "$new_host" ]; then
-            jq_cmd="$jq_cmd | .teamtalk.hostname = \"$new_host\""
-        fi
-        
-        if [ -n "$new_tcp" ]; then
-            jq_cmd="$jq_cmd | .teamtalk.tcp_port = $new_tcp"
-        fi
-        
-        if [ -n "$new_udp" ]; then
-            jq_cmd="$jq_cmd | .teamtalk.udp_port = $new_udp"
-        fi
-        
-        if [ -n "$new_enc" ]; then
-            jq_cmd="$jq_cmd | .teamtalk.encrypted = $new_enc"
-        fi
-        
-        if [ -n "$new_user" ]; then
-            jq_cmd="$jq_cmd | .teamtalk.username = \"$new_user\""
-        fi
-        
-        if [ -n "$new_pass" ]; then
-            jq_cmd="$jq_cmd | .teamtalk.password = \"$new_pass\""
-        fi
-        
-        jq "$jq_cmd" "$config_file" > "$tmp_config" && mv "$tmp_config" "$config_file"
-        
-        # Fix permissions for container user
-        chown 1000:1000 "$config_file"
-        
-        echo "  ✓ $bot_name updated"
-    done
-    
-    echo ""
-    echo -e "${YELLOW}Restarting all bots to apply changes...${NC}"
-    docker stop -t 1 $(docker ps -a -q -f "label=role=ttmediabot") >/dev/null 2>&1
-    docker start $(docker ps -a -q -f "label=role=ttmediabot") >/dev/null 2>&1
-    
-    echo ""
-    echo -e "${GREEN}Configuration updated successfully!${NC}"
-    read -p "Press Enter to continue..."
-}
-
-# Function: Duplicate Bot
-duplicate_bot() {
-    # Show menu once
-    header
-    while true; do
-        echo -e "${YELLOW} --- Duplicate Bot --- ${NC}"
-        
-        # Array to store bot info
-        bots=()
-        bot_servers=()
-        
-        if [ -d "$BOTS_ROOT" ]; then
-            for d in "$BOTS_ROOT"/*; do
-                if [ -d "$d" ]; then
-                    bot_name=$(basename "$d")
-                    bots+=("$bot_name")
-                    
-                    # Extract server address from config.json
-                    config_file="$d/config.json"
-                    if [ -f "$config_file" ]; then
-                        server=$(jq -r '.teamtalk.hostname // "N/A"' "$config_file" 2>/dev/null)
-                        bot_servers+=("$server")
-                    else
-                        bot_servers+=("N/A")
-                    fi
-                fi
-            done
-        fi
-        
-        if [ ${#bots[@]} -eq 0 ]; then
-            echo "No bots found."
-            read -p "Enter to return..."
-            return
-        fi
-        
-        echo "Bots available to duplicate:"
-        for i in "${!bots[@]}"; do
-            echo "$((i+1)). ${bots[$i]} → ${bot_servers[$i]}"
-        done
-        echo "0. Return"
-        echo ""
-        read -p "Enter the NUMBER of the bot to DUPLICATE: " bot_num
-        
-        # Handle Empty (Enter key) - Just refresh
-        if [[ -z "$bot_num" ]]; then
-            echo ""
-            continue
-        fi
-        
-        # Handle Return
-        if [[ "$bot_num" == "0" ]]; then return; fi
-        
-        # Validate input
-        if [[ ! "$bot_num" =~ ^[0-9]+$ ]] || [ "$bot_num" -lt 1 ] || [ "$bot_num" -gt "${#bots[@]}" ]; then
-            echo ""
-            continue
-        fi
-        
-        # Get source bot
-        idx=$((bot_num-1))
-        source_bot="${bots[$idx]}"
-        SOURCE_BOT_DIR="${BOTS_ROOT}/${source_bot}"
-        
-        echo ""
-        echo -e "${GREEN}Duplicating bot: $source_bot${NC}"
-        echo ""
-        
-        # Ask for new base name
-        read -p "Enter NEW BASE NAME for the bot(s) (Enter = default 'bot'): " new_base_name
-        if [[ -z "$new_base_name" ]]; then
-            new_base_name="bot"
-        fi
-        
-        # Find highest existing number for both container names and nicknames
-        highest_num=0
-        base_name_exists=false
-        highest_nickname_num=0
-        nickname_base_exists=false
-        
-        
-        if [ -d "$BOTS_ROOT" ]; then
-            # Get source bot's server info for comparison
-            source_hostname=$(jq -r '.teamtalk.hostname // ""' "$SOURCE_BOT_DIR/config.json")
-            source_tcp_port=$(jq -r '.teamtalk.tcp_port // 0' "$SOURCE_BOT_DIR/config.json")
-            
-            for d in "$BOTS_ROOT"/*; do
-                if [ -d "$d" ]; then
-                    name=$(basename "$d")
-                    
-                    # Strictly check containers
-                    if [[ "$name" == "$new_base_name" ]]; then
-                        base_name_exists=true
-                    elif [[ "$name" =~ ^${new_base_name}([0-9]+)$ ]]; then
-                        n="${BASH_REMATCH[1]}"
-                        [ "$n" -gt "$highest_num" ] && highest_num=$n
-                    fi
-                    
-                    # Strictly check nicknames - BUT ONLY for bots on the SAME SERVER
-                    config_file="$d/config.json"
-                    if [ -f "$config_file" ]; then
-                        # Get this bot's server info
-                        existing_hostname=$(jq -r '.teamtalk.hostname // ""' "$config_file")
-                        existing_tcp_port=$(jq -r '.teamtalk.tcp_port // 0' "$config_file")
-                        
-                        # Only check nicknames if it's the SAME server
-                        if [[ "$existing_hostname" == "$source_hostname" ]] && [[ "$existing_tcp_port" == "$source_tcp_port" ]]; then
-                            nick=$(jq -r '.teamtalk.nickname // ""' "$config_file")
-                            if [[ "$nick" == "$new_base_name" ]]; then
-                                nickname_base_exists=true
-                            elif [[ "$nick" =~ ^${new_base_name}([0-9]+)$ ]]; then
-                                n="${BASH_REMATCH[1]}"
-                                [ "$n" -gt "$highest_nickname_num" ] && highest_nickname_num=$n
-                            fi
-                        fi
-                    fi
-                fi
-            done
-        fi
-        
-        # Ask for quantity
-        read -p "How many ADDITIONAL bots to create (0 = only the base)?: " additional_bots
-        if [[ ! "$additional_bots" =~ ^[0-9]+$ ]]; then
-            echo -e "${RED}Invalid quantity.${NC}"
-            echo ""
-            continue
-        fi
-        
-        total_bots=$((additional_bots + 1))
-        echo ""
-        echo -e "${YELLOW}Creating $total_bots duplicated bot(s)...${NC}"
-        
-        # Simple sequential counter for naming
-        if [ "$base_name_exists" == "true" ]; then
-            next_container_num=$((highest_num + 1))
-        else
-            next_container_num=1
-        fi
-        
-        if [ "$nickname_base_exists" == "true" ]; then
-            next_nickname_num=$((highest_nickname_num + 1))
-        else
-            next_nickname_num=1
-        fi
-        
-        # Track if we've used the base name yet
-        container_base_used=$base_name_exists
-        nickname_base_used=$nickname_base_exists
-        
-        # Loop to create duplicated bots
-        for i in $(seq 1 $total_bots); do
-            # Determine container name - always use base naming scheme
-            if [ "$container_base_used" == "false" ]; then
-                current_bot_name="$new_base_name"
-                container_base_used=true
-            else
-                current_bot_name="${new_base_name}${next_container_num}"
-                next_container_num=$((next_container_num + 1))
-            fi
-
-            # Determine nickname - same logic
-            if [ "$nickname_base_used" == "false" ]; then
-                current_nickname="$new_base_name"
-                nickname_base_used=true
-            else
-                current_nickname="${new_base_name}${next_nickname_num}"
-                next_nickname_num=$((next_nickname_num + 1))
-            fi
-            
-            CURRENT_BOT_DIR="${BOTS_ROOT}/${current_bot_name}"
-            
-            # Check if container exists
-            if [ "$(docker ps -a -q -f name=^/${current_bot_name}$)" ]; then
-                echo -e "${RED}Skipping '$current_bot_name' (container already exists)${NC}"
-                continue
-            fi
-            
-            if [ -d "$CURRENT_BOT_DIR" ]; then
-                echo -e "${RED}Skipping '$current_bot_name' (folder already exists)${NC}"
-                continue
-            fi
-            
-            echo ""
-            echo -e "${YELLOW}Creating bot '$current_bot_name' (Nickname: $current_nickname)...${NC}"
-            mkdir -p "$CURRENT_BOT_DIR"
-            
-            # Copy config from source bot
-            cp "$SOURCE_BOT_DIR/config.json" "$CURRENT_BOT_DIR/config.json"
-            
-            # Update nickname
-            tmp_config=$(mktemp)
-            jq --arg nick "$current_nickname" '.teamtalk.nickname = $nick' "$CURRENT_BOT_DIR/config.json" > "$tmp_config" && mv "$tmp_config" "$CURRENT_BOT_DIR/config.json"
-            
-            # Copy cookies if exists
-            if [ -f "$SOURCE_BOT_DIR/cookies.txt" ]; then
-                cp "$SOURCE_BOT_DIR/cookies.txt" "$CURRENT_BOT_DIR/cookies.txt"
-            else
-                touch "$CURRENT_BOT_DIR/cookies.txt"
-            fi
-            
-            # Fix permissions
-            chown -R 1000:1000 "$CURRENT_BOT_DIR"
-            
-            # Create container (without starting)
-            COOKIES_MOUNT_DUP="-v ${CURRENT_BOT_DIR}/cookies.txt:/home/ttbot/TTMediaBot/data/cookies.txt"
-            docker create \
-                --name "${current_bot_name}" \
-                --network host \
-                --label "role=ttmediabot" \
-                --restart always \
-                -v "${CURRENT_BOT_DIR}:/home/ttbot/TTMediaBot/data" \
-                -v "${CURRENT_BOT_DIR}/cookies.txt:/home/ttbot/TTMediaBot/data/cookies.txt" \
-                "${BOT_IMAGE}" > /dev/null 2>&1
-            
-            if [ $? -eq 0 ]; then
-                echo "  ✓ Bot '$current_bot_name' created"
-            else
-                echo "  ✗ Error creating '$current_bot_name'"
-            fi
-        done
-        
-        echo ""
-        echo -e "${YELLOW}Starting all bots in parallel...${NC}"
-        # Start all newly created bots in parallel
-        docker start $(docker ps -a -q -f "label=role=ttmediabot" -f "status=created") 2>/dev/null
-        
-        echo -e "${GREEN}Duplication completed! $total_bots bot(s) created and started.${NC}"
-        read -p "Press Enter to continue..."
-        header
-    done
-}
-
-# Function: Update Cookies for All Bots
-update_all_cookies() {
-    header
-    echo -e "${YELLOW} --- Update Cookies for All Bots --- ${NC}"
-    list_bots
-    
-    read -p "Path to NEW cookies file (Ex: /root/cookies.txt): " new_cookies_path
-    
-    if [ ! -f "$new_cookies_path" ]; then
-        echo -e "${RED}File not found!${NC}"
-        read -p "Enter to return..."
-        return
-    fi
-    
-    echo "Updating cookies in all bots..."
-    
-    # Loop verify dirs
-    found_any=false
-    for bot_dir in "$BOTS_ROOT"/*; do
-        if [ -d "$bot_dir" ]; then
-            found_any=true
-            bot_name=$(basename "$bot_dir")
-            echo "Updating bot: $bot_name"
-            
-            cp "$new_cookies_path" "$bot_dir/cookies.txt"
-            
-            # Ensure permissions
-            chown 1000:1000 "$bot_dir/cookies.txt"
-            
-            echo -e "${GREEN}OK.${NC}"
-        fi
-    done
-    
-    if [ "$found_any" = false ]; then
-        echo "No bots found."
-    else
-        echo -e "${YELLOW}Restarting all bots to apply new cookies...${NC}"
-        
-        # Stop all bots in parallel (fast)
-        echo "Stopping bots..."
-        docker stop -t 1 $(docker ps -a -q -f "label=role=ttmediabot") 2>/dev/null
-        
-        # Start all bots in parallel (fast)
-        echo "Starting bots..."
-        docker start $(docker ps -a -q -f "label=role=ttmediabot") 2>/dev/null
-        
-        echo -e "${GREEN}All bots restarted.${NC}"
-    fi
-    
-    read -p "Completed. Enter to return..."
-}
-
-# Function: Restart All with Timer
-restart_with_timer() {
-    header
-    echo -e "${YELLOW} --- Restart with Timer (Exit and Return) --- ${NC}"
-    
-    echo "This will STOP all bots, wait for the defined time, and START them again."
-    read -p "Enter wait time in SECONDS (ex: 5): " wait_time
-    
-    if [[ ! "$wait_time" =~ ^[0-9]+$ ]]; then
-        echo -e "${RED}Invalid time.${NC}"
-        read -p "Enter to return..."
-        return
-    fi
-    
-    echo -e "${YELLOW}Stopping all bots...${NC}"
-    docker stop -t 1 $(docker ps -a -q -f "label=role=ttmediabot")
-    
-    echo -e "${YELLOW}Waiting ${wait_time} seconds...${NC}"
-    # Countdown visual
-    for ((i=wait_time; i>0; i--)); do
-        printf "\r%02d..." "$i"
-        sleep 1
-    done
-    echo ""
-    
-    echo -e "${YELLOW}Starting all bots...${NC}"
-    docker start $(docker ps -a -q -f "label=role=ttmediabot")
-    
-    echo -e "${GREEN}Process completed.${NC}"
-    read -p "Enter to return..."
-}
-
-# Function: Full Uninstall
-uninstall_all() {
-    clear
-    echo -e "${RED}=========================================${NC}"
-    echo -e "${RED}      COMPLETE UNINSTALLATION            ${NC}"
-    echo -e "${RED}=========================================${NC}"
-    echo ""
-    echo -e "${RED}WARNING: THIS ACTION IS DESTRUCTIVE!${NC}"
-    echo "It will do the following:"
-    echo "1. STOP and REMOVE all 'ttmediabot' containers."
-    echo "2. REMOVE the Docker image 'ttmediabot'."
-    echo "3. DELETE the '${BOTS_ROOT}' folder with all bots and configs."
-    echo ""
-    
-    read -p "Type 'yes' to confirm total destruction: " confirm
-    if [ "$confirm" != "yes" ]; then
-        echo "Cancelled."
-        read -p "Enter to return..."
-        return
-    fi
-    
-    echo ""
-    echo -e "${YELLOW}1. Stopping containers (forced)...${NC}"
-    # Stop and remove all related containers
-    docker stop -t 1 $(docker ps -a -q -f "label=role=ttmediabot") 2>/dev/null
-    docker rm $(docker ps -a -q -f "label=role=ttmediabot") 2>/dev/null
-    
-    echo -e "${YELLOW}2. Total Nuke on Docker (Images, Networks, Volumes)...${NC}"
-    docker system prune -a -f --volumes 2>/dev/null
-    
-    echo -e "${YELLOW}3. Stopping Docker service...${NC}"
-    systemctl stop docker 2>/dev/null
-    systemctl stop docker.socket 2>/dev/null
-    
-    echo -e "${YELLOW}4. Removing bot files...${NC}"
-    if [ -d "$BOTS_ROOT" ]; then
-        rm -rf "$BOTS_ROOT"
-    fi
-    
-    echo ""
-    echo -e "${YELLOW}4. Uninstalling Docker and dependencies (Total Cleanup)...${NC}"
-    apt-get purge -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose
-    
-    echo "Removing residual configuration folders and files..."
-    sudo rm -rf /var/lib/docker
-    sudo rm -rf /var/lib/containerd
-    sudo rm -rf /etc/docker
-    sudo rm -rf /etc/apparmor.d/docker
-    sudo rm -rf /var/run/docker.sock
-    sudo rm -rf /var/run/docker
-    sudo rm -rf /run/docker
-    sudo rm -rf /root/.docker
-    sudo rm -rf /home/*/.docker
-    sudo rm -rf /var/log/docker
-    sudo rm -rf /var/log/containerd
-    
-    # Remove manual binary installs if any
-    rm -f /usr/local/bin/docker-compose
-    
-    echo "Removing 'docker' group..."
-    groupdel docker 2>/dev/null || true
-    
-    echo "Cleaning unused packages..."
-    apt-get autoremove -y >/dev/null
-    apt-get autoclean -y >/dev/null
-    
-    echo ""
-    echo -e "${GREEN}CLEANUP COMPLETED.${NC}"
-    echo "All containers, images, configurations, and Docker itself were removed from the system."
-    echo -e "${YELLOW}The project folder ('$(pwd)') WAS KEPT, as requested.${NC}"
-    echo -e "${RED}Recommended to restart the server to clear network interfaces (docker0).${NC}"
-    exit 0
 }
 
 # Function: Manage Bots
 manage_bots() {
-    # Show menu once
-    header
     while true; do
+        header
         echo -e "${YELLOW} --- Manage Bots --- ${NC}"
-        echo "1. Start All (With label role=ttmediabot)"
-        echo "2. Restart All (With label role=ttmediabot)"
-        echo "3. Stop All (With label role=ttmediabot)"
-        echo "4. Delete Bot"
-        echo "5. Bulk Delete Bots"
-        echo "6. Duplicate Bot"
-        echo "7. Update Cookies (All Bots)"
-        echo "8. Restart with Timer (Stop -> Wait -> Start)"
-        echo "9. Bulk Update Configuration"
-        echo "10. Return to Main Menu"
+        echo "0. Back to Main Menu"
         echo ""
-        read -p "Choose an option: " opt_manage
         
-        # Handle empty input - just reprint menu
-        if [ -z "$opt_manage" ]; then
-            echo ""
-            continue
+        # List running bots
+        echo "Running Bots:"
+        docker ps --format "table {{.Names}}\t{{.Status}}" -f "label=role=ttmediabot" | sed '1d' | nl -s ". "
+        
+        # Get bot names into an array
+        bots=($(docker ps --format "{{.Names}}" -f "label=role=ttmediabot"))
+        count=${#bots[@]}
+        
+        if [ $count -eq 0 ]; then
+            echo "No bots running."
+            read -p "Press Enter to return..."
+            return
         fi
         
-        case $opt_manage in
+        echo ""
+        read -p "Select a bot number to manage (or 0 to back): " selection
+        
+        if [[ "$selection" =~ ^[0-9]+$ ]] && [ "$selection" -gt 0 ] && [ "$selection" -le "$count" ]; then
+            bot_name=${bots[$((selection-1))]}
+            manage_single_bot "$bot_name"
+        elif [ "$selection" -eq 0 ]; then
+            return
+        else
+            echo "Invalid selection."
+        fi
+    done
+}
+
+# Function: Manage Single Bot
+manage_single_bot() {
+    local bot_name=$1
+    while true; do
+        header
+        echo -e "${YELLOW} --- Managing: $bot_name --- ${NC}"
+        echo "1. View Logs"
+        echo "2. Restart"
+        echo "3. Stop"
+        echo "4. Delete"
+        echo "5. Configure (Nano)"
+        echo "6. Back"
+        echo ""
+        read -p "Choose: " action
+        
+        case $action in
             1)
-                echo "Starting all bots..."
-                docker start $(docker ps -a -q -f "label=role=ttmediabot")
-                read -p "Completed. Enter to continue..."
-                header
+                docker logs -f "$bot_name"
                 ;;
             2)
-                echo "Restarting all bots..."
-                echo "  Stopping..."
-                docker stop -t 1 $(docker ps -a -q -f "label=role=ttmediabot")
-                echo "  Starting..."
-                docker start $(docker ps -a -q -f "label=role=ttmediabot")
-                read -p "Completed. Enter to continue..."
-                header
+                docker restart "$bot_name"
+                echo "Restarted."
+                sleep 1
                 ;;
             3)
-                echo "Stopping all bots..."
-                docker stop -t 1 $(docker ps -a -q -f "label=role=ttmediabot")
-                read -p "Completed. Enter to continue..."
-                header
+                docker stop "$bot_name"
+                echo "Stopped."
+                sleep 1
                 ;;
             4)
-                delete_bot
-                header
+                read -p "Are you sure you want to delete '$bot_name'? (y/N): " confirm
+                if [[ "$confirm" =~ ^[yY]$ ]]; then
+                    docker rm -f "$bot_name"
+                    rm -rf "$BOTS_ROOT/$bot_name"
+                    echo "Deleted."
+                    sleep 1
+                    return
+                fi
                 ;;
             5)
-                delete_bots_batch
-                header
+                nano "$BOTS_ROOT/$bot_name/config.json"
+                echo "Restarting bot to apply changes..."
+                docker restart "$bot_name"
+                sleep 1
                 ;;
             6)
-                duplicate_bot
-                header
-                ;;
-            7)
-                update_all_cookies
-                header
-                ;;
-            8)
-                restart_with_timer
-                header
-                ;;
-            9)
-                bulk_update_config
-                header
-                ;;
-            10)
                 return
                 ;;
             *)
-                # Invalid option - just reprint menu
-                echo ""
+                echo "Invalid option."
                 ;;
         esac
     done
 }
+
+# Function: Uninstall Everything
+uninstall_all() {
+    header
+    echo -e "${RED}!!! WARNING: THIS WILL DELETE ALL BOTS AND IMAGES !!!${NC}"
+    read -p "Are you sure? (type 'yes' to confirm): " confirm
+    
+    if [ "$confirm" == "yes" ]; then
+        echo "Stopping and removing containers..."
+        docker ps -a -q -f "label=role=ttmediabot" | xargs -r docker rm -f
+        
+        echo "Removing image..."
+        docker rmi -f "$BOT_IMAGE"
+        
+        echo "Removing bot files..."
+        rm -rf "$BOTS_ROOT"
+        
+        echo -e "${GREEN}Cleanup complete.${NC}"
+        exit 0
+    else
+        echo "Cancelled."
+    fi
+}
+
+# Function: Perform Image Rebuild (Internal)
+perform_image_rebuild() {
+    echo ""
+    echo -e "${YELLOW}Starting Image Rebuild...${NC}"
+    echo "Checking running bots..."
+    
+    # Capture NAMES of running bots to restart them later
+    RUNNING_NAMES=$(docker ps --format "{{.Names}}" -f "label=role=ttmediabot")
+    
+    if [ ! -z "$RUNNING_NAMES" ]; then
+        echo -e "${YELLOW}Stopping bots for update...${NC}"
+        echo "$RUNNING_NAMES" | xargs docker stop -t 1 > /dev/null 2>&1
+    fi
+    
+    echo -e "${YELLOW}Building new image...${NC}"
+    docker build --build-arg CACHEBUST=$(date +%s) -t ${BOT_IMAGE} .
+    
+    if [ $? -eq 0 ]; then
+         echo -e "${GREEN}Image updated successfully!${NC}"
+         
+         # Recreate containers to use new image
+         recreate_bot_containers
+         
+         if [ ! -z "$RUNNING_NAMES" ]; then
+             echo -e "${YELLOW}Restarting active bots...${NC}"
+             echo "$RUNNING_NAMES" | xargs docker start > /dev/null 2>&1
+             echo -e "${GREEN}Bots restarted with the new code.${NC}"
+         fi
+    else
+         echo -e "${RED}Error building image!${NC}"
+    fi
+    sleep 2
+}
+
+# Function: Force Rebuild Image (Menu Option)
+force_rebuild_image() {
+    header
+    echo -e "${YELLOW} --- Rebuild Docker Image --- ${NC}"
+    
+    # Check if Dockerfile exists
+    if [ ! -f "Dockerfile" ]; then
+        echo -e "${RED}Error: Dockerfile not found in current directory!${NC}"
+        read -p "Enter to return..."
+        return
+    fi
+    
+    echo "This will check for code updates (local files) and rebuild the image."
+    echo "Existing bots will be restarted with the new code."
+    echo ""
+    read -p "Are you sure? (y/N): " confirm
+    
+    if [[ "$confirm" =~ ^[yY]$ ]]; then
+        perform_image_rebuild
+    else
+        echo "Cancelled."
+    fi
+    
+    read -p "Press Enter to return..."
+    header
+}
+
+# Function: Update & Fix Permissions
+update_and_fix_permissions() {
+    header
+    echo -e "${YELLOW} --- Update & Fix Permissions --- ${NC}"
+    
+    # 1. Determine REAL user
+    REAL_USER=${SUDO_USER:-$USER}
+    
+    if [ "$REAL_USER" == "root" ]; then
+         # Fallback 1: Check owner of the script directory
+         SCRIPT_OWNER=$(stat -c '%U' "$SCRIPT_DIR")
+         if [ "$SCRIPT_OWNER" != "root" ]; then
+             REAL_USER="$SCRIPT_OWNER"
+         else
+             # Fallback 2: Check owner of parent directory
+             PARENT_DIR=$(dirname "$SCRIPT_DIR")
+             PARENT_OWNER=$(stat -c '%U' "$PARENT_DIR")
+             if [ "$PARENT_OWNER" != "root" ]; then
+                 REAL_USER="$PARENT_OWNER"
+             else
+                 # Fallback 3: Ask user
+                 echo -e "${RED}Could not detect non-root user automatically.${NC}"
+                 read -p "Enter your system username (for permission fix): " manual_user
+                 if [ -n "$manual_user" ]; then
+                     REAL_USER="$manual_user"
+                 else
+                     echo "No user entered. Using 'root'."
+                     REAL_USER="root"
+                 fi
+             fi
+         fi
+    fi
+
+    echo -e "${YELLOW}Target User: ${REAL_USER}${NC}"
+    echo ""
+
+    # 2. Check for Updates (GitHub API vs Local Date)
+    REPO_OWNER="JoaoDEVWHADS"
+    REPO_NAME="TTMediaBot"
+    BRANCH="master"
+    
+    echo -e "${YELLOW}Checking GitHub for updates...${NC}"
+    
+    # Get latest commit date from GitHub API
+    # returns ISO 8601 date, e.g., "2023-10-27T10:00:00Z"
+    LATEST_COMMIT_DATE=$(curl -s "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/commits/$BRANCH" | jq -r '.commit.committer.date')
+    
+    UPDATE_PERFORMED=false
+    
+    if [ -z "$LATEST_COMMIT_DATE" ] || [ "$LATEST_COMMIT_DATE" == "null" ]; then
+        echo -e "${RED}Error fetching update info from GitHub.${NC}"
+        echo "Check internet connection or API rate limits."
+        read -p "Press Enter to continue (will still fix permissions)..."
+    else
+        # Convert to Unix timestamp
+        REMOTE_TS=$(date -d "$LATEST_COMMIT_DATE" +%s)
+        
+        # Get local file modification date (of this script)
+        LOCAL_TS=$(stat -c %Y "$0")
+        
+        # Compare
+        if [ "$REMOTE_TS" -gt "$LOCAL_TS" ]; then
+            echo -e "${GREEN}Update found!${NC}"
+            echo "Remote: $(date -d @$REMOTE_TS)"
+            echo "Local:  $(date -d @$LOCAL_TS)"
+            echo ""
+            echo "This will:"
+            echo "1. Backup 'bots' folder (configs/cookies)"
+            echo "2. Clone the latest repository code"
+            echo "3. Replace all local files with the cloned version"
+            echo "4. Restore backup"
+            echo "5. Convert installation to a valid Git repository"
+            echo ""
+            read -p "Proceed? (y/N): " confirm_update
+            
+            if [[ "$confirm_update" =~ ^[yY]$ ]]; then
+                echo -e "${YELLOW}Starting update...${NC}"
+                
+                # Define Temp Dirs
+                TMP_DIR=$(mktemp -d)
+                BACKUP_DIR="$TMP_DIR/backup"
+                mkdir -p "$BACKUP_DIR"
+                
+                # 1. Backup Configs
+                echo "Backing up configurations..."
+                
+                if [ -d "$BOTS_ROOT" ]; then
+                    cp -r "$BOTS_ROOT" "$BACKUP_DIR/"
+                fi
+                
+                # 2. Clone Repository (Full Git Init)
+                echo "Cloning repository..."
+                CLONE_DIR="$TMP_DIR/clone"
+                
+                # Clone to temp dir
+                git clone "https://github.com/$REPO_OWNER/$REPO_NAME.git" "$CLONE_DIR"
+                
+                if [ $? -ne 0 ]; then
+                    echo -e "${RED}Clone failed.${NC}"
+                else
+                    echo "Installing..."
+                    
+                    # Debug info
+                    echo "Cloned content:"
+                    ls -A "$CLONE_DIR" | head -n 5
+                    echo "..."
+                    
+                    # Copy files over, overwriting
+                    # Use /. to include hidden files (especially .git)
+                    # This converts the local folder into a git repo if it wasn't one
+                    cp -rf "$CLONE_DIR/." "$SCRIPT_DIR/"
+                    
+                    # 4. Restore Backup
+                    echo "Restoring configurations..."
+                    if [ -d "$BACKUP_DIR/bots" ]; then
+                        # Restore bots folder
+                        cp -rf "$BACKUP_DIR/bots/"* "$BOTS_ROOT/" 2>/dev/null
+                    fi
+                    
+                    # Update timestamp
+                    touch "$0"
+                    
+                    echo -e "${GREEN}Update applied! Repository is now git-linked.${NC}"
+                    UPDATE_PERFORMED=true
+                    
+                    # Cleanup
+                    echo "Cleaning up..."
+                    rm -rf "$TMP_DIR"
+                fi
+            else
+                echo "Update cancelled."
+            fi
+        else
+            echo -e "${GREEN}Already up to date.${NC}"
+            echo "Remote: $(date -d @$REMOTE_TS)"
+            echo "Local:  $(date -d @$LOCAL_TS)"
+        fi
+    fi
+    
+    echo ""
+    echo -e "${YELLOW}Fixing permissions...${NC}"
+    
+    # 4. Fix permissions
+    # Operate on SCRIPT_DIR
+    TARGET_FIX_DIR="$SCRIPT_DIR"
+    TARGET_FIX_DIR=$(realpath "$TARGET_FIX_DIR")
+    
+    echo "Setting ownership to $REAL_USER:$REAL_USER for $TARGET_FIX_DIR..."
+    chown -R "$REAL_USER":"$REAL_USER" "$TARGET_FIX_DIR"
+    
+    echo "Setting permissions (777 - Full Control)..."
+    chmod -R 777 "$TARGET_FIX_DIR"
+    
+    chmod +x "$TARGET_FIX_DIR"/*.sh 2>/dev/null
+    
+    echo ""
+    echo -e "${GREEN}Done! Permissions set to User: $REAL_USER, Mode: 777.${NC}"
+    
+    # 5. Auto-Rebuild (if update occurred)
+    if [ "$UPDATE_PERFORMED" == "true" ]; then
+        echo ""
+        echo -e "${YELLOW}Since an update was applied, we need to rebuild the Docker image.${NC}"
+        # Wait a bit
+        sleep 2
+        perform_image_rebuild
+    fi
+    
+    # Return to script dir
+    cd "$SCRIPT_DIR" || return
+    
+    read -p "Press Enter to return..."
+    header
+}
+
 
 # Check/Install Deps first
 install_dependencies
@@ -1323,40 +638,40 @@ build_image
 mkdir -p "$BOTS_ROOT"
 
 # Show menu once
-header
 while true; do
+    header
     echo "1. Create Bot"
     echo "2. Manage Bots"
     echo "3. Uninstall Everything (Total Cleanup)"
-    echo "4. Exit"
+    echo "4. Update & Fix Permissions"
+    echo "5. Rebuild Docker Image"
+    echo "6. Exit"
     echo ""
     read -p "Choose an option: " option
-    
-    # Handle empty input - just reprint menu
-    if [ -z "$option" ]; then
-        echo ""
-        continue
-    fi
     
     case $option in
         1)
             create_bot
-            header
             ;;
         2)
             manage_bots
-            header
             ;;
         3)
             uninstall_all
             ;;
         4)
+            update_and_fix_permissions
+            ;;
+        5)
+            force_rebuild_image
+            ;;
+        6)
             echo "Exiting..."
             exit 0
             ;;
         *)
-            # Invalid option - just reprint menu
-            echo ""
+            echo "Invalid option."
+            sleep 1
             ;;
     esac
 done
