@@ -123,7 +123,7 @@ class CommandProcessor:
                 raise errors.AccessDeniedError(
                     self.translator.translate("You are banned"),
                 )
-            elif user.channel.id != self.ttclient.channel.id:
+            elif user.channel.id != self.ttclient.channel.id and command != "jc":
                 raise errors.AccessDeniedError(
                     self.translator.translate("You are not in bot's channel"),
                 )

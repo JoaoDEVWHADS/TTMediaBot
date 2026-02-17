@@ -240,6 +240,11 @@ create_bot() {
     nickname=${nickname:-TTMediaBot}
     read -p "Full path to cookies file (Ex: /root/cookies.txt): " cookies_path
     
+    read -p "Channel (Default: /): " channel
+    channel=${channel:-/}
+    read -sp "Channel Password (Default: empty): " channel_password
+    echo ""
+    
     
     
     # Batch create option - ask BEFORE creating
@@ -345,15 +350,19 @@ create_bot() {
     for i in $(seq 1 $total_bots); do
         # Determine container name
         if [ $i -eq 1 ]; then
-            # First bot uses container_base
-            if [ "$container_base_used" == "false" ]; then
-                current_bot_name="$container_base"
-                container_base_used=true
-            else
-                current_bot_name="${container_base}${next_container_num}"
-                next_container_num=$((next_container_num + 1))
-            fi
+            # First bot uses the explicit name provided by user
+            current_bot_name="$bot_name"
             current_nickname="$nickname"
+            
+            # If the chosen name happens to be the same as container_base, mark it as used
+            if [ "$current_bot_name" == "$container_base" ]; then
+                container_base_used=true
+            fi
+            
+            # If the chosen nickname happens to be the same as nickname_base, mark it as used
+            if [ -n "$nickname_base" ] && [ "$current_nickname" == "$nickname_base" ]; then
+                nickname_base_used=true
+            fi
         else
             # Additional bots use container_base for container naming
             # Sequence: bot, bot1, bot2, bot3...
@@ -427,6 +436,8 @@ create_bot() {
        --arg nick "$current_nickname" \
        --arg user "$username" \
        --arg pass "$password" \
+       --arg chan "$channel" \
+       --arg chan_pass "$channel_password" \
        --arg cookie "$CONTAINER_COOKIE_PATH" \
        '.teamtalk.hostname = $host | 
         .teamtalk.tcp_port = $tcp | 
@@ -434,7 +445,9 @@ create_bot() {
         .teamtalk.encrypted = $enc | 
         .teamtalk.nickname = $nick | 
         .teamtalk.username = $user | 
-        .teamtalk.password = $pass |
+        .teamtalk.password = $pass | 
+        .teamtalk.channel = $chan | 
+        .teamtalk.channel_password = $chan_pass |
         if $cookie != "" then .services.yt.cookiefile_path = $cookie else . end' \
        "$CURRENT_BOT_DIR/config.json" > "$tmp_config" && mv "$tmp_config" "$CURRENT_BOT_DIR/config.json"
 
@@ -701,6 +714,8 @@ bulk_update_config() {
     current_udp=$(jq -r '.teamtalk.udp_port // "N/A"' "$first_config")
     current_enc=$(jq -r '.teamtalk.encrypted // false' "$first_config")
     current_user=$(jq -r '.teamtalk.username // "N/A"' "$first_config")
+    current_chan=$(jq -r '.teamtalk.channel // "/"' "$first_config")
+    current_chan_pass=$(jq -r '.teamtalk.channel_password // ""' "$first_config")
     
     echo -e "${GREEN}Current configuration (reference: $first_bot):${NC}"
     echo "  Server: $current_host"
@@ -708,6 +723,8 @@ bulk_update_config() {
     echo "  UDP: $current_udp"
     echo "  Encryption: $([ "$current_enc" = "true" ] && echo "Yes" || echo "No")"
     echo "  Username: $current_user"
+    echo "  Channel: $current_chan"
+    echo "  Channel Password: $([ -n "$current_chan_pass" ] && echo "*****" || echo "(None)")"
     echo ""
     echo "Total bots: ${#bots[@]}"
     echo ""
@@ -719,7 +736,8 @@ bulk_update_config() {
         echo "2. Ports (TCP/UDP)"
         echo "3. Encryption"
         echo "4. Credentials (username/password)"
-        echo "5. Everything"
+        echo "5. Channel & Password"
+        echo "6. Everything"
         echo "0. Cancel"
         echo ""
         read -p "Choose an option: " choice
@@ -733,7 +751,7 @@ bulk_update_config() {
             0)
                 return
                 ;;
-            1|2|3|4|5)
+            1|2|3|4|5|6)
                 break
                 ;;
             *)
@@ -744,51 +762,78 @@ bulk_update_config() {
     done
     
     # Collect new values based on choice
-    new_host=""
-    new_tcp=""
-    new_udp=""
-    new_enc=""
-    new_user=""
-    new_pass=""
+    # Initialize with UNSET to distinguish between "keep current" and "clear"
+    new_host="UNSET"
+    new_tcp="UNSET"
+    new_udp="UNSET"
+    new_enc="UNSET"
+    new_user="UNSET"
+    new_pass="UNSET"
+    new_chan="UNSET"
+    new_chan_pass="UNSET"
     
     echo ""
     
-    if [[ "$choice" == "1" || "$choice" == "5" ]]; then
-        read -p "New server (Enter = keep '$current_host'): " new_host
-        new_host=${new_host:-$current_host}
+    if [[ "$choice" == "1" || "$choice" == "6" ]]; then
+        read -p "New server (Enter = keep): " input
+        if [ -n "$input" ]; then new_host="$input"; fi
     fi
     
-    if [[ "$choice" == "2" || "$choice" == "5" ]]; then
-        read -p "New TCP port (Enter = keep '$current_tcp'): " new_tcp
-        new_tcp=${new_tcp:-$current_tcp}
-        read -p "New UDP port (Enter = keep '$current_udp'): " new_udp
-        new_udp=${new_udp:-$current_udp}
+    if [[ "$choice" == "2" || "$choice" == "6" ]]; then
+        read -p "New TCP port (Enter = keep): " input
+        if [ -n "$input" ]; then new_tcp="$input"; fi
+        read -p "New UDP port (Enter = keep): " input
+        if [ -n "$input" ]; then new_udp="$input"; fi
     fi
     
-    if [[ "$choice" == "3" || "$choice" == "5" ]]; then
+    if [[ "$choice" == "3" || "$choice" == "6" ]]; then
         read -p "Encryption (y/N): " enc_input
         if [[ "$enc_input" =~ ^[yY]$ ]]; then
             new_enc="true"
-        else
+        elif [[ "$enc_input" =~ ^[nN]$ ]]; then
             new_enc="false"
         fi
     fi
     
-    if [[ "$choice" == "4" || "$choice" == "5" ]]; then
-        read -p "New username (Enter = keep '$current_user'): " new_user
-        new_user=${new_user:-$current_user}
-        read -p "New password: " new_pass
+    if [[ "$choice" == "4" || "$choice" == "6" ]]; then
+        read -p "New username (Enter = keep, '.' = clear): " input
+        if [ "$input" == "." ]; then new_user=""; elif [ -n "$input" ]; then new_user="$input"; fi
+        
+        read -p "New password (Enter = keep, '.' = clear): " input
+        if [ "$input" == "." ]; then new_pass=""; elif [ -n "$input" ]; then new_pass="$input"; fi
+    fi
+    
+    if [[ "$choice" == "5" || "$choice" == "6" ]]; then
+        read -p "New Channel (Enter = keep, '.' = root '/'): " input
+        if [ "$input" == "." ]; then new_chan="/"; elif [ -n "$input" ]; then new_chan="$input"; fi
+        
+        read -p "New Channel Password (Enter = keep, '.' = clear): " input
+        if [ "$input" == "." ]; then new_chan_pass=""; elif [ -n "$input" ]; then new_chan_pass="$input"; fi
     fi
     
     # Show summary
     echo ""
     echo -e "${YELLOW}Changes summary:${NC}"
-    [ -n "$new_host" ] && echo "  Server: $new_host"
-    [ -n "$new_tcp" ] && echo "  TCP: $new_tcp"
-    [ -n "$new_udp" ] && echo "  UDP: $new_udp"
-    [ -n "$new_enc" ] && echo "  Encryption: $([ "$new_enc" = "true" ] && echo "Yes" || echo "No")"
-    [ -n "$new_user" ] && echo "  Username: $new_user"
-    [ -n "$new_pass" ] && echo "  Password: ********"
+    [ "$new_host" != "UNSET" ] && echo "  Server: $new_host"
+    [ "$new_tcp" != "UNSET" ] && echo "  TCP: $new_tcp"
+    [ "$new_udp" != "UNSET" ] && echo "  UDP: $new_udp"
+    [ "$new_enc" != "UNSET" ] && echo "  Encryption: $([ "$new_enc" = "true" ] && echo "Yes" || echo "No")"
+    
+    if [ "$new_user" != "UNSET" ]; then
+        if [ -z "$new_user" ]; then echo "  Username: (Cleared)"; else echo "  Username: $new_user"; fi
+    fi
+    
+    if [ "$new_pass" != "UNSET" ]; then
+        if [ -z "$new_pass" ]; then echo "  Password: (Cleared)"; else echo "  Password: ********"; fi
+    fi
+    
+    if [ "$new_chan" != "UNSET" ]; then
+        echo "  Channel: $new_chan"
+    fi
+    
+    if [ "$new_chan_pass" != "UNSET" ]; then
+        if [ -z "$new_chan_pass" ]; then echo "  Channel Password: (Cleared)"; else echo "  Channel Password: ********"; fi
+    fi
     echo ""
     echo "Will be applied to ${#bots[@]} bot(s)"
     echo ""
@@ -818,28 +863,36 @@ bulk_update_config() {
         # Build jq command dynamically
         jq_cmd="."
         
-        if [ -n "$new_host" ]; then
+        if [ "$new_host" != "UNSET" ]; then
             jq_cmd="$jq_cmd | .teamtalk.hostname = \"$new_host\""
         fi
         
-        if [ -n "$new_tcp" ]; then
+        if [ "$new_tcp" != "UNSET" ]; then
             jq_cmd="$jq_cmd | .teamtalk.tcp_port = $new_tcp"
         fi
         
-        if [ -n "$new_udp" ]; then
+        if [ "$new_udp" != "UNSET" ]; then
             jq_cmd="$jq_cmd | .teamtalk.udp_port = $new_udp"
         fi
         
-        if [ -n "$new_enc" ]; then
+        if [ "$new_enc" != "UNSET" ]; then
             jq_cmd="$jq_cmd | .teamtalk.encrypted = $new_enc"
         fi
         
-        if [ -n "$new_user" ]; then
+        if [ "$new_user" != "UNSET" ]; then
             jq_cmd="$jq_cmd | .teamtalk.username = \"$new_user\""
         fi
         
-        if [ -n "$new_pass" ]; then
+        if [ "$new_pass" != "UNSET" ]; then
             jq_cmd="$jq_cmd | .teamtalk.password = \"$new_pass\""
+        fi
+        
+        if [ "$new_chan" != "UNSET" ]; then
+            jq_cmd="$jq_cmd | .teamtalk.channel = \"$new_chan\""
+        fi
+        
+        if [ "$new_chan_pass" != "UNSET" ]; then
+           jq_cmd="$jq_cmd | .teamtalk.channel_password = \"$new_chan_pass\""
         fi
         
         jq "$jq_cmd" "$config_file" > "$tmp_config" && mv "$tmp_config" "$config_file"
