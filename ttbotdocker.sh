@@ -41,19 +41,31 @@ install_dependencies() {
         apt-get update
         apt-get install -y ca-certificates curl gnupg lsb-release
 
-        # 2. Add Docker's official GPG key
+        # 2. Detect OS and set appropriate values
+        OS_ID=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
+        case "$OS_ID" in
+            ubuntu|debian)
+                echo -e "Detected OS: ${GREEN}$OS_ID${NC}"
+                ;;
+            *)
+                echo -e "${RED}Unsupported OS: $OS_ID. Trying 'debian' as fallback...${NC}"
+                OS_ID="debian"
+                ;;
+        esac
+
+        # 3. Add Docker's official GPG key
         mkdir -p /etc/apt/keyrings
         # Remove existing docker.gpg to avoid replacement prompt
         rm -f /etc/apt/keyrings/docker.gpg
-        curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        curl -fsSL "https://download.docker.com/linux/$OS_ID/gpg" | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
         chmod a+r /etc/apt/keyrings/docker.gpg
 
-        # 3. Set up the repository (using lsb_release to detect distro codename automatically)
+        # 4. Set up the repository
         echo \
-          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$OS_ID \
           $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-        # 4. Install Docker Engine
+        # 5. Install Docker Engine
         apt-get update
         apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 

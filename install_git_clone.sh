@@ -46,26 +46,20 @@ fi
 if [ -d "$DIR_NAME" ]; then
     echo "--- Setting Permissions and Ownership ---"
     
-    # Get the SSH logged user (not root)
     REAL_USER=${SUDO_USER:-$USER}
     
-    # Give full ownership to the SSH user
     chown -R "$REAL_USER":"$REAL_USER" "$DIR_NAME"
-    
-    # Give full permissions (read, write, execute) to everyone
     chmod -R 777 "$DIR_NAME"
-    
-    # Make shell scripts executable
     chmod +x "$DIR_NAME"/*.sh
     
     echo "Ownership and permissions set for user: $REAL_USER"
     
     cd "$DIR_NAME" || exit
     
-    # Download and extract TeamTalk DLL
     echo "========================================="
     echo "--- Downloading TeamTalk_DLL.zip ---"
     echo "========================================="
+    
     DLL_URL="https://github.com/JoaoDEVWHADS/TTMediaBot/releases/download/downloadttdll/TeamTalk_DLL.zip"
     DLL_FILE="TeamTalk_DLL.zip"
     
@@ -80,7 +74,6 @@ if [ -d "$DIR_NAME" ]; then
         echo "Download complete!"
     fi
     
-    # Extract the ZIP file
     echo "========================================="
     echo "--- Extracting TeamTalk_DLL.zip ---"
     echo "========================================="
@@ -92,12 +85,10 @@ if [ -d "$DIR_NAME" ]; then
     fi
     echo "Extraction complete!"
     
-    # Delete the ZIP file after extraction
     echo "--- Removing TeamTalk_DLL.zip ---"
     rm -f "$DLL_FILE"
     echo "ZIP file removed."
     
-    # Verify TeamTalk_DLL folder exists
     echo "========================================="
     echo "--- Verifying TeamTalk_DLL folder ---"
     echo "========================================="
@@ -108,28 +99,55 @@ if [ -d "$DIR_NAME" ]; then
     fi
     echo "TeamTalk_DLL folder found!"
     
-    # Set permissions and ownership for TeamTalk_DLL folder
     echo "--- Setting permissions for TeamTalk_DLL ---"
     chown -R "$REAL_USER":"$REAL_USER" TeamTalk_DLL
     chmod -R 777 TeamTalk_DLL
     echo "Permissions set for TeamTalk_DLL folder."
     
-    # Final verification
     echo "========================================="
     echo "--- Final Verification ---"
     echo "========================================="
-    echo "Checking ownership and permissions..."
+    
     ls -la | grep TeamTalk_DLL
     
     if [ -d "TeamTalk_DLL" ] && [ "$(stat -c '%U' TeamTalk_DLL)" = "$REAL_USER" ]; then
-        echo "✓ All checks passed!"
-        echo "✓ TeamTalk_DLL folder exists"
-        echo "✓ Ownership is correct: $REAL_USER"
-        echo "✓ Permissions are set to 777"
+        echo "? All checks passed!"
+        echo "? TeamTalk_DLL folder exists"
+        echo "? Ownership is correct: $REAL_USER"
+        echo "? Permissions are set to 777"
+        echo "========================================="
+        echo "--- Checking Docker Installation ---"
+        echo "========================================="
+
+        # =========================================
+        # DOCKER AUTO FIX (ONLY ADDITION MADE)
+        # =========================================
+
+        if ! command -v docker &> /dev/null; then
+            echo "Docker not found. Installing automatically..."
+            curl -fsSL https://get.docker.com | sh
+        else
+            echo "Docker is already installed."
+        fi
+
+        echo "--- Ensuring Docker service is running ---"
+        systemctl enable docker
+        systemctl start docker
+
+        if ! systemctl is-active --quiet docker; then
+            echo "Docker service failed to start."
+            exit 1
+        fi
+
+        echo "--- Adding user to docker group ---"
+        usermod -aG docker "$REAL_USER"
+
+        echo "Docker is ready."
         echo "========================================="
         echo "Setup Complete! Starting Docker Manager..."
         echo "========================================="
         sleep 2
+
         exec ./ttbotdocker.sh
     else
         echo "ERROR: Verification failed. Please check manually."
