@@ -180,7 +180,7 @@ force_rebuild_image() {
         echo "$RUNNING_NAMES" | xargs docker stop -t 1 > /dev/null 2>&1
     fi
     
-    echo -e "${YELLOW}Building new image (updating code, keeping dependencies in cache)...${NC}"
+    echo -e "${YELLOW}Building new image (updating code and PIP libraries)...${NC}"
     docker build --build-arg CACHEBUST=$(date +%s) -t ${BOT_IMAGE} .
     
     if [ $? -eq 0 ]; then
@@ -616,7 +616,8 @@ delete_bots_batch() {
         for i in "${!bots[@]}"; do
             echo "$((i+1)). ${bots[$i]}"
         done
-        echo "0. Return"
+        echo "0. DELETE ALL BOTS"
+        echo "r. Return"
         echo ""
         echo -e "${YELLOW}Enter NUMBERS separated by SPACE (ex: 1 2 5):${NC}"
         read -p "> " bot_nums
@@ -628,12 +629,17 @@ delete_bots_batch() {
         fi
         
         # Handle Return
-        if [[ "$bot_nums" == "0" ]]; then return; fi
+        if [[ "$bot_nums" == "r" || "$bot_nums" == "R" ]]; then return; fi
         
         # Parse and validate numbers
         selected_bots=()
         invalid=false
-        for num in $bot_nums; do
+        
+        # Handle Delete All
+        if [[ "$bot_nums" == "0" ]]; then
+            selected_bots=("${bots[@]}")
+        else
+            for num in $bot_nums; do
             if [[ ! "$num" =~ ^[0-9]+$ ]] || [ "$num" -lt 1 ] || [ "$num" -gt "${#bots[@]}" ]; then
                 echo -e "${RED}Invalid number: $num${NC}"
                 invalid=true
@@ -642,6 +648,7 @@ delete_bots_batch() {
             idx=$((num-1))
             selected_bots+=("${bots[$idx]}")
         done
+        fi
         
         if [ "$invalid" = true ]; then
             echo ""
@@ -992,10 +999,26 @@ duplicate_bot() {
         echo -e "${GREEN}Duplicating bot: $source_bot${NC}"
         echo ""
         
-        # Ask for new base name
-        read -p "Enter NEW BASE NAME for the bot(s) (Enter = default 'bot'): " new_base_name
-        if [[ -z "$new_base_name" ]]; then
-            new_base_name="bot"
+        # Ask for new base name and validate it doesn't already exist
+        while true; do
+            read -p "Enter NEW BASE NAME for the bot(s) (Enter = default 'bot'): " new_base_name
+            if [[ -z "$new_base_name" ]]; then
+                new_base_name="bot"
+            fi
+            
+            if [ "$(docker ps -a -q -f name=^/${new_base_name}$)" ] || [ -d "${BOTS_ROOT}/${new_base_name}" ]; then
+                echo -e "${RED}Error: A bot with the exact name '${new_base_name}' already exists.${NC}"
+                echo "Please type another name."
+                echo ""
+                continue
+            fi
+            break
+        done
+        
+        # Ask for nickname base
+        read -p "BASE name for NICKNAMES (Enter = same as container '$new_base_name'): " nickname_base
+        if [[ -z "$nickname_base" ]]; then
+            nickname_base="$new_base_name"
         fi
         
         # Find highest existing number for both container names and nicknames
@@ -1032,9 +1055,9 @@ duplicate_bot() {
                         # Only check nicknames if it's the SAME server
                         if [[ "$existing_hostname" == "$source_hostname" ]] && [[ "$existing_tcp_port" == "$source_tcp_port" ]]; then
                             nick=$(jq -r '.teamtalk.nickname // ""' "$config_file")
-                            if [[ "$nick" == "$new_base_name" ]]; then
+                            if [[ "$nick" == "$nickname_base" ]]; then
                                 nickname_base_exists=true
-                            elif [[ "$nick" =~ ^${new_base_name}([0-9]+)$ ]]; then
+                            elif [[ "$nick" =~ ^${nickname_base}([0-9]+)$ ]]; then
                                 n="${BASH_REMATCH[1]}"
                                 [ "$n" -gt "$highest_nickname_num" ] && highest_nickname_num=$n
                             fi
@@ -1086,10 +1109,10 @@ duplicate_bot() {
 
             # Determine nickname - same logic
             if [ "$nickname_base_used" == "false" ]; then
-                current_nickname="$new_base_name"
+                current_nickname="$nickname_base"
                 nickname_base_used=true
             else
-                current_nickname="${new_base_name}${next_nickname_num}"
+                current_nickname="${nickname_base}${next_nickname_num}"
                 next_nickname_num=$((next_nickname_num + 1))
             fi
             
@@ -1396,6 +1419,11 @@ manage_bots() {
     done
 }
 
+# Execute update check on startup
+if [ -f "$SCRIPT_DIR/update.sh" ]; then
+    bash "$SCRIPT_DIR/update.sh"
+fi
+
 # Check/Install Deps first
 install_dependencies
 build_image
@@ -1411,6 +1439,7 @@ while true; do
     echo "3. Rebuild Image / Update Code"
     echo "4. Uninstall Everything (Total Cleanup)"
     echo "5. Exit"
+    echo "6. Check for Updates"
     echo ""
     read -p "Choose an option: " option
     
@@ -1439,6 +1468,15 @@ while true; do
         5)
             echo "Exiting..."
             exit 0
+            ;;
+        6)
+            if [ -f "update.sh" ]; then
+                bash update.sh
+            else
+                echo -e "${RED}update.sh not found.${NC}"
+                read -p "Press Enter to continue..."
+            fi
+            header
             ;;
         *)
             # Invalid option - just reprint menu

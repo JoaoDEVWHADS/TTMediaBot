@@ -78,7 +78,7 @@ perform_image_rebuild() {
         echo "$RUNNING_NAMES" | xargs docker stop -t 1 > /dev/null 2>&1
     fi
     
-    echo -e "${YELLOW}Building new image (updating code, keeping dependencies in cache)...${NC}"
+    echo -e "${YELLOW}Building new image (updating code and PIP libraries)...${NC}"
     docker build --build-arg CACHEBUST=$(date +%s) -t ${BOT_IMAGE} .
     
     if [ $? -eq 0 ]; then
@@ -119,15 +119,9 @@ update_and_fix_permissions() {
              if [ "$PARENT_OWNER" != "root" ]; then
                  REAL_USER="$PARENT_OWNER"
              else
-                 # Fallback 3: Ask user
-                 echo -e "${RED}Could not detect non-root user automatically.${NC}"
-                 read -p "Enter your system username (for permission fix): " manual_user
-                 if [ -n "$manual_user" ]; then
-                     REAL_USER="$manual_user"
-                 else
-                     echo "No user entered. Using 'root'."
-                     REAL_USER="root"
-                 fi
+                 # Fallback 3: Use root automatically
+                 echo -e "${YELLOW}Could not detect non-root user. Using 'root' automatically.${NC}"
+                 REAL_USER="root"
              fi
          fi
     fi
@@ -140,7 +134,7 @@ update_and_fix_permissions() {
     REPO_NAME="TTMediaBot"
     BRANCH="master"
     
-    echo -e "${YELLOW}Checking GitHub for updates...${NC}"
+    echo -e "${YELLOW}Checking for updates...${NC}"
     
     # Get latest commit date from GitHub API
     # returns ISO 8601 date, e.g., "2023-10-27T10:00:00Z"
