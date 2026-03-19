@@ -13,6 +13,12 @@ This fork includes several modifications and optimizations:
 - **Docker Containerization:** The bot runs in Docker containers based on Debian 11 and Python 3.10, ensuring compatibility with legacy dependencies while maintaining stability
 - **Proven Stability:** Since I first encountered this bot in 2021, the adaptations made to work around YouTube's restrictions, combined with the optimizations from 2021/2022, have proven to be excellent and reliable
 
+## 🆕 Latest Updates (03/19/2026)
+
+- **Auto-Update System:** The script now checks for GitHub updates automatically on startup and includes a "Check for Updates" menu option.
+- **PIP Auto-Upgrade:** Docker image rebuilds now strictly force a complete upgrade (`pip install -U`) of all Python libraries.
+- **Security & QoL:** Duplicate bots now strictly validate names to avoid accidental overwrites and explicitly prompt for Nickname Base. Bulk delete now supports a "Delete All" feature.
+
 ## 🎵 YouTube Music Support
 
 This fork includes optimized support for **YouTube Music** alongside regular YouTube:
@@ -156,6 +162,7 @@ Comprehensive bot management submenu with 10 options:
 **2.5. Bulk Delete Bots**
 - Delete multiple bots in one operation
 - Enter space-separated numbers (e.g., `1 3 5`)
+- Use option `0` to **delete ALL bots** simultaneously
 - Shows summary before deletion
 - Efficient parallel container removal
 
@@ -164,8 +171,8 @@ Comprehensive bot management submenu with 10 options:
 - Select source bot from numbered list
 - Shows server address for each bot
 - Batch duplication support (create multiple copies)
-- Automatic numbering for containers and nicknames
-- Smart conflict detection (only checks same server)
+- Automatic numbering for containers and explicitly asks for **NICKNAME BASE**
+- Smart conflict detection: prevents cloning if the chosen base name already exists
 
 **2.7. Update Cookies (All Bots)**
 - Update YouTube cookies for all bots at once
@@ -213,11 +220,18 @@ Complete cleanup of TTMediaBot installation:
 #### 5. Exit
 Closes the script
 
+#### 6. Check for Updates
+Automatically checks the GitHub repository for updates.
+- Uses `update.sh` to compare local code with the remote repository
+- Safely backups configuration before updating
+- Includes a pause at the end so users can read the console
+
 ### Automatic Features
 
 The script automatically:
+- **Checks for Updates** automatically on startup if `update.sh` is present
 - **Installs dependencies** (Docker, jq) on first run
-- **Builds Docker image** automatically on first run (if not present)
+- **Builds Docker image** automatically and forces PIP to update libraries (`-U`) on every rebuild
 - **No startup prompts:** Rebuilding is now a manual menu option (Option 3), making startup faster
 - **Creates `bots` directory** structure
 - **Detects conflicts** (container names, nicknames on same server)

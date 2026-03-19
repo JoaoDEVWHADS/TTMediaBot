@@ -1,5 +1,5 @@
-    bots/
-TeamTalk_DLL/
+/bots/
+/TeamTalk_DLL/
 
 # Python
 __pycache__/
