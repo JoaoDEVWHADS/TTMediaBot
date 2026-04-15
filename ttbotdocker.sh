@@ -1438,8 +1438,8 @@ while true; do
     echo "2. Manage Bots"
     echo "3. Rebuild Image / Update Code"
     echo "4. Uninstall Everything (Total Cleanup)"
-    echo "5. Exit"
-    echo "6. Check for Updates"
+    echo "5. Check for Updates"
+    echo "6. Exit"
     echo ""
     read -p "Choose an option: " option
     
@@ -1466,10 +1466,6 @@ while true; do
             uninstall_all
             ;;
         5)
-            echo "Exiting..."
-            exit 0
-            ;;
-        6)
             if [ -f "update.sh" ]; then
                 bash update.sh
             else
@@ -1477,6 +1473,10 @@ while true; do
                 read -p "Press Enter to continue..."
             fi
             header
+            ;;
+        6)
+            echo "Exiting..."
+            exit 0
             ;;
         *)
             # Invalid option - just reprint menu
