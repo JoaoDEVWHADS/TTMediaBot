@@ -178,11 +178,6 @@ class YtmService(_Service):
             "nocheckcertificate": True,
             "geo_bypass": True,
             "extract_flat": "in_playlist", # Speed up if URL is a playlist, though we usually pass single video URLs here
-            "postprocessors": [{
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": "192",
-            }],
         }
 
         if cookie_path and os.path.isfile(cookie_path):
@@ -206,10 +201,16 @@ class YtmService(_Service):
              return
         
         # Instantiate per request for thread safety
-        with YoutubeDL(self._ydl_config) as ydl:
+        config = self._ydl_config.copy()
+        config["postprocessors"] = [{
+            "key": "FFmpegExtractAudio",
+            "preferredcodec": "mp3",
+            "preferredquality": "192",
+        }]
+        with YoutubeDL(config) as ydl:
              # We need to ensure skip_download is False for actual downloading
              ydl.params['skip_download'] = False
-             dl = get_suitable_downloader(info)(ydl, self._ydl_config)
+             dl = get_suitable_downloader(info)(ydl, config)
              dl.download(file_path, info)
         duration = (time.perf_counter() - start_time) * 1000
         logging.info(f"YTM Download finished in {duration:.2f}ms for {track.name}")

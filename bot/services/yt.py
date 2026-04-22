@@ -52,11 +52,6 @@ class YtService(_Service):
             "no_warnings": True,
             "nocheckcertificate": True,
             "geo_bypass": True,
-            "postprocessors": [{
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": "192",
-            }],
         }
 
         if self.config.cookiefile_path and os.path.isfile(self.config.cookiefile_path):
@@ -72,8 +67,14 @@ class YtService(_Service):
             return
         
         # Instantiate per request for thread safety, but use shared config (no file copy)
-        with YoutubeDL(self._ydl_config) as ydl:
-            dl = get_suitable_downloader(info)(ydl, self._ydl_config)
+        config = self._ydl_config.copy()
+        config["postprocessors"] = [{
+            "key": "FFmpegExtractAudio",
+            "preferredcodec": "mp3",
+            "preferredquality": "192",
+        }]
+        with YoutubeDL(config) as ydl:
+            dl = get_suitable_downloader(info)(ydl, config)
             dl.download(file_path, info)
         duration = (time.perf_counter() - start_time) * 1000
         logging.info(f"YT Download finished in {duration:.2f}ms for {track.name}")
