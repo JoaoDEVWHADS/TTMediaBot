@@ -10,6 +10,8 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+REPO_URL="git@github.com:JoaoDEVWHADS/TTMediaBot.git"
+
 echo "--- Checking for Git ---"
 if ! command -v git &> /dev/null; then
     echo "Git not found. Installing..."
