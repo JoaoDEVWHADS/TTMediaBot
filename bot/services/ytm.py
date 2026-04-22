@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from bot import Bot
 
 from yt_dlp import YoutubeDL
+from yt_dlp.downloader import get_suitable_downloader
 from ytmusicapi import YTMusic
 
 from bot.config.models import YtmModel
