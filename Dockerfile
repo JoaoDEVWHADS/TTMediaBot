@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     p7zip-full \
     pulseaudio \
     ca-certificates \
+    ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js LTS (matching install.sh)

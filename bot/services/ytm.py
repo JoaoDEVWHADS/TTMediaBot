@@ -164,9 +164,9 @@ class YtmService(_Service):
 
         self._ydl_config = {
             "skip_download": True,
-            "format": "bestaudio[ext=m4a]/bestaudio/best",
+            "format": "bestaudio/best",
             # Performance optimizations:
-            "format_sort": ["res:144", "codec:m4a", "codec:opus"], # Prioritize low res/audio codecs for speed
+            "format_sort": ["res:144", "codec:mp3", "codec:m4a", "codec:opus"], # Prioritize mp3/m4a for simplicity
             "youtube_include_dash_manifest": False, # Skip DASH manifest download
             "youtube_include_hls_manifest": False,  # Skip HLS manifest download
             "socket_timeout": 5,
@@ -177,6 +177,11 @@ class YtmService(_Service):
             "nocheckcertificate": True,
             "geo_bypass": True,
             "extract_flat": "in_playlist", # Speed up if URL is a playlist, though we usually pass single video URLs here
+            "postprocessors": [{
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "mp3",
+                "preferredquality": "192",
+            }],
         }
 
         if cookie_path and os.path.isfile(cookie_path):
@@ -201,9 +206,10 @@ class YtmService(_Service):
         
         # Instantiate per request for thread safety
         with YoutubeDL(self._ydl_config) as ydl:
-             # We need to process it to get the stream if we don't have it
-             # But download usually expects a URL or ID
-             pass
+             # We need to ensure skip_download is False for actual downloading
+             ydl.params['skip_download'] = False
+             dl = get_suitable_downloader(info)(ydl, self._ydl_config)
+             dl.download(file_path, info)
         duration = (time.perf_counter() - start_time) * 1000
         logging.info(f"YTM Download finished in {duration:.2f}ms for {track.name}")
 
@@ -242,7 +248,7 @@ class YtmService(_Service):
                  title = stream.get("title", "Unknown")
                  if "uploader" in stream:
                       title += " - {}".format(stream["uploader"])
-                 format = stream.get("ext", "m4a")
+                 format = "mp3"
                  
                  duration = (time.perf_counter() - start_time) * 1000
                  logging.info(f"YTM Get (Process) finished in {duration:.2f}ms for {title}")

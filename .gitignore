@@ -31,7 +31,7 @@ env/
 ENV/
 
 # Project Specific
-config.json
+# config.json (Allowed)
 cookies.txt
 *.log
 TTMediaBot.log

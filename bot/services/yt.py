@@ -39,9 +39,9 @@ class YtService(_Service):
     def initialize(self):
         self._ydl_config = {
             "skip_download": True,
-            "format": "bestaudio[ext=m4a]/bestaudio/best",
+            "format": "bestaudio/best",
             # Performance optimizations:
-            "format_sort": ["res:144", "codec:m4a", "codec:opus"], # Prioritize low res/audio codecs for speed
+            "format_sort": ["res:144", "codec:mp3", "codec:m4a", "codec:opus"], # Prioritize mp3/m4a for simplicity
             "youtube_include_dash_manifest": False, # Skip DASH manifest download
             "youtube_include_hls_manifest": False,  # Skip HLS manifest download
             "socket_timeout": 5,
@@ -52,6 +52,11 @@ class YtService(_Service):
             "no_warnings": True,
             "nocheckcertificate": True,
             "geo_bypass": True,
+            "postprocessors": [{
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "mp3",
+                "preferredquality": "192",
+            }],
         }
 
         if self.config.cookiefile_path and os.path.isfile(self.config.cookiefile_path):
@@ -120,7 +125,7 @@ class YtService(_Service):
             title = stream["title"]
             if "uploader" in stream:
                 title += " - {}".format(stream["uploader"])
-            format = stream["ext"]
+            format = "mp3"
             if "is_live" in stream and stream["is_live"]:
                 type = TrackType.Live
             else:
