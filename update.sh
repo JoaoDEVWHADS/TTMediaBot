@@ -278,24 +278,26 @@ update_and_fix_permissions() {
             fi
         fi
     
-    echo ""
-    echo -e "${YELLOW}Fixing permissions...${NC}"
-    
-    # 4. Fix permissions
-    # Operate on SCRIPT_DIR
-    TARGET_FIX_DIR="$SCRIPT_DIR"
-    TARGET_FIX_DIR=$(realpath "$TARGET_FIX_DIR")
-    
-    echo "Setting ownership to $REAL_USER:$REAL_USER for $TARGET_FIX_DIR..."
-    chown -R "$REAL_USER":"$REAL_USER" "$TARGET_FIX_DIR"
-    
-    echo "Setting permissions (777 - Full Control)..."
-    chmod -R 777 "$TARGET_FIX_DIR"
-    
-    chmod +x "$TARGET_FIX_DIR"/*.sh 2>/dev/null
-    
-    echo ""
-    echo -e "${GREEN}Done! Permissions set to User: $REAL_USER, Mode: 777.${NC}"
+    if [ "$UPDATE_PERFORMED" == "true" ] || [ "$REBUILD_REQUIRED" == "true" ]; then
+        echo ""
+        echo -e "${YELLOW}Fixing permissions...${NC}"
+        
+        # 4. Fix permissions
+        # Operate on SCRIPT_DIR
+        TARGET_FIX_DIR="$SCRIPT_DIR"
+        TARGET_FIX_DIR=$(realpath "$TARGET_FIX_DIR")
+        
+        echo "Setting ownership to $REAL_USER:$REAL_USER for $TARGET_FIX_DIR..."
+        chown -R "$REAL_USER":"$REAL_USER" "$TARGET_FIX_DIR"
+        
+        echo "Setting permissions (777 - Full Control)..."
+        chmod -R 777 "$TARGET_FIX_DIR"
+        
+        chmod +x "$TARGET_FIX_DIR"/*.sh 2>/dev/null
+        
+        echo ""
+        echo -e "${GREEN}Done! Permissions set to User: $REAL_USER, Mode: 777.${NC}"
+    fi
     
     # 5. Auto-Rebuild (if update occurred or version mismatch detected)
     if [ "$UPDATE_PERFORMED" == "true" ] || [ "$REBUILD_REQUIRED" == "true" ]; then
@@ -350,9 +352,6 @@ EOF
     else
         echo -e "${GREEN}Auto-Updater Service configured (restart skipped to avoid interruption).${NC}"
     fi
-}
-
-
 # Run
 install_deps_light() {
     if ! command -v jq &> /dev/null; then apt-get install -y jq; fi
@@ -360,10 +359,20 @@ install_deps_light() {
     if ! command -v curl &> /dev/null; then apt-get install -y curl; fi
 }
 
-install_deps_light
-update_and_fix_permissions
-configure_auto_updater
-# Automated update test - Thu Apr 23 06:11:32 UTC 2026
-# Version tracking test - Thu Apr 23 06:32:18 UTC 2026
-# Final verification commit - Thu Apr 23 06:44:28 UTC 2026
-# TTMediaBot v1.2 - Stability Shield Active
+# --- MAIN EXECUTION WRAPPER ---
+# Wrapping in a main function ensures bash loads the entire block into memory
+# protecting against crashes if the script modifies itself mid-execution during git reset.
+main() {
+    install_deps_light
+    update_and_fix_permissions
+    
+    # Only restart the heavy systemd service if an update actually happened, 
+    # or if the service hasn't been installed yet.
+    if [ "$UPDATE_PERFORMED" == "true" ] || [ "$REBUILD_REQUIRED" == "true" ] || [ ! -f "/etc/systemd/system/ttmediabot-updater.service" ]; then
+        configure_auto_updater
+    fi
+}
+
+# Execute main in memory
+main "$@"
+exit 0
