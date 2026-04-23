@@ -68,22 +68,22 @@ recreate_bot_containers() {
 perform_image_rebuild() {
     echo ""
     echo -e "${YELLOW}Starting Image Rebuild...${NC}"
-    echo "Checking running bots..."
     
     # Capture NAMES of running bots to restart them later
     RUNNING_NAMES=$(docker ps --format "{{.Names}}" -f "label=role=ttmediabot")
     
     if [ ! -z "$RUNNING_NAMES" ]; then
-        echo -e "${YELLOW}Stopping bots for update...${NC}"
+        echo -e "${YELLOW}Stopping bots for update (User Choice: Stop before Build)...${NC}"
         echo "$RUNNING_NAMES" | xargs docker stop -t 1 > /dev/null 2>&1
     fi
-    
+
     # Build the image with a commit hash label for version tracking
     CURRENT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+    echo "Building new image with version label: $CURRENT_HASH"
     docker build --build-arg CACHEBUST=$(date +%s) --label "commit_hash=$CURRENT_HASH" -t ${BOT_IMAGE} .
     
     if [ $? -eq 0 ]; then
-         echo -e "${GREEN}Image updated successfully!${NC}"
+         echo -e "${GREEN}Image built successfully!${NC}"
          
          # Recreate containers to use new image
          recreate_bot_containers
@@ -141,20 +141,36 @@ update_and_fix_permissions() {
     if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
         # Fetch remote info
         git fetch origin "$BRANCH" -q
-        REMOTE_HASH=$(git rev-parse "origin/$BRANCH")
-        LOCAL_HASH=$(git rev-parse HEAD)
+        REMOTE_HASH=$(git rev-parse "origin/$BRANCH" | tr -d '[:space:]')
+        LOCAL_HASH=$(git rev-parse HEAD | tr -d '[:space:]')
         
         # Check running version
-        RUNNING_HASH=$(docker inspect ${BOT_IMAGE} --format '{{ index .Config.Labels "commit_hash" }}' 2>/dev/null || echo "none")
+        # Use 'tr -d' to ensure no weird whitespace/newlines break the comparison
+        RUNNING_HASH=$(docker inspect ${BOT_IMAGE} --format '{{ index .Config.Labels "commit_hash" }}' 2>/dev/null | tr -d '[:space:]')
+        [ -z "$RUNNING_HASH" ] && RUNNING_HASH="none"
         
-        if [ "$REMOTE_HASH" != "$LOCAL_HASH" ] || [ "$LOCAL_HASH" != "$RUNNING_HASH" ]; then
+        # Determine if we need an update or a rebuild
+        NEEDS_PULL=false
+        NEEDS_REBUILD=false
+        
+        if [ "$REMOTE_HASH" != "$LOCAL_HASH" ]; then
+            NEEDS_PULL=true
+        fi
+        
+        if [ "$LOCAL_HASH" != "$RUNNING_HASH" ]; then
+            NEEDS_REBUILD=true
+        fi
+        
+        if [ "$NEEDS_PULL" = true ] || [ "$NEEDS_REBUILD" = true ]; then
             echo -e "${GREEN}Update or Version mismatch found!${NC}"
             echo "Remote:  $REMOTE_HASH"
             echo "Local:   $LOCAL_HASH"
             echo "Running: $RUNNING_HASH"
             UPDATE_FOUND=true
+            # If we need a rebuild, ensure UPDATE_PERFORMED will be true later
+            [ "$NEEDS_REBUILD" = true ] && REBUILD_REQUIRED=true
         else
-            echo -e "${GREEN}Already up to date and running latest version.${NC}"
+            echo -e "${GREEN}Already up to date and running latest version ($LOCAL_HASH).${NC}"
             UPDATE_FOUND=false
         fi
     else
@@ -189,22 +205,36 @@ update_and_fix_permissions() {
         echo "3. Update all local files"
         echo "4. Restore backup"
         echo ""
-        read -p "Proceed? (y/N): " confirm_update
+        
+        if [ "$AUTO_UPDATE" = "true" ]; then
+            confirm_update="y"
+            echo "Auto-Update mode detected. Proceeding automatically..."
+        else
+            read -p "Proceed? (y/N): " confirm_update
+        fi
             
-            if [[ "$confirm_update" =~ ^[yY]$ ]]; then
+        if [[ "$confirm_update" =~ ^[yY]$ ]]; then
                 echo -e "${YELLOW}Starting update...${NC}"
                 
                 # Check if we are in a git repository
                 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-                    echo "Performing git pull..."
-                    # Backup configs before pull just in case
+                    echo "Performing forced synchronization with GitHub..."
+                    # Backup configs before sync just in case
                     TMP_BACKUP=$(mktemp -d)
-                    if [ -d "$BOTS_ROOT" ]; then cp -r "$BOTS_ROOT" "$TMP_BACKUP/"; fi
+                    if [ -d "$BOTS_ROOT" ]; then 
+                        mkdir -p "$TMP_BACKUP/bots"
+                        cp -r "$BOTS_ROOT/." "$TMP_BACKUP/bots/"
+                    fi
                     
-                    git pull origin "$BRANCH"
+                    # Force synchronization to match origin exactly
+                    git fetch origin "$BRANCH"
+                    git reset --hard "origin/$BRANCH"
+                    git clean -fd # Also remove untracked files that might conflict
                     
                     # Restore backup if needed
-                    if [ -d "$TMP_BACKUP/bots" ]; then cp -rf "$TMP_BACKUP/bots/"* "$BOTS_ROOT/" 2>/dev/null; fi
+                    if [ -d "$TMP_BACKUP/bots" ]; then 
+                        cp -rf "$TMP_BACKUP/bots/." "$BOTS_ROOT/" 2>/dev/null
+                    fi
                     rm -rf "$TMP_BACKUP"
                     
                     UPDATE_PERFORMED=true
@@ -267,10 +297,10 @@ update_and_fix_permissions() {
     echo ""
     echo -e "${GREEN}Done! Permissions set to User: $REAL_USER, Mode: 777.${NC}"
     
-    # 5. Auto-Rebuild (if update occurred)
-    if [ "$UPDATE_PERFORMED" == "true" ]; then
+    # 5. Auto-Rebuild (if update occurred or version mismatch detected)
+    if [ "$UPDATE_PERFORMED" == "true" ] || [ "$REBUILD_REQUIRED" == "true" ]; then
         echo ""
-        echo -e "${YELLOW}Since an update was applied, we need to rebuild the Docker image.${NC}"
+        echo -e "${YELLOW}Update applied or version mismatch detected. Rebuilding Docker image...${NC}"
         # Wait a bit
         sleep 2
         perform_image_rebuild
@@ -312,9 +342,14 @@ EOF
     echo "Enabling and starting service..."
     systemctl daemon-reload
     systemctl enable ttmediabot-updater.service >/dev/null 2>&1
-    systemctl restart ttmediabot-updater.service
     
-    echo -e "${GREEN}Auto-Updater Service configured and running!${NC}"
+    # Only restart if not being called by the auto-updater to avoid killing our own process
+    if [ "$AUTO_UPDATE" != "true" ]; then
+        systemctl restart ttmediabot-updater.service
+        echo -e "${GREEN}Auto-Updater Service configured and running!${NC}"
+    else
+        echo -e "${GREEN}Auto-Updater Service configured (restart skipped to avoid interruption).${NC}"
+    fi
 }
 
 
@@ -331,3 +366,4 @@ configure_auto_updater
 # Automated update test - Thu Apr 23 06:11:32 UTC 2026
 # Version tracking test - Thu Apr 23 06:32:18 UTC 2026
 # Final verification commit - Thu Apr 23 06:44:28 UTC 2026
+# TTMediaBot v1.2 - Stability Shield Active

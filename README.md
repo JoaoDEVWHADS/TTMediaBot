@@ -496,6 +496,8 @@ cp -r bots bots_backup_$(date +%Y%m%d)
 
 ---
 
+---
+
 ## 📊 Logs and Monitoring
 
 ### Viewing Real-Time Logs
@@ -558,4 +560,3 @@ docker ps -a -f "label=role=ttmediabot"
 ```bash
 docker stats $(docker ps -q -f "label=role=ttmediabot")
 ```
-
