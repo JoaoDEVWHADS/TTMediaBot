@@ -41,8 +41,13 @@ RUN pip install --upgrade pip \
 # Build argument to bust cache for core code and frequently-changing tools
 ARG CACHEBUST=1
 
-# Always ensure latest yt-dlp on every build (very fast if already latest)
-RUN pip install -U "yt-dlp[default]"
+# Re-copy requirements just in case we need it below the cache line
+COPY requirements.txt .
+
+# Always ensure latest libraries and yt-dlp on every build
+RUN pip install -U -r requirements.txt \
+    && pip install httpx==0.27.0 \
+    && pip install -U "yt-dlp[default]"
 
 # Copy project files
 COPY . .
