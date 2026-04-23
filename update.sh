@@ -189,56 +189,54 @@ update_and_fix_permissions() {
             if [[ "$confirm_update" =~ ^[yY]$ ]]; then
                 echo -e "${YELLOW}Starting update...${NC}"
                 
-                # Define Temp Dirs
-                TMP_DIR=$(mktemp -d)
-                BACKUP_DIR="$TMP_DIR/backup"
-                mkdir -p "$BACKUP_DIR"
-                
-                # 1. Backup Configs
-                echo "Backing up configurations..."
-                
-                if [ -d "$BOTS_ROOT" ]; then
-                    cp -r "$BOTS_ROOT" "$BACKUP_DIR/"
-                fi
-                
-                # 2. Clone Repository (Full Git Init)
-                echo "Cloning repository..."
-                CLONE_DIR="$TMP_DIR/clone"
-                
-                # Clone to temp dir
-                git clone "https://github.com/$REPO_OWNER/$REPO_NAME.git" "$CLONE_DIR"
-                
-                if [ $? -ne 0 ]; then
-                    echo -e "${RED}Clone failed.${NC}"
-                else
-                    echo "Installing..."
+                # Check if we are in a git repository
+                if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+                    echo "Performing git pull..."
+                    # Backup configs before pull just in case
+                    TMP_BACKUP=$(mktemp -d)
+                    if [ -d "$BOTS_ROOT" ]; then cp -r "$BOTS_ROOT" "$TMP_BACKUP/"; fi
                     
-                    # Debug info
-                    echo "Cloned content:"
-                    ls -A "$CLONE_DIR" | head -n 5
-                    echo "..."
+                    git pull origin "$BRANCH"
                     
-                    # Copy files over, overwriting
-                    # Use /. to include hidden files (especially .git)
-                    # This converts the local folder into a git repo if it wasn't one
-                    cp -rf "$CLONE_DIR/." "$SCRIPT_DIR/"
+                    # Restore backup if needed
+                    if [ -d "$TMP_BACKUP/bots" ]; then cp -rf "$TMP_BACKUP/bots/"* "$BOTS_ROOT/" 2>/dev/null; fi
+                    rm -rf "$TMP_BACKUP"
                     
-                    # 4. Restore Backup
-                    echo "Restoring configurations..."
-                    if [ -d "$BACKUP_DIR/bots" ]; then
-                        # Restore bots folder
-                        cp -rf "$BACKUP_DIR/bots/"* "$BOTS_ROOT/" 2>/dev/null
-                    fi
-                    
-                    # Update timestamp
-                    touch "$SCRIPT_DIR/ttbotdocker.sh"
-                    
-                    echo -e "${GREEN}Update applied! Repository is now git-linked.${NC}"
                     UPDATE_PERFORMED=true
+                else
+                    # First time conversion to git repo or standalone install
+                    # Define Temp Dirs
+                    TMP_DIR=$(mktemp -d)
+                    BACKUP_DIR="$TMP_DIR/backup"
+                    mkdir -p "$BACKUP_DIR"
                     
-                    # Cleanup
-                    echo "Cleaning up..."
-                    rm -rf "$TMP_DIR"
+                    # 1. Backup Configs
+                    echo "Backing up configurations..."
+                    if [ -d "$BOTS_ROOT" ]; then cp -r "$BOTS_ROOT" "$BACKUP_DIR/"; fi
+                    
+                    # 2. Clone Repository
+                    echo "Cloning repository..."
+                    CLONE_DIR="$TMP_DIR/clone"
+                    git clone "https://github.com/$REPO_OWNER/$REPO_NAME.git" "$CLONE_DIR"
+                    
+                    if [ $? -eq 0 ]; then
+                        echo "Installing..."
+                        cp -rf "$CLONE_DIR/." "$SCRIPT_DIR/"
+                        
+                        # 4. Restore Backup
+                        if [ -d "$BACKUP_DIR/bots" ]; then cp -rf "$BACKUP_DIR/bots/"* "$BOTS_ROOT/" 2>/dev/null; fi
+                        
+                        UPDATE_PERFORMED=true
+                        rm -rf "$TMP_DIR"
+                    else
+                        echo -e "${RED}Clone failed.${NC}"
+                    fi
+                fi
+
+                if [ "$UPDATE_PERFORMED" == "true" ]; then
+                     # Update timestamp
+                     touch "$SCRIPT_DIR/ttbotdocker.sh"
+                     echo -e "${GREEN}Update applied!${NC}"
                 fi
             else
                 echo "Update cancelled."
