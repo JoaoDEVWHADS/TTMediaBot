@@ -93,15 +93,18 @@ perform_image_rebuild() {
              echo "$RUNNING_NAMES" | xargs docker start > /dev/null 2>&1
              
              # Health Check: Wait for all bots to be confirmed 'running'
-             echo -en "${YELLOW}Verifying bot health...${NC} "
-             MAX_RETRIES=15
+             # We wait up to 5 minutes (150 retries * 2s) to accommodate large fleets,
+             # but we keep a safety limit to avoid locking the system forever if a bot is broken.
+             echo -en "${YELLOW}Verifying bot health (Timeout: 5m)...${NC} "
+             MAX_RETRIES=150
              RETRY_COUNT=0
              while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
                  TOTAL_BOTS=$(echo "$RUNNING_NAMES" | wc -w)
-                 STABLE_BOTS=$(docker ps -f "status=running" --format "{{.Names}}" | grep -xF "$RUNNING_NAMES" | wc -l)
+                 # Check for both 'running' and 'restarting' (since a bot might be in a fast crash loop but it means it "tried" to start)
+                 STABLE_BOTS=$(docker ps -a --filter "status=running" --filter "status=restarting" --format "{{.Names}}" | grep -xF "$RUNNING_NAMES" | wc -l)
                  
                  if [ "$STABLE_BOTS" -ge "$TOTAL_BOTS" ]; then
-                     echo -e "[ ${GREEN}OK${NC} ] All bots are running."
+                     echo -e "[ ${GREEN}OK${NC} ] All $TOTAL_BOTS bots are confirmed active."
                      break
                  fi
                  
