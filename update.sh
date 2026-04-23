@@ -336,9 +336,14 @@ EOF
     echo "Enabling and starting service..."
     systemctl daemon-reload
     systemctl enable ttmediabot-updater.service >/dev/null 2>&1
-    systemctl restart ttmediabot-updater.service
     
-    echo -e "${GREEN}Auto-Updater Service configured and running!${NC}"
+    # Only restart if not being called by the auto-updater to avoid killing our own process
+    if [ "$AUTO_UPDATE" != "true" ]; then
+        systemctl restart ttmediabot-updater.service
+        echo -e "${GREEN}Auto-Updater Service configured and running!${NC}"
+    else
+        echo -e "${GREEN}Auto-Updater Service configured (restart skipped to avoid interruption).${NC}"
+    fi
 }
 
 
