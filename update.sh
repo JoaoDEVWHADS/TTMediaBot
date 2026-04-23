@@ -264,6 +264,43 @@ update_and_fix_permissions() {
     cd "$SCRIPT_DIR" || return
 }
 
+# Function: Configure Auto-Updater Service
+configure_auto_updater() {
+    echo ""
+    echo -e "${YELLOW} --- Configuring Auto-Updater Service --- ${NC}"
+    
+    SERVICE_FILE="/etc/systemd/system/ttmediabot-updater.service"
+    
+    # Create the service file
+    echo "Creating systemd service..."
+    cat > "$SERVICE_FILE" <<EOF
+[Unit]
+Description=TTMediaBot Auto-Updater Watcher
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=$SCRIPT_DIR
+ExecStart=/bin/bash $SCRIPT_DIR/auto_updater.sh
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    # Fix permissions for the watcher script
+    chmod +x "$SCRIPT_DIR/auto_updater.sh"
+
+    # Reload systemd and enable service
+    echo "Enabling and starting service..."
+    systemctl daemon-reload
+    systemctl enable ttmediabot-updater.service >/dev/null 2>&1
+    systemctl restart ttmediabot-updater.service
+    
+    echo -e "${GREEN}Auto-Updater Service configured and running!${NC}"
+}
+
 
 # Run
 install_deps_light() {
@@ -274,3 +311,4 @@ install_deps_light() {
 
 install_deps_light
 update_and_fix_permissions
+configure_auto_updater

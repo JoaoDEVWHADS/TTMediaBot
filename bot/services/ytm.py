@@ -181,8 +181,14 @@ class YtmService(_Service):
         }
 
         if self.cookiejar:
-            self._ydl_config |= {"cookiejar": self.cookiejar}
-            
+            try:
+                # Create a temporary copy of the cookie file for yt-dlp
+                self.yt_dlp_cookiefile = os.path.join(tempfile.gettempdir(), f"ytm_cookies_{os.getpid()}.txt")
+                shutil.copy2(cookie_path, self.yt_dlp_cookiefile)
+                self._ydl_config |= {"cookiefile": self.yt_dlp_cookiefile}
+            except Exception as e:
+                logging.error(f"Failed to setup temporary cookies for YTM (yt-dlp): {e}")
+
         # Removed instance reuse due to thread safety
         # self.ydl = YoutubeDL(self._ydl_config)
 
