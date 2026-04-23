@@ -70,9 +70,17 @@ perform_image_rebuild() {
     echo -e "${YELLOW}Starting Image Rebuild...${NC}"
     
     # Capture NAMES of running bots to restart them later
+    # We also check a persistent state file in case a previous update was interrupted after stopping bots
+    STATE_FILE="/tmp/ttmediabot_last_running.txt"
     RUNNING_NAMES=$(docker ps --format "{{.Names}}" -f "label=role=ttmediabot")
     
+    if [ -z "$RUNNING_NAMES" ] && [ -f "$STATE_FILE" ]; then
+        RUNNING_NAMES=$(cat "$STATE_FILE")
+        echo -e "${YELLOW}Recovery: Found interrupted update state. Will attempt to restart: $RUNNING_NAMES${NC}"
+    fi
+
     if [ ! -z "$RUNNING_NAMES" ]; then
+        echo "$RUNNING_NAMES" > "$STATE_FILE"
         echo -e "${YELLOW}Stopping bots for update (User Choice: Stop before Build)...${NC}"
         echo "$RUNNING_NAMES" | xargs docker stop -t 1 > /dev/null 2>&1
     fi
@@ -115,6 +123,9 @@ perform_image_rebuild() {
              
              if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
                  echo -e "\n${RED}Warning: Some bots might have failed to start or crashed.${NC}"
+             else
+                 # Success! Clear the persistent state file
+                 rm -f "$STATE_FILE"
              fi
          fi
     else
