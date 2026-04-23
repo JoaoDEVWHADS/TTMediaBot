@@ -14,9 +14,12 @@ while true; do
     # Check remote hash using ls-remote (bypass rate limits)
     REMOTE_HASH=$(git ls-remote origin -h "refs/heads/$BRANCH" | awk '{print $1}')
     LOCAL_HASH=$(git rev-parse HEAD 2>/dev/null)
+    
+    # Check what version is currently running in Docker
+    RUNNING_HASH=$(docker inspect ttmediabot --format '{{ index .Config.Labels "commit_hash" }}' 2>/dev/null || echo "none")
 
-    if [ -n "$REMOTE_HASH" ] && [ "$REMOTE_HASH" != "$LOCAL_HASH" ]; then
-        echo "$(date): New update detected ($REMOTE_HASH). Running update.sh..."
+    if [ -n "$REMOTE_HASH" ] && { [ "$REMOTE_HASH" != "$LOCAL_HASH" ] || [ "$REMOTE_HASH" != "$RUNNING_HASH" ]; }; then
+        echo "$(date): Out of sync detected (Remote: $REMOTE_HASH, Local: $LOCAL_HASH, Running: $RUNNING_HASH). Running update.sh..."
         # Use 'yes' to auto-confirm prompts in update.sh
         yes | ./update.sh
     fi

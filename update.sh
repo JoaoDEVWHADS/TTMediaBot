@@ -78,8 +78,9 @@ perform_image_rebuild() {
         echo "$RUNNING_NAMES" | xargs docker stop -t 1 > /dev/null 2>&1
     fi
     
-    echo -e "${YELLOW}Building new image (updating code and PIP libraries)...${NC}"
-    docker build --build-arg CACHEBUST=$(date +%s) -t ${BOT_IMAGE} .
+    # Build the image with a commit hash label for version tracking
+    CURRENT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+    docker build --build-arg CACHEBUST=$(date +%s) --label "commit_hash=$CURRENT_HASH" -t ${BOT_IMAGE} .
     
     if [ $? -eq 0 ]; then
          echo -e "${GREEN}Image updated successfully!${NC}"
@@ -143,13 +144,17 @@ update_and_fix_permissions() {
         REMOTE_HASH=$(git rev-parse "origin/$BRANCH")
         LOCAL_HASH=$(git rev-parse HEAD)
         
-        if [ "$REMOTE_HASH" != "$LOCAL_HASH" ]; then
-            echo -e "${GREEN}Update found!${NC}"
-            echo "Remote: $REMOTE_HASH"
-            echo "Local:  $LOCAL_HASH"
+        # Check running version
+        RUNNING_HASH=$(docker inspect ${BOT_IMAGE} --format '{{ index .Config.Labels "commit_hash" }}' 2>/dev/null || echo "none")
+        
+        if [ "$REMOTE_HASH" != "$LOCAL_HASH" ] || [ "$LOCAL_HASH" != "$RUNNING_HASH" ]; then
+            echo -e "${GREEN}Update or Version mismatch found!${NC}"
+            echo "Remote:  $REMOTE_HASH"
+            echo "Local:   $LOCAL_HASH"
+            echo "Running: $RUNNING_HASH"
             UPDATE_FOUND=true
         else
-            echo -e "${GREEN}Already up to date.${NC}"
+            echo -e "${GREEN}Already up to date and running latest version.${NC}"
             UPDATE_FOUND=false
         fi
     else
