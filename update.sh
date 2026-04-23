@@ -199,15 +199,23 @@ update_and_fix_permissions() {
                 
                 # Check if we are in a git repository
                 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-                    echo "Performing git pull..."
-                    # Backup configs before pull just in case
+                    echo "Performing forced synchronization with GitHub..."
+                    # Backup configs before sync just in case
                     TMP_BACKUP=$(mktemp -d)
-                    if [ -d "$BOTS_ROOT" ]; then cp -r "$BOTS_ROOT" "$TMP_BACKUP/"; fi
+                    if [ -d "$BOTS_ROOT" ]; then 
+                        mkdir -p "$TMP_BACKUP/bots"
+                        cp -r "$BOTS_ROOT/." "$TMP_BACKUP/bots/"
+                    fi
                     
-                    git pull origin "$BRANCH"
+                    # Force synchronization to match origin exactly
+                    git fetch origin "$BRANCH"
+                    git reset --hard "origin/$BRANCH"
+                    git clean -fd # Also remove untracked files that might conflict
                     
                     # Restore backup if needed
-                    if [ -d "$TMP_BACKUP/bots" ]; then cp -rf "$TMP_BACKUP/bots/"* "$BOTS_ROOT/" 2>/dev/null; fi
+                    if [ -d "$TMP_BACKUP/bots" ]; then 
+                        cp -rf "$TMP_BACKUP/bots/." "$BOTS_ROOT/" 2>/dev/null
+                    fi
                     rm -rf "$TMP_BACKUP"
                     
                     UPDATE_PERFORMED=true
