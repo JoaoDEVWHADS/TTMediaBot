@@ -149,14 +149,28 @@ update_and_fix_permissions() {
         RUNNING_HASH=$(docker inspect ${BOT_IMAGE} --format '{{ index .Config.Labels "commit_hash" }}' 2>/dev/null | tr -d '[:space:]')
         [ -z "$RUNNING_HASH" ] && RUNNING_HASH="none"
         
-        if [ "$REMOTE_HASH" != "$LOCAL_HASH" ] || [ "$LOCAL_HASH" != "$RUNNING_HASH" ]; then
+        # Determine if we need an update or a rebuild
+        NEEDS_PULL=false
+        NEEDS_REBUILD=false
+        
+        if [ "$REMOTE_HASH" != "$LOCAL_HASH" ]; then
+            NEEDS_PULL=true
+        fi
+        
+        if [ "$LOCAL_HASH" != "$RUNNING_HASH" ]; then
+            NEEDS_REBUILD=true
+        fi
+        
+        if [ "$NEEDS_PULL" = true ] || [ "$NEEDS_REBUILD" = true ]; then
             echo -e "${GREEN}Update or Version mismatch found!${NC}"
             echo "Remote:  $REMOTE_HASH"
             echo "Local:   $LOCAL_HASH"
             echo "Running: $RUNNING_HASH"
             UPDATE_FOUND=true
+            # If we need a rebuild, ensure UPDATE_PERFORMED will be true later
+            [ "$NEEDS_REBUILD" = true ] && REBUILD_REQUIRED=true
         else
-            echo -e "${GREEN}Already up to date and running latest version.${NC}"
+            echo -e "${GREEN}Already up to date and running latest version ($LOCAL_HASH).${NC}"
             UPDATE_FOUND=false
         fi
     else
@@ -277,10 +291,10 @@ update_and_fix_permissions() {
     echo ""
     echo -e "${GREEN}Done! Permissions set to User: $REAL_USER, Mode: 777.${NC}"
     
-    # 5. Auto-Rebuild (if update occurred)
-    if [ "$UPDATE_PERFORMED" == "true" ]; then
+    # 5. Auto-Rebuild (if update occurred or version mismatch detected)
+    if [ "$UPDATE_PERFORMED" == "true" ] || [ "$REBUILD_REQUIRED" == "true" ]; then
         echo ""
-        echo -e "${YELLOW}Since an update was applied, we need to rebuild the Docker image.${NC}"
+        echo -e "${YELLOW}Update applied or version mismatch detected. Rebuilding Docker image...${NC}"
         # Wait a bit
         sleep 2
         perform_image_rebuild
