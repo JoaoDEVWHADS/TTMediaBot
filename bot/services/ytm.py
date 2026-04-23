@@ -98,16 +98,17 @@ class YtmService(_Service):
         if self.yt_config and self.yt_config.cookiefile_path:
              cookie_path = self.yt_config.cookiefile_path
 
+        self.cookiejar = None
         auth = None
         if cookie_path and os.path.isfile(cookie_path):
              try:
                  # Parse Netscape cookies to build a Cookie header
-                 cj = http.cookiejar.MozillaCookieJar(cookie_path)
-                 cj.load()
+                 self.cookiejar = http.cookiejar.MozillaCookieJar(cookie_path)
+                 self.cookiejar.load(ignore_discard=True, ignore_expires=True)
                  
                  cookie_header_parts = []
                  sapisid = ""
-                 for cookie in cj:
+                 for cookie in self.cookiejar:
                      if "youtube" in cookie.domain or "google" in cookie.domain:
                          cookie_header_parts.append(f"{cookie.name}={cookie.value}")
                      if cookie.name == "SAPISID":
@@ -142,7 +143,6 @@ class YtmService(_Service):
                              headers["authorization"] = auth_header
                          except ImportError:
                              # Fallback if helpers not accessible (unlikely)
-                             import time
                              import hashlib
                              timestamp = str(int(time.time()))
                              payload = f"{timestamp} {sapisid} https://music.youtube.com"
@@ -180,11 +180,8 @@ class YtmService(_Service):
             "extract_flat": "in_playlist", # Speed up if URL is a playlist, though we usually pass single video URLs here
         }
 
-        if cookie_path and os.path.isfile(cookie_path):
-            self._ydl_config |= {"cookiefile": cookie_path}
-
-        if cookie_path and os.path.isfile(cookie_path):
-            self._ydl_config |= {"cookiefile": cookie_path}
+        if self.cookiejar:
+            self._ydl_config |= {"cookiejar": self.cookiejar}
             
         # Removed instance reuse due to thread safety
         # self.ydl = YoutubeDL(self._ydl_config)

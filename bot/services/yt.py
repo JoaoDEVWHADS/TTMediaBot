@@ -55,7 +55,12 @@ class YtService(_Service):
         }
 
         if self.config.cookiefile_path and os.path.isfile(self.config.cookiefile_path):
-            self._ydl_config |= {"cookiefile": self.config.cookiefile_path}
+            try:
+                cj = http.cookiejar.MozillaCookieJar(self.config.cookiefile_path)
+                cj.load(ignore_discard=True, ignore_expires=True)
+                self._ydl_config |= {"cookiejar": cj}
+            except Exception as e:
+                logging.error(f"Failed to load cookies for YT: {e}")
             
     def download(self, track: Track, file_path: str) -> None:
         start_time = time.perf_counter()
