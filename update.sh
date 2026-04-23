@@ -347,8 +347,8 @@ EOF
     
     # Only restart if not being called by the auto-updater to avoid killing our own process
     if [ "$AUTO_UPDATE" != "true" ]; then
-        systemctl restart ttmediabot-updater.service
-        echo -e "${GREEN}Auto-Updater Service configured and running!${NC}"
+        systemctl restart --no-block ttmediabot-updater.service
+        echo -e "${GREEN}Auto-Updater Service configured and restarting in background!${NC}"
     else
         echo -e "${GREEN}Auto-Updater Service configured (restart skipped to avoid interruption).${NC}"
     fi
@@ -367,11 +367,9 @@ main() {
     install_deps_light
     update_and_fix_permissions
     
-    # Only restart the heavy systemd service if an update actually happened, 
-    # or if the service hasn't been installed yet.
-    if [ "$UPDATE_PERFORMED" == "true" ] || [ "$REBUILD_REQUIRED" == "true" ] || [ ! -f "/etc/systemd/system/ttmediabot-updater.service" ]; then
-        configure_auto_updater
-    fi
+    # The user mandated that service configuration MUST run every time
+    # but not block the flow (implemented via --no-block inside the function).
+    configure_auto_updater
 }
 
 # Execute main in memory
