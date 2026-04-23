@@ -522,13 +522,8 @@ class DownloadCommand(Command):
         )
 
     def __call__(self, arg: str, user: User) -> Optional[str]:
-        if not (
-            self.ttclient.user.is_admin or
-            (self.ttclient.user.user_account.rights & UserRight.UploadFiles == UserRight.UploadFiles)
-        ):
-            raise PermissionError(
-                self.translator.translate("Cannot upload file to channel")
-            )
+        # Permissions will be checked by the server
+
         if self.player.state != State.Stopped:
             track = self.player.track
             if track.url and (

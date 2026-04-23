@@ -64,6 +64,17 @@ class Uploader:
                         user,
                     )
                     error_exit = True
+                elif (
+                    error.command_id == command_id
+                    and error.type == ErrorType.NotAuthorised
+                ):
+                    self.ttclient.send_message(
+                        self.translator.translate("Error: {}").format(
+                            "Not authorized to upload files to this channel"
+                        ),
+                        user,
+                    )
+                    error_exit = True
                 else:
                     self.ttclient.errors_queue.put(error)
             except Empty:
