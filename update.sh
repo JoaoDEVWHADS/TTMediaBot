@@ -136,37 +136,55 @@ update_and_fix_permissions() {
     
     echo -e "${YELLOW}Checking for updates...${NC}"
     
-    # Get latest commit date from GitHub API
-    # returns ISO 8601 date, e.g., "2023-10-27T10:00:00Z"
-    LATEST_COMMIT_DATE=$(curl -s "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/commits/$BRANCH" | jq -r '.commit.committer.date')
-    
+    # Check if we are in a git repository
+    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        # Fetch remote info
+        git fetch origin "$BRANCH" -q
+        REMOTE_HASH=$(git rev-parse "origin/$BRANCH")
+        LOCAL_HASH=$(git rev-parse HEAD)
+        
+        if [ "$REMOTE_HASH" != "$LOCAL_HASH" ]; then
+            echo -e "${GREEN}Update found!${NC}"
+            echo "Remote: $REMOTE_HASH"
+            echo "Local:  $LOCAL_HASH"
+            UPDATE_FOUND=true
+        else
+            echo -e "${GREEN}Already up to date.${NC}"
+            UPDATE_FOUND=false
+        fi
+    else
+        # Fallback to date-based check if not a git repo yet (first install)
+        LATEST_COMMIT_DATE=$(curl -s "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/commits/$BRANCH" | jq -r '.commit.committer.date')
+        
+        if [ -n "$LATEST_COMMIT_DATE" ] && [ "$LATEST_COMMIT_DATE" != "null" ]; then
+            REMOTE_TS=$(date -d "$LATEST_COMMIT_DATE" +%s)
+            LOCAL_TS=$(stat -c %Y "$SCRIPT_DIR/ttbotdocker.sh" 2>/dev/null || echo 0)
+            
+            if [ "$REMOTE_TS" -gt "$LOCAL_TS" ]; then
+                echo -e "${GREEN}Update found (date-based)!${NC}"
+                UPDATE_FOUND=true
+            else
+                echo -e "${GREEN}Already up to date (date-based).${NC}"
+                UPDATE_FOUND=false
+            fi
+        else
+            # If API fails, assume we might need update if we aren't a git repo
+            echo -e "${RED}Warning: Could not check updates via API (rate limit?).${NC}"
+            UPDATE_FOUND=false
+        fi
+    fi
+
     UPDATE_PERFORMED=false
     
-    if [ -z "$LATEST_COMMIT_DATE" ] || [ "$LATEST_COMMIT_DATE" == "null" ]; then
-        echo -e "${RED}Error fetching update info from GitHub.${NC}"
-        echo "Check internet connection or API rate limits."
-        exit 1
-    else
-        # Convert to Unix timestamp
-        REMOTE_TS=$(date -d "$LATEST_COMMIT_DATE" +%s)
-        
-        # Get local file modification date (of this script)
-        LOCAL_TS=$(stat -c %Y "$SCRIPT_DIR/ttbotdocker.sh")
-        
-        # Compare
-        if [ "$REMOTE_TS" -gt "$LOCAL_TS" ]; then
-            echo -e "${GREEN}Update found!${NC}"
-            echo "Remote: $(date -d @$REMOTE_TS)"
-            echo "Local:  $(date -d @$LOCAL_TS)"
-            echo ""
-            echo "This will:"
-            echo "1. Backup 'bots' folder (configs/cookies)"
-            echo "2. Clone the latest repository code"
-            echo "3. Replace all local files with the cloned version"
-            echo "4. Restore backup"
-            echo "5. Convert installation to a valid Git repository"
-            echo ""
-            read -p "Proceed? (y/N): " confirm_update
+    if [ "$UPDATE_FOUND" == "true" ]; then
+        echo ""
+        echo "This will:"
+        echo "1. Backup 'bots' folder (configs/cookies)"
+        echo "2. Clone/pull the latest repository code"
+        echo "3. Update all local files"
+        echo "4. Restore backup"
+        echo ""
+        read -p "Proceed? (y/N): " confirm_update
             
             if [[ "$confirm_update" =~ ^[yY]$ ]]; then
                 echo -e "${YELLOW}Starting update...${NC}"
@@ -225,10 +243,6 @@ update_and_fix_permissions() {
             else
                 echo "Update cancelled."
             fi
-        else
-            echo -e "${GREEN}Already up to date.${NC}"
-            echo "Remote: $(date -d @$REMOTE_TS)"
-            echo "Local:  $(date -d @$LOCAL_TS)"
         fi
     fi
     
