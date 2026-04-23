@@ -30,18 +30,19 @@ WORKDIR /home/ttbot/TTMediaBot
 # Add current directory to LD_LIBRARY_PATH so libTeamTalk5.so is found
 ENV LD_LIBRARY_PATH=/home/ttbot/TTMediaBot:/home/ttbot/TTMediaBot/TeamTalk_DLL:$LD_LIBRARY_PATH
 
-# Build argument to bust cache when code changes and update PIP packages
-ARG CACHEBUST=1
-
 # Copy requirements
 COPY requirements.txt .
 
-# Install Python dependencies and force upgrade everything
+# Install Python dependencies (Cacheable)
 RUN pip install --upgrade pip \
-    && pip install -U -r requirements.txt \
-    && pip install -U --pre "yt-dlp[default]" \
-    && pip uninstall -y httpx \
+    && pip install -r requirements.txt \
     && pip install httpx==0.27.0
+
+# Build argument to bust cache for core code and frequently-changing tools
+ARG CACHEBUST=1
+
+# Always ensure latest yt-dlp on every build (very fast if already latest)
+RUN pip install -U "yt-dlp[default]"
 
 # Copy project files
 COPY . .
