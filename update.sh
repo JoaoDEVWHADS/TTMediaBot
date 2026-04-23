@@ -142,11 +142,13 @@ update_and_fix_permissions() {
     if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
         # Fetch remote info
         git fetch origin "$BRANCH" -q
-        REMOTE_HASH=$(git rev-parse "origin/$BRANCH")
-        LOCAL_HASH=$(git rev-parse HEAD)
+        REMOTE_HASH=$(git rev-parse "origin/$BRANCH" | tr -d '[:space:]')
+        LOCAL_HASH=$(git rev-parse HEAD | tr -d '[:space:]')
         
         # Check running version
-        RUNNING_HASH=$(docker inspect ${BOT_IMAGE} --format '{{ index .Config.Labels "commit_hash" }}' 2>/dev/null || echo "none")
+        # Use 'tr -d' to ensure no weird whitespace/newlines break the comparison
+        RUNNING_HASH=$(docker inspect ${BOT_IMAGE} --format '{{ index .Config.Labels "commit_hash" }}' 2>/dev/null | tr -d '[:space:]')
+        [ -z "$RUNNING_HASH" ] && RUNNING_HASH="none"
         
         if [ "$REMOTE_HASH" != "$LOCAL_HASH" ] || [ "$LOCAL_HASH" != "$RUNNING_HASH" ]; then
             echo -e "${GREEN}Update or Version mismatch found!${NC}"

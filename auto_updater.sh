@@ -14,11 +14,13 @@ while true; do
     BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "master")
     
     # Check remote hash using ls-remote (bypass rate limits)
-    REMOTE_HASH=$(git ls-remote origin -h "refs/heads/$BRANCH" | awk '{print $1}')
-    LOCAL_HASH=$(git rev-parse HEAD 2>/dev/null)
+    REMOTE_HASH=$(git ls-remote origin -h "refs/heads/$BRANCH" | awk '{print $1}' | tr -d '[:space:]')
+    LOCAL_HASH=$(git rev-parse HEAD 2>/dev/null | tr -d '[:space:]')
     
     # Check what version is currently running in Docker
-    RUNNING_HASH=$(docker inspect ttmediabot --format '{{ index .Config.Labels "commit_hash" }}' 2>/dev/null || echo "none")
+    # We use 'tr -d' to ensure no weird whitespace/newlines break the comparison
+    RUNNING_HASH=$(docker inspect ttmediabot --format '{{ index .Config.Labels "commit_hash" }}' 2>/dev/null | tr -d '[:space:]')
+    [ -z "$RUNNING_HASH" ] && RUNNING_HASH="none"
 
     if [ -n "$REMOTE_HASH" ] && { [ "$REMOTE_HASH" != "$LOCAL_HASH" ] || [ "$REMOTE_HASH" != "$RUNNING_HASH" ]; }; then
         if [ -f "$LOCK_FILE" ]; then
