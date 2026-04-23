@@ -7,6 +7,8 @@ cd "$SCRIPT_DIR"
 
 echo "TTMediaBot Auto-Updater started. Checking every 20 seconds..."
 
+LOCK_FILE="/tmp/ttmediabot_update.lock"
+
 while true; do
     # Get current branch name
     BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "master")
@@ -19,9 +21,15 @@ while true; do
     RUNNING_HASH=$(docker inspect ttmediabot --format '{{ index .Config.Labels "commit_hash" }}' 2>/dev/null || echo "none")
 
     if [ -n "$REMOTE_HASH" ] && { [ "$REMOTE_HASH" != "$LOCAL_HASH" ] || [ "$REMOTE_HASH" != "$RUNNING_HASH" ]; }; then
-        echo "$(date): Out of sync detected (Remote: $REMOTE_HASH, Local: $LOCAL_HASH, Running: $RUNNING_HASH). Running update.sh..."
-        # Use 'yes' to auto-confirm prompts in update.sh
-        yes | ./update.sh
+        if [ -f "$LOCK_FILE" ]; then
+            echo "$(date): Update already in progress. Skipping cycle..."
+        else
+            touch "$LOCK_FILE"
+            echo "$(date): Out of sync detected (Remote: $REMOTE_HASH, Local: $LOCAL_HASH, Running: $RUNNING_HASH). Running update.sh..."
+            # Use 'yes' to auto-confirm prompts in update.sh
+            yes | ./update.sh
+            rm -f "$LOCK_FILE"
+        fi
     fi
     sleep 20
 done

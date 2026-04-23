@@ -68,22 +68,23 @@ recreate_bot_containers() {
 perform_image_rebuild() {
     echo ""
     echo -e "${YELLOW}Starting Image Rebuild...${NC}"
-    echo "Checking running bots..."
-    
-    # Capture NAMES of running bots to restart them later
-    RUNNING_NAMES=$(docker ps --format "{{.Names}}" -f "label=role=ttmediabot")
-    
-    if [ ! -z "$RUNNING_NAMES" ]; then
-        echo -e "${YELLOW}Stopping bots for update...${NC}"
-        echo "$RUNNING_NAMES" | xargs docker stop -t 1 > /dev/null 2>&1
-    fi
     
     # Build the image with a commit hash label for version tracking
+    # By building FIRST, we minimize the downtime to just the container restart phase.
     CURRENT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+    echo "Building new image with version label: $CURRENT_HASH"
     docker build --build-arg CACHEBUST=$(date +%s) --label "commit_hash=$CURRENT_HASH" -t ${BOT_IMAGE} .
     
     if [ $? -eq 0 ]; then
-         echo -e "${GREEN}Image updated successfully!${NC}"
+         echo -e "${GREEN}Image built successfully!${NC}"
+         
+         # Capture NAMES of running bots to restart them later
+         RUNNING_NAMES=$(docker ps --format "{{.Names}}" -f "label=role=ttmediabot")
+         
+         if [ ! -z "$RUNNING_NAMES" ]; then
+             echo -e "${YELLOW}Briefly restarting bots to apply update...${NC}"
+             echo "$RUNNING_NAMES" | xargs docker stop -t 1 > /dev/null 2>&1
+         fi
          
          # Recreate containers to use new image
          recreate_bot_containers
