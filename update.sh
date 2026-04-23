@@ -352,6 +352,7 @@ EOF
     else
         echo -e "${GREEN}Auto-Updater Service configured (restart skipped to avoid interruption).${NC}"
     fi
+}
 # Run
 install_deps_light() {
     if ! command -v jq &> /dev/null; then apt-get install -y jq; fi
