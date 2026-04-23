@@ -13,11 +13,15 @@ This fork includes several modifications and optimizations:
 - **Docker Containerization:** The bot runs in Docker containers based on Debian 11 and Python 3.10, ensuring compatibility with legacy dependencies while maintaining stability
 - **Proven Stability:** Since I first encountered this bot in 2021, the adaptations made to work around YouTube's restrictions, combined with the optimizations from 2021/2022, have proven to be excellent and reliable
 
-## 🆕 Latest Updates (03/19/2026)
+## 🆕 Latest Updates (04/23/2026) - v1.1 "Reliability & Quality" Update
 
-- **Auto-Update System:** The script now checks for GitHub updates automatically on startup and includes a "Check for Updates" menu option.
-- **PIP Auto-Upgrade:** Docker image rebuilds now strictly force a complete upgrade (`pip install -U`) of all Python libraries.
-- **Security & QoL:** Duplicate bots now strictly validate names to avoid accidental overwrites and explicitly prompt for Nickname Base. Bulk delete now supports a "Delete All" feature.
+- **🚀 100% Automated Background Updates:** A new systemd service now monitors GitHub every 20 seconds using version labeling (Git hashes). The bot pulls, rebuilds, and restarts automatically whenever a mismatch is detected, even for local commits.
+- **🛡️ Advanced Cookie Protection:** Implemented a temporary file copy mechanism. The bot never modifies your original `cookies.txt`, preventing file corruption and shrinking.
+- **🎵 High-Quality MP3 Downloads:** Successfully migrated from M4A to **192kbps MP3** by default for superior sound quality and better client compatibility.
+- **✅ Improved Permissions:** Refined upload logic to allow non-privileged bots to use TeamTalk's native channel permissions without being pre-emptively blocked.
+- **⚡ Ultra-Fast Updates:** Refactored `update.sh` to use native Git logic, bypassing GitHub API rate limits and preserving local configurations.
+
+## 🆕 Previous Updates (03/19/2026)
 
 ## 🎵 YouTube Music Support
 
