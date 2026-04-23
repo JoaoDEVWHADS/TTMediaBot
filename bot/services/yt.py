@@ -1,4 +1,5 @@
 from __future__ import annotations
+import http.cookiejar
 import logging
 import time
 import os
@@ -54,13 +55,15 @@ class YtService(_Service):
             "geo_bypass": True,
         }
 
+        self.cookiefile = None
         if self.config.cookiefile_path and os.path.isfile(self.config.cookiefile_path):
             try:
-                cj = http.cookiejar.MozillaCookieJar(self.config.cookiefile_path)
-                cj.load(ignore_discard=True, ignore_expires=True)
-                self._ydl_config |= {"cookiejar": cj}
+                # Create a temporary copy of the cookie file to prevent yt-dlp from modifying the original
+                self.cookiefile = os.path.join(tempfile.gettempdir(), f"yt_cookies_{os.getpid()}.txt")
+                shutil.copy2(self.config.cookiefile_path, self.cookiefile)
+                self._ydl_config |= {"cookiefile": self.cookiefile}
             except Exception as e:
-                logging.error(f"Failed to load cookies for YT: {e}")
+                logging.error(f"Failed to setup temporary cookies for YT: {e}")
             
     def download(self, track: Track, file_path: str) -> None:
         start_time = time.perf_counter()
