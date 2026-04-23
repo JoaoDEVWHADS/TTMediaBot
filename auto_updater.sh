@@ -9,6 +9,20 @@ echo "TTMediaBot Auto-Updater started. Checking every 20 seconds..."
 
 LOCK_FILE="/tmp/ttmediabot_update.lock"
 
+# Cleanup function
+cleanup() {
+    echo "Cleaning up lock file..."
+    rm -f "$LOCK_FILE"
+}
+
+# Trap signals for cleanup
+trap cleanup EXIT INT TERM
+
+# Initial cleanup of stale lock if script is starting fresh
+# (Wait 2 seconds to ensure no other instance is starting)
+sleep 2
+rm -f "$LOCK_FILE"
+
 while true; do
     # Get current branch name
     BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "master")

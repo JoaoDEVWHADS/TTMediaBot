@@ -205,9 +205,15 @@ update_and_fix_permissions() {
         echo "3. Update all local files"
         echo "4. Restore backup"
         echo ""
-        read -p "Proceed? (y/N): " confirm_update
+        
+        if [ "$AUTO_UPDATE" = "true" ]; then
+            confirm_update="y"
+            echo "Auto-Update mode detected. Proceeding automatically..."
+        else
+            read -p "Proceed? (y/N): " confirm_update
+        fi
             
-            if [[ "$confirm_update" =~ ^[yY]$ ]]; then
+        if [[ "$confirm_update" =~ ^[yY]$ ]]; then
                 echo -e "${YELLOW}Starting update...${NC}"
                 
                 # Check if we are in a git repository
