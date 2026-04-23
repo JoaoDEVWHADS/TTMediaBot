@@ -242,7 +242,6 @@ update_and_fix_permissions() {
                 echo "Update cancelled."
             fi
         fi
-    fi
     
     echo ""
     echo -e "${YELLOW}Fixing permissions...${NC}"
