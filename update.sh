@@ -329,3 +329,4 @@ install_deps_light
 update_and_fix_permissions
 configure_auto_updater
 # Automated update test - Thu Apr 23 06:11:32 UTC 2026
+# Version tracking test - Thu Apr 23 06:32:18 UTC 2026
