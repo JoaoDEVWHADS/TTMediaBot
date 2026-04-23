@@ -43,7 +43,10 @@ while true; do
             touch "$LOCK_FILE"
             echo "$(date): Out of sync detected (Remote: $REMOTE_HASH, Local: $LOCAL_HASH, Running: $RUNNING_HASH). Running update.sh..."
             # Pass AUTO_UPDATE=true to skip service restarts within the script that would kill this process
-            AUTO_UPDATE=true yes | ./update.sh
+            # Correct variable scope for pipes via export:
+            export AUTO_UPDATE=true
+            yes | ./update.sh
+            unset AUTO_UPDATE
             rm -f "$LOCK_FILE"
         fi
     fi
