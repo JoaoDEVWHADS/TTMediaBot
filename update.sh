@@ -91,7 +91,28 @@ perform_image_rebuild() {
          if [ ! -z "$RUNNING_NAMES" ]; then
              echo -e "${YELLOW}Restarting active bots...${NC}"
              echo "$RUNNING_NAMES" | xargs docker start > /dev/null 2>&1
-             echo -e "${GREEN}Bots restarted with the new code.${NC}"
+             
+             # Health Check: Wait for all bots to be confirmed 'running'
+             echo -en "${YELLOW}Verifying bot health...${NC} "
+             MAX_RETRIES=15
+             RETRY_COUNT=0
+             while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+                 TOTAL_BOTS=$(echo "$RUNNING_NAMES" | wc -w)
+                 STABLE_BOTS=$(docker ps -f "status=running" --format "{{.Names}}" | grep -xF "$RUNNING_NAMES" | wc -l)
+                 
+                 if [ "$STABLE_BOTS" -ge "$TOTAL_BOTS" ]; then
+                     echo -e "[ ${GREEN}OK${NC} ] All bots are running."
+                     break
+                 fi
+                 
+                 echo -n "."
+                 sleep 2
+                 RETRY_COUNT=$((RETRY_COUNT + 1))
+             done
+             
+             if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+                 echo -e "\n${RED}Warning: Some bots might have failed to start or crashed.${NC}"
+             fi
          fi
     else
          echo -e "${RED}Error building image!${NC}"
@@ -102,6 +123,21 @@ perform_image_rebuild() {
 
 # Function: Update & Fix Permissions
 update_and_fix_permissions() {
+    # Lock protection to avoid race conditions (Commit A vs Commit B)
+    # If AUTO_UPDATE=true, the lock is handled by the parent service (auto_updater.sh)
+    # If called manually, we check and create it to avoid overlapping with the auto-updater.
+    LOCK_FILE="/tmp/ttmediabot_update.lock"
+    if [ "$AUTO_UPDATE" != "true" ]; then
+        if [ -f "$LOCK_FILE" ]; then
+            echo -e "${RED}Error: Another update is already in progress.${NC}"
+            echo "Waiting for it to finish..."
+            while [ -f "$LOCK_FILE" ]; do sleep 2; done
+            echo "Lock released. Proceeding..."
+        fi
+        touch "$LOCK_FILE"
+        trap 'rm -f "$LOCK_FILE"' EXIT INT TERM
+    fi
+
     header
     echo -e "${YELLOW} --- Update & Auto-Fix --- ${NC}"
     
