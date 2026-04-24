@@ -66,6 +66,7 @@ get_cookies() {
     fi
 }
 
+
 # Function: Install Dependencies
 install_dependencies() {
     header
@@ -75,24 +76,33 @@ install_dependencies() {
         echo "Docker not found. Installing via official repository..."
         
         # 1. Update apt and install prerequisites
+        export DEBIAN_FRONTEND=noninteractive
         apt-get update
         apt-get install -y ca-certificates curl gnupg lsb-release
 
-        # 2. Detect OS and set appropriate values
-        OS_ID=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
+        # 2. Detect OS and Codename
+        . /etc/os-release
+        OS_ID=$ID
+        CODENAME=$VERSION_CODENAME
+        
+        # Fallback if VERSION_CODENAME is empty (some older/different distros)
+        if [ -z "$CODENAME" ]; then
+            CODENAME=$(lsb_release -cs 2>/dev/null)
+        fi
+
         case "$OS_ID" in
             ubuntu|debian)
-                echo -e "Detected OS: ${GREEN}$OS_ID${NC}"
+                echo -e "Detected OS: ${GREEN}$OS_ID ($CODENAME)${NC}"
                 ;;
             *)
                 echo -e "${RED}Unsupported OS: $OS_ID. Trying 'debian' as fallback...${NC}"
                 OS_ID="debian"
+                [ -z "$CODENAME" ] && CODENAME="stable"
                 ;;
         esac
 
         # 3. Add Docker's official GPG key
         mkdir -p /etc/apt/keyrings
-        # Remove existing docker.gpg to avoid replacement prompt
         rm -f /etc/apt/keyrings/docker.gpg
         curl -fsSL "https://download.docker.com/linux/$OS_ID/gpg" | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
         chmod a+r /etc/apt/keyrings/docker.gpg
@@ -100,16 +110,15 @@ install_dependencies() {
         # 4. Set up the repository
         echo \
           "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$OS_ID \
-          $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+          $CODENAME stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
         # 5. Install Docker Engine
         apt-get update
         apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-        # 5. Enable service and add user to group
+        # 6. Enable service
         systemctl enable --now docker
         
-        # Add the non-root user who called sudo to the docker group
         REAL_USER=${SUDO_USER:-$USER}
         if [ "$REAL_USER" != "root" ]; then
             usermod -aG docker "$REAL_USER"
@@ -121,12 +130,17 @@ install_dependencies() {
 
     if ! command -v jq &> /dev/null; then
         echo "jq not found. Installing..."
+        apt-get update
         apt-get install -y jq
     else
         echo -e "${GREEN}jq is already installed.${NC}"
     fi
-    sleep 2
+    sleep 1
 }
+
+# Run dependencies check immediately
+install_dependencies
+
 
 # Function: Recreate Bot Containers
 recreate_bot_containers() {
@@ -1461,13 +1475,12 @@ manage_bots() {
     done
 }
 
+
 # Execute update check on startup
 if [ -f "$SCRIPT_DIR/update.sh" ]; then
     bash "$SCRIPT_DIR/update.sh"
 fi
 
-# Check/Install Deps first
-install_dependencies
 build_image
 
 # Main Menu
