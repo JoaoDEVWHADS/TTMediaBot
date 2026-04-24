@@ -20,20 +20,46 @@ header() {
     echo ""
 }
 
+get_status() {
+    # Check if masked
+    if systemctl list-unit-files "$SERVICE_NAME" | grep -q "masked"; then
+        echo -e "  Masked:  ${RED}Yes${NC}"
+    else
+        echo -e "  Masked:  ${GREEN}No${NC}"
+    fi
+
+    # Check if enabled
+    if systemctl is-enabled --quiet "$SERVICE_NAME" 2>/dev/null; then
+        echo -e "  Enabled: ${GREEN}Yes${NC}"
+    else
+        echo -e "  Enabled: ${RED}No${NC}"
+    fi
+
+    # Check if active
+    if systemctl is-active --quiet "$SERVICE_NAME" 2>/dev/null; then
+        echo -e "  Service: ${GREEN}Active${NC}"
+    else
+        echo -e "  Service: ${RED}Inactive${NC}"
+    fi
+}
+
 enable_auto_update() {
     echo -e "${YELLOW}Enabling Auto-Updates...${NC}"
     
-    # 1. Restore service file if backup exists
-    if [ -f "$BACKUP_PATH" ]; then
+    # 1. Unmask if it was masked
+    systemctl unmask "$SERVICE_NAME"
+    
+    # 2. Check if service file needs restoration from backup
+    if [ ! -f "$SERVICE_PATH" ] && [ -f "$BACKUP_PATH" ]; then
         echo "Restoring service file from backup..."
-        mv -f "$BACKUP_PATH" "$SERVICE_PATH"
+        cp -f "$BACKUP_PATH" "$SERVICE_PATH"
     fi
     
-    # 2. Unmask, reload, enable, and start
-    systemctl unmask "$SERVICE_NAME"
+    # 3. Reload, enable, and start
     systemctl daemon-reload
     systemctl enable "$SERVICE_NAME"
     systemctl start "$SERVICE_NAME"
+    
     echo -e "${GREEN}Auto-Updates enabled successfully!${NC}"
     sleep 2
 }
@@ -45,15 +71,15 @@ disable_auto_update() {
     systemctl stop "$SERVICE_NAME"
     systemctl disable "$SERVICE_NAME"
     
-    # 2. Backup service file to allow masking if it's a regular file
+    # 2. Backup service file before masking to avoid 'file exists' error
     if [ -f "$SERVICE_PATH" ] && [ ! -L "$SERVICE_PATH" ]; then
         echo "Backing up service file..."
         mv -f "$SERVICE_PATH" "$BACKUP_PATH"
     fi
     
-    # 3. Reload and mask
-    systemctl daemon-reload
+    # 3. Mask and reload
     systemctl mask "$SERVICE_NAME"
+    systemctl daemon-reload
     
     echo -e "${GREEN}Auto-Updates disabled and masked successfully!${NC}"
     sleep 2
@@ -62,9 +88,7 @@ disable_auto_update() {
 while true; do
     header
     echo "Current Status:"
-    systemctl is-active --quiet "$SERVICE_NAME" && echo -e "  Service: ${GREEN}Active${NC}" || echo -e "  Service: ${RED}Inactive${NC}"
-    systemctl is-enabled --quiet "$SERVICE_NAME" && echo -e "  Enabled: ${GREEN}Yes${NC}" || echo -e "  Enabled: ${RED}No${NC}"
-    [ -L "$SERVICE_PATH" ] && [ "$(readlink -f $SERVICE_PATH)" == "/dev/null" ] && echo -e "  Masked:  ${RED}Yes${NC}" || echo -e "  Masked:  ${GREEN}No${NC}"
+    get_status
     echo ""
     echo "1. Enable Auto-Updates"
     echo "2. Disable Auto-Updates"
