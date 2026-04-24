@@ -13,11 +13,13 @@ This fork includes several modifications and optimizations:
 - **Docker Containerization:** The bot runs in Docker containers based on Debian 11 and Python 3.10, ensuring compatibility with legacy dependencies while maintaining stability
 - **Proven Stability:** Since I first encountered this bot in 2021, the adaptations made to work around YouTube's restrictions, combined with the optimizations from 2021/2022, have proven to be excellent and reliable
 
-## 🆕 Latest Updates (04/24/2026) - v1.2 "Privacy & Lifecycle" Update
+## 🆕 Latest Updates (04/24/2026) - v1.3 "Control & Robustness" Update
 
-- **🛡️ Per-Request Cookie Lifecycle:** Each download or stream request now creates a unique, volatile copy of your `cookies.txt` in `/tmp`. These files are deleted immediately after use (via context managers), ensuring 100% privacy and zero disk clutter.
-- **🐳 Dockerfile Optimization:** Updated `httpx` to version `0.28.1+` to resolve dependency conflicts with `py-yt-search` and `yt-dlp`, ensuring the bot runs with the most stable and compatible network stack.
-- **🧵 Thread-Safe Authentication:** The temporary cookie mechanism is now fully thread-safe, allowing multiple bots or simultaneous pre-fetches to operate without file access conflicts.
+- **🎮 Auto-Update Controller (`masc.sh`):** New dedicated menu (Main Menu option 6) to enable/disable automatic updates. It uses systemd masking for 100% persistence, ensuring the service never restarts without your permission.
+- **🍪 Cookie Paste Option:** You can now paste your cookies directly into the terminal during bot creation or global updates. The script automatically fixes common formatting issues (converting spaces to tabs) and sets correct file permissions.
+- **🛡️ Per-Request Cookie Lifecycle:** Each download or stream request now creates a unique, volatile copy of your `cookies.txt` in `/tmp`. These files are deleted immediately after use, ensuring 100% privacy and zero disk clutter.
+- **🐳 Dockerfile Optimization:** Updated `httpx` to version `0.28.1+` and resolved dependency conflicts, ensuring a stable and compatible network stack.
+- **🧵 Thread-Safe Authentication:** The temporary cookie mechanism is now fully thread-safe, allowing multiple bots to operate without file access conflicts.
 
 ## 🆕 Previous Updates (04/23/2026) - v1.1 "Reliability & Quality" Update
 

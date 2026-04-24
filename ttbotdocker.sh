@@ -29,6 +29,43 @@ header() {
     echo ""
 }
 
+# Function: Get Cookies (Path or Paste)
+get_cookies() {
+    local tmp_cookies="/tmp/cookies_pasted.txt"
+    rm -f "$tmp_cookies"
+    
+    echo -e "${YELLOW}How do you want to provide cookies?${NC}"
+    echo "1. Path to existing file"
+    echo "2. Paste cookie content"
+    read -p "Option [1-2] (Default 1): " cookie_opt
+    cookie_opt=${cookie_opt:-1}
+    
+    if [ "$cookie_opt" == "2" ]; then
+        echo -e "${YELLOW}--------------------------------------------------${NC}"
+        echo -e "${YELLOW}PASTE YOUR COOKIES BELOW.${NC}"
+        echo -e "${YELLOW}THEN: Press ENTER and then press CTRL+D to save.${NC}"
+        echo -e "${YELLOW}--------------------------------------------------${NC}"
+        cat > "$tmp_cookies"
+        echo ""
+        if [ -s "$tmp_cookies" ]; then
+            # Auto-fix: Convert sequences of spaces/tabs to real TABs for Netscape format
+            # preservation of comments and 7-column structure
+            awk '/^#/ {print; next} NF>=7 { $1=$1; print } NF<7 && NF>0 { print }' OFS='\t' "$tmp_cookies" > "${tmp_cookies}.tmp" && mv "${tmp_cookies}.tmp" "$tmp_cookies"
+            
+            echo -e "${GREEN}SUCCESS: Cookies captured and format normalized!${NC}"
+            sleep 1
+            RET_COOKIES="$tmp_cookies"
+        else
+            echo -e "${RED}ERROR: No content was pasted.${NC}"
+            sleep 1
+            RET_COOKIES=""
+        fi
+    else
+        read -p "Full path to cookies file (Ex: /root/cookies.txt): " c_path
+        RET_COOKIES="$c_path"
+    fi
+}
+
 # Function: Install Dependencies
 install_dependencies() {
     header
@@ -250,7 +287,8 @@ create_bot() {
     echo ""
     read -p "Bot Nickname (Default: TTMediaBot): " nickname
     nickname=${nickname:-TTMediaBot}
-    read -p "Full path to cookies file (Ex: /root/cookies.txt): " cookies_path
+    get_cookies
+    cookies_path="$RET_COOKIES"
     
     read -p "Channel (Default: /): " channel
     channel=${channel:-/}
@@ -429,6 +467,7 @@ create_bot() {
     if [ -f "$cookies_path" ]; then
         echo "Copying cookies file..."
         cp "$cookies_path" "$CURRENT_BOT_DIR/cookies.txt"
+        chown 1000:1000 "$CURRENT_BOT_DIR/cookies.txt"
         COOKIES_MOUNT="-v ${CURRENT_BOT_DIR}/cookies.txt:/home/ttbot/TTMediaBot/data/cookies.txt"
         CONTAINER_COOKIE_PATH="data/cookies.txt"
     else
@@ -1185,7 +1224,8 @@ update_all_cookies() {
     echo -e "${YELLOW} --- Update Cookies for All Bots --- ${NC}"
     list_bots
     
-    read -p "Path to NEW cookies file (Ex: /root/cookies.txt): " new_cookies_path
+    get_cookies
+    new_cookies_path="$RET_COOKIES"
     
     if [ ! -f "$new_cookies_path" ]; then
         echo -e "${RED}File not found!${NC}"
