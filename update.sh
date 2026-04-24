@@ -365,6 +365,12 @@ update_and_fix_permissions() {
 
 # Function: Configure Auto-Updater Service
 configure_auto_updater() {
+    # Check if masked - respect user choice to disable
+    if LANG=C systemctl list-unit-files ttmediabot-updater.service 2>/dev/null | grep -q "masked"; then
+        echo -e "${YELLOW}Auto-Updater is currently masked. Skipping configuration to respect manual override.${NC}"
+        return
+    fi
+
     echo ""
     echo -e "${YELLOW} --- Configuring Auto-Updater Service --- ${NC}"
     
