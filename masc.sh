@@ -37,12 +37,11 @@ header() {
 
 get_status() {
     # Use LANG=C to ensure English output for status checks
-    local status_output=$(LANG=C systemctl status "$SERVICE_NAME" 2>&1)
     local enabled_status=$(LANG=C systemctl is-enabled "$SERVICE_NAME" 2>/dev/null)
     local active_status=$(LANG=C systemctl is-active "$SERVICE_NAME" 2>/dev/null)
 
     # Check if masked
-    if [[ "$status_output" == *"masked"* ]] || [[ "$enabled_status" == "masked" ]]; then
+    if [[ "$enabled_status" == "masked" ]]; then
         echo -e "  Masked:  ${RED}Yes (Disabled)${NC}"
     else
         echo -e "  Masked:  ${GREEN}No (Allowed)${NC}"
@@ -69,38 +68,40 @@ enable_auto_update() {
     # 1. Unmask
     systemctl unmask "$SERVICE_NAME"
     
-    # 2. Recreate service file from template (guaranteed to be correct)
+    # 2. Recreate service file from template
     echo "Creating service file..."
     echo "$SERVICE_TEMPLATE" > "$SERVICE_PATH"
     chmod 644 "$SERVICE_PATH"
     
-    # 3. Reload, enable, and start
+    # 3. Reload, enable, and start (non-blocking)
     systemctl daemon-reload
     systemctl enable "$SERVICE_NAME"
-    systemctl start "$SERVICE_NAME"
+    systemctl start --no-block "$SERVICE_NAME"
     
-    echo -e "${GREEN}Auto-Updates enabled successfully!${NC}"
+    echo -e "${GREEN}Auto-Updates enabled!${NC}"
     sleep 2
 }
 
 disable_auto_update() {
     echo -e "${YELLOW}Disabling Auto-Updates...${NC}"
     
-    # 1. Stop and disable
-    systemctl stop "$SERVICE_NAME"
+    # 1. Aggressive process cleanup first to prevent systemctl hang
+    echo "Cleaning up processes..."
+    killall -9 auto_updater.sh sleep 2>/dev/null
+    
+    # 2. Stop and disable (non-blocking)
+    systemctl stop --no-block "$SERVICE_NAME"
     systemctl disable "$SERVICE_NAME"
     
-    # 2. Remove the service file or symlink to prepare for masking
+    # 3. Remove the service file or symlink
     rm -f "$SERVICE_PATH"
     
-    # 3. Mask and reload
+    # 4. Mask and reload
     systemctl mask "$SERVICE_NAME"
     systemctl daemon-reload
+    systemctl reset-failed "$SERVICE_NAME"
     
-    # 4. Final verification and process cleanup
-    killall -9 auto_updater.sh 2>/dev/null
-    
-    echo -e "${GREEN}Auto-Updates disabled and masked successfully!${NC}"
+    echo -e "${GREEN}Auto-Updates disabled and masked!${NC}"
     sleep 2
 }
 
