@@ -325,6 +325,7 @@ update_and_fix_permissions() {
                 fi
             else
                 echo "Update cancelled."
+                exit 0
             fi
         fi
     
