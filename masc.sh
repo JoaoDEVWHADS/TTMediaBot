@@ -10,7 +10,22 @@ NC='\033[0m' # No Color
 
 SERVICE_NAME="ttmediabot-updater.service"
 SERVICE_PATH="/etc/systemd/system/$SERVICE_NAME"
-BACKUP_PATH="/etc/systemd/system/$SERVICE_NAME.bak"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Template to ensure we can always restore the service
+SERVICE_TEMPLATE="[Unit]
+Description=TTMediaBot Auto-Updater Watcher
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=$SCRIPT_DIR
+ExecStart=/bin/bash $SCRIPT_DIR/auto_updater.sh
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target"
 
 header() {
     clear
@@ -21,39 +36,43 @@ header() {
 }
 
 get_status() {
+    # Use LANG=C to ensure English output for status checks
+    local status_output=$(LANG=C systemctl status "$SERVICE_NAME" 2>&1)
+    local enabled_status=$(LANG=C systemctl is-enabled "$SERVICE_NAME" 2>/dev/null)
+    local active_status=$(LANG=C systemctl is-active "$SERVICE_NAME" 2>/dev/null)
+
     # Check if masked
-    if systemctl list-unit-files "$SERVICE_NAME" | grep -q "masked"; then
-        echo -e "  Masked:  ${RED}Yes${NC}"
+    if [[ "$status_output" == *"masked"* ]] || [[ "$enabled_status" == "masked" ]]; then
+        echo -e "  Masked:  ${RED}Yes (Disabled)${NC}"
     else
-        echo -e "  Masked:  ${GREEN}No${NC}"
+        echo -e "  Masked:  ${GREEN}No (Allowed)${NC}"
     fi
 
     # Check if enabled
-    if systemctl is-enabled --quiet "$SERVICE_NAME" 2>/dev/null; then
+    if [ "$enabled_status" == "enabled" ]; then
         echo -e "  Enabled: ${GREEN}Yes${NC}"
     else
         echo -e "  Enabled: ${RED}No${NC}"
     fi
 
     # Check if active
-    if systemctl is-active --quiet "$SERVICE_NAME" 2>/dev/null; then
-        echo -e "  Service: ${GREEN}Active${NC}"
+    if [ "$active_status" == "active" ]; then
+        echo -e "  Service: ${GREEN}Active (Running)${NC}"
     else
-        echo -e "  Service: ${RED}Inactive${NC}"
+        echo -e "  Service: ${RED}Inactive (Stopped)${NC}"
     fi
 }
 
 enable_auto_update() {
     echo -e "${YELLOW}Enabling Auto-Updates...${NC}"
     
-    # 1. Unmask if it was masked
+    # 1. Unmask
     systemctl unmask "$SERVICE_NAME"
     
-    # 2. Check if service file needs restoration from backup
-    if [ ! -f "$SERVICE_PATH" ] && [ -f "$BACKUP_PATH" ]; then
-        echo "Restoring service file from backup..."
-        cp -f "$BACKUP_PATH" "$SERVICE_PATH"
-    fi
+    # 2. Recreate service file from template (guaranteed to be correct)
+    echo "Creating service file..."
+    echo "$SERVICE_TEMPLATE" > "$SERVICE_PATH"
+    chmod 644 "$SERVICE_PATH"
     
     # 3. Reload, enable, and start
     systemctl daemon-reload
@@ -71,15 +90,15 @@ disable_auto_update() {
     systemctl stop "$SERVICE_NAME"
     systemctl disable "$SERVICE_NAME"
     
-    # 2. Backup service file before masking to avoid 'file exists' error
-    if [ -f "$SERVICE_PATH" ] && [ ! -L "$SERVICE_PATH" ]; then
-        echo "Backing up service file..."
-        mv -f "$SERVICE_PATH" "$BACKUP_PATH"
-    fi
+    # 2. Remove the service file or symlink to prepare for masking
+    rm -f "$SERVICE_PATH"
     
     # 3. Mask and reload
     systemctl mask "$SERVICE_NAME"
     systemctl daemon-reload
+    
+    # 4. Final verification and process cleanup
+    killall -9 auto_updater.sh 2>/dev/null
     
     echo -e "${GREEN}Auto-Updates disabled and masked successfully!${NC}"
     sleep 2
