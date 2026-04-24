@@ -1439,7 +1439,8 @@ while true; do
     echo "3. Rebuild Image / Update Code"
     echo "4. Uninstall Everything (Total Cleanup)"
     echo "5. Check for Updates"
-    echo "6. Exit"
+    echo "6. Enable/Disable Auto-Updates"
+    echo "7. Exit"
     echo ""
     read -p "Choose an option: " option
     
@@ -1475,6 +1476,15 @@ while true; do
             header
             ;;
         6)
+            if [ -f "$SCRIPT_DIR/masc.sh" ]; then
+                bash "$SCRIPT_DIR/masc.sh"
+            else
+                echo -e "${RED}masc.sh not found.${NC}"
+                read -p "Press Enter to continue..."
+            fi
+            header
+            ;;
+        7)
             echo "Exiting..."
             exit 0
             ;;
