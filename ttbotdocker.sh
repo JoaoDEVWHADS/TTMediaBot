@@ -531,6 +531,7 @@ create_bot() {
     docker start $(docker ps -a -q -f "label=role=ttmediabot" -f "status=created") 2>/dev/null
     
     echo -e "${GREEN}Creation completed! $total_bots bot(s) created and started.${NC}"
+    rm -f /tmp/cookies_pasted.txt
     read -p "Press Enter to return..."
 }
 
@@ -1268,6 +1269,7 @@ update_all_cookies() {
         echo -e "${GREEN}All bots restarted.${NC}"
     fi
     
+    rm -f /tmp/cookies_pasted.txt
     read -p "Completed. Enter to return..."
 }
 
