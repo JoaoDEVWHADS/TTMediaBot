@@ -13,13 +13,17 @@ This fork includes several modifications and optimizations:
 - **Docker Containerization:** The bot runs in Docker containers based on Debian 11 and Python 3.10, ensuring compatibility with legacy dependencies while maintaining stability
 - **Proven Stability:** Since I first encountered this bot in 2021, the adaptations made to work around YouTube's restrictions, combined with the optimizations from 2021/2022, have proven to be excellent and reliable
 
-## 🆕 Latest Updates (04/23/2026) - v1.1 "Reliability & Quality" Update
+## 🆕 Latest Updates (04/24/2026) - v1.2 "Privacy & Lifecycle" Update
 
-- **🚀 100% Automated Background Updates:** A new systemd service now monitors GitHub every 20 seconds using version labeling (Git hashes). The bot pulls, rebuilds, and restarts automatically whenever a mismatch is detected, even for local commits.
-- **🛡️ Advanced Cookie Protection:** Implemented a temporary file copy mechanism. The bot never modifies your original `cookies.txt`, preventing file corruption and shrinking.
-- **🎵 High-Quality MP3 Downloads:** Successfully migrated from M4A to **192kbps MP3** by default for superior sound quality and better client compatibility.
-- **✅ Improved Permissions:** Refined upload logic to allow non-privileged bots to use TeamTalk's native channel permissions without being pre-emptively blocked.
-- **⚡ Ultra-Fast Updates:** Refactored `update.sh` to use native Git logic, bypassing GitHub API rate limits and preserving local configurations.
+- **🛡️ Per-Request Cookie Lifecycle:** Each download or stream request now creates a unique, volatile copy of your `cookies.txt` in `/tmp`. These files are deleted immediately after use (via context managers), ensuring 100% privacy and zero disk clutter.
+- **🐳 Dockerfile Optimization:** Updated `httpx` to version `0.28.1+` to resolve dependency conflicts with `py-yt-search` and `yt-dlp`, ensuring the bot runs with the most stable and compatible network stack.
+- **🧵 Thread-Safe Authentication:** The temporary cookie mechanism is now fully thread-safe, allowing multiple bots or simultaneous pre-fetches to operate without file access conflicts.
+
+## 🆕 Previous Updates (04/23/2026) - v1.1 "Reliability & Quality" Update
+
+- **🚀 Automated Background Updates:** Systemd service monitors GitHub every 20 seconds.
+- **🎵 High-Quality MP3:** Migrated to 192kbps MP3 by default.
+- **✅ Improved Permissions:** Refined upload logic for non-privileged bots.
 
 ## 🆕 Previous Updates (03/19/2026)
 

@@ -36,7 +36,7 @@ COPY requirements.txt .
 # Install Python dependencies (Cacheable)
 RUN pip install --upgrade pip \
     && pip install -r requirements.txt \
-    && pip install httpx==0.27.0
+    && pip install "httpx>=0.28.1"
 
 # Build argument to bust cache for core code and frequently-changing tools
 ARG CACHEBUST=1
@@ -46,7 +46,7 @@ COPY requirements.txt .
 
 # Always ensure latest libraries and yt-dlp on every build
 RUN pip install -U -r requirements.txt \
-    && pip install httpx==0.27.0 \
+    && pip install "httpx>=0.28.1" \
     && pip install -U "yt-dlp[default]"
 
 # Copy project files

@@ -76,12 +76,6 @@ class YtmService(_Service):
             
             if new_tracks:
                 # Add to bot queue safely
-                # self.bot.player is accessible
-                # thread safety: adding to list is atomic usually, but let's see how Player handles it.
-                # Player.play usually pops. Queue is a list.
-                # We can extend the queue.
-                
-                # Check if we should lock? The bot seems to be single-process mostly with threads.
                 self.bot.player.track_list.extend(new_tracks)
                 
                 duration = (time.perf_counter() - start_time) * 1000
@@ -131,18 +125,11 @@ class YtmService(_Service):
                      
                      # 4. Generate Authorization header if SAPISID is available
                      if sapisid:
-                         # We need to compute SAPISIDHASH.
-                         # Simplified implementation to avoid importing internal helpers if possible,
-                         # but importing from ytmusicapi.helpers is safer.
                          try:
                              from ytmusicapi.helpers import get_authorization
-                             # get_authorization expects (sapisid + " " + origin)
-                             # Wait, checks implementation usually: sha1(time + " " + sapisid + " " + origin)
-                             # Let's import the helper to be safe.
                              auth_header = get_authorization(sapisid + " " + "https://music.youtube.com")
                              headers["authorization"] = auth_header
                          except ImportError:
-                             # Fallback if helpers not accessible (unlikely)
                              import hashlib
                              timestamp = str(int(time.time()))
                              payload = f"{timestamp} {sapisid} https://music.youtube.com"
@@ -157,7 +144,6 @@ class YtmService(_Service):
              self.ytmusic = YTMusic(auth=auth)
         else:
              # Fallback to public instance if auth generation failed
-             logging.warning("YTM: initializing without auth (cookies failed)")
              self.ytmusic = YTMusic()
         
         # Explicit public instance for search/metadata (User Request: No cookies for search)
@@ -180,17 +166,27 @@ class YtmService(_Service):
             "extract_flat": "in_playlist", # Speed up if URL is a playlist, though we usually pass single video URLs here
         }
 
-        if self.cookiejar:
-            try:
-                # Create a temporary copy of the cookie file for yt-dlp
-                self.yt_dlp_cookiefile = os.path.join(tempfile.gettempdir(), f"ytm_cookies_{os.getpid()}.txt")
-                shutil.copy2(cookie_path, self.yt_dlp_cookiefile)
-                self._ydl_config |= {"cookiefile": self.yt_dlp_cookiefile}
-            except Exception as e:
-                logging.error(f"Failed to setup temporary cookies for YTM (yt-dlp): {e}")
+    @contextmanager
+    def _temp_cookie_file(self) -> Generator[Optional[str], None, None]:
+        if not self.yt_config.cookiefile_path or not os.path.isfile(self.yt_config.cookiefile_path):
+            yield None
+            return
 
-        # Removed instance reuse due to thread safety
-        # self.ydl = YoutubeDL(self._ydl_config)
+        # Unique name per thread/process to avoid collisions
+        temp_cookie_path = os.path.join(
+            tempfile.gettempdir(), 
+            f"ytm_cookies_{os.getpid()}_{threading.get_ident()}.txt"
+        )
+        
+        try:
+            shutil.copy2(self.yt_config.cookiefile_path, temp_cookie_path)
+            yield temp_cookie_path
+        finally:
+            if os.path.isfile(temp_cookie_path):
+                try:
+                    os.remove(temp_cookie_path)
+                except Exception as e:
+                    logging.debug(f"Failed to remove temp cookie file {temp_cookie_path}: {e}")
 
     def download(self, track: Track, file_path: str) -> None:
         start_time = time.perf_counter()
@@ -210,11 +206,16 @@ class YtmService(_Service):
             "preferredcodec": "mp3",
             "preferredquality": "192",
         }]
-        with YoutubeDL(config) as ydl:
-             # We need to ensure skip_download is False for actual downloading
-             ydl.params['skip_download'] = False
-             dl = get_suitable_downloader(info)(ydl, config)
-             dl.download(file_path, info)
+
+        with self._temp_cookie_file() as cookie_file:
+             if cookie_file:
+                  config["cookiefile"] = cookie_file
+             with YoutubeDL(config) as ydl:
+                  # We need to ensure skip_download is False for actual downloading
+                  ydl.params['skip_download'] = False
+                  dl = get_suitable_downloader(info)(ydl, config)
+                  dl.download(file_path, info)
+
         duration = (time.perf_counter() - start_time) * 1000
         logging.info(f"YTM Download finished in {duration:.2f}ms for {track.name}")
 
@@ -231,124 +232,100 @@ class YtmService(_Service):
         # If process=True, we are likely in the player trying to resolve the stream URL
         if process:
              # Instantiate per request for thread safety
-             with YoutubeDL(self._ydl_config) as ydl:
-                 # If we have extra_info, use it, otherwise extract from URL
-                 if extra_info:
-                      info = extra_info
-                      if "url" not in info and "videoId" in info:
-                           # Construct URL for yt-dlp
-                           # Optimization: Use www.youtube.com instead of music.youtube.com for faster extraction
-                           url = f"https://www.youtube.com/watch?v={info['videoId']}"
-                           info = ydl.extract_info(url, process=False)
-                 else:
-                      info = ydl.extract_info(url, process=False)
-                 
-                 # Process stream
-                 stream = ydl.process_ie_result(info)
-                 if "url" in stream:
-                      url = stream["url"]
-                 else:
-                      raise errors.ServiceError()
-                 
-                 title = stream.get("title", "Unknown")
-                 if "uploader" in stream:
-                      title += " - {}".format(stream["uploader"])
-                 format = "mp3"
-                 
-                 duration = (time.perf_counter() - start_time) * 1000
-                 logging.info(f"YTM Get (Process) finished in {duration:.2f}ms for {title}")
-                 
-                 # TRIGGER BACKGROUND AUTOPLAY FETCH
-                 # Check if we have a videoId and if we should fetch autoplay
-                 # We assume if it's a dynamic track from YTM search, we want autoplay.
-                 # extra_info from search has videoId.
-                 
-                 current_video_id = None
-                 if extra_info and "videoId" in extra_info:
-                     current_video_id = extra_info["videoId"]
-                 elif "id" in stream:
-                     current_video_id = stream["id"]
-                 
-                 # We need to ensure we don't trigger this for every track in the playlist 
-                 # if they were already added via autoplay. 
-                 # But here 'get' is called for the track being played.
-                 # If the queue is running low, we might want to fetch more?
-                 # For now, let's stick to the user request: "prefetch after first music starts".
-                 # This usually means when we play a track from Search.
-                 
-                 # If the track came from Search, it has extra_info populated.
-                 if current_video_id:
-                     # Check if we are playing the last track (or close to it)
-                     # We want to enable infinite autoplay.
-                     # Logic: If this is the last track in the list, fetch more.
-                     
-                     should_fetch = False
-                     try:
-                         if self.bot.player.track_list:
-                             last_track = self.bot.player.track_list[-1]
-                             
-                             # Robust check: Compare videoId if available
-                             last_video_id = None
-                             if last_track.extra_info and 'videoId' in last_track.extra_info:
-                                 last_video_id = last_track.extra_info.get('videoId')
-                             
-                             # Check if current url matches last track url, or if index is at end, or videoId matches
-                             if last_video_id and last_video_id == current_video_id:
-                                 should_fetch = True
-                                 logging.info(f"[YTM] Autoplay trigger: Current track IS last track (ID match: {current_video_id})")
-                             elif last_track.url == url:
-                                 should_fetch = True
-                                 logging.info(f"[YTM] Autoplay trigger: Current track IS last track (URL match)")
-                             elif self.bot.player.track_index >= len(self.bot.player.track_list) - 1:
-                                 should_fetch = True
-                                 logging.info(f"[YTM] Autoplay trigger: Track index {self.bot.player.track_index} is at end of list")
-                             else:
-                                 logging.debug(f"[YTM] Autoplay skipped: Not last track. Index: {self.bot.player.track_index}, List Len: {len(self.bot.player.track_list)}")
-                         else:
-                             # If list is empty (shouldn't be if we are playing), fetch just in case
-                             should_fetch = True
-                             logging.info(f"[YTM] Autoplay trigger: Track list empty")
-                     except Exception as e:
-                         logging.warning(f"[YTM] Error checking track list for autoplay: {e}")
-                         should_fetch = True # Default to fetching if check fails?
-                         
-                     if should_fetch:
-                         # Run in a separate thread to avoid blocking playback start
-                         threading.Thread(target=self._fetch_and_queue_autoplay, args=(current_video_id, url), daemon=True).start()
-                 
-                 return [
-                      Track(service=self.name, url=url, name=title, format=format, type=TrackType.Default, extra_info=stream)
-                 ]
+             config = self._ydl_config.copy()
+             with self._temp_cookie_file() as cookie_file:
+                  if cookie_file:
+                       config["cookiefile"] = cookie_file
+                  
+                  with YoutubeDL(config) as ydl:
+                       # If we have extra_info, use it, otherwise extract from URL
+                       if extra_info:
+                            info = extra_info
+                            if "url" not in info and "videoId" in info:
+                                 # Construct URL for yt-dlp
+                                 # Optimization: Use www.youtube.com instead of music.youtube.com for faster extraction
+                                 url = f"https://www.youtube.com/watch?v={info['videoId']}"
+                                 info = ydl.extract_info(url, process=False)
+                       else:
+                            info = ydl.extract_info(url, process=False)
+                       
+                       # Process stream
+                       stream = ydl.process_ie_result(info)
+                       if "url" in stream:
+                            url = stream["url"]
+                       else:
+                            raise errors.ServiceError()
+                       
+                       title = stream.get("title", "Unknown")
+                       if "uploader" in stream:
+                            title += " - {}".format(stream["uploader"])
+                       format = "mp3"
+                       
+                       duration = (time.perf_counter() - start_time) * 1000
+                       logging.info(f"YTM Get (Process) finished in {duration:.2f}ms for {title}")
+                  
+                  # TRIGGER BACKGROUND AUTOPLAY FETCH
+                  current_video_id = None
+                  if extra_info and "videoId" in extra_info:
+                       current_video_id = extra_info["videoId"]
+                  elif "id" in stream:
+                       current_video_id = stream["id"]
+                  
+                  if current_video_id:
+                       should_fetch = False
+                       try:
+                            if self.bot.player.track_list:
+                                 last_track = self.bot.player.track_list[-1]
+                                 last_video_id = None
+                                 if last_track.extra_info and 'videoId' in last_track.extra_info:
+                                      last_video_id = last_track.extra_info.get('videoId')
+                                 
+                                 if last_video_id and last_video_id == current_video_id:
+                                      should_fetch = True
+                                      logging.info(f"[YTM] Autoplay trigger: Current track IS last track (ID match: {current_video_id})")
+                                 elif last_track.url == url:
+                                      should_fetch = True
+                                      logging.info(f"[YTM] Autoplay trigger: Current track IS last track (URL match)")
+                       except Exception as e:
+                            logging.debug(f"[YTM] Trace bot player state error: {e}")
+                       
+                       if should_fetch:
+                            try:
+                                 self.bot.loop.create_task(self._fetch_autoplay_async(current_video_id))
+                            except Exception:
+                                 threading.Thread(target=self._fetch_autoplay_sync, args=(current_video_id,), daemon=True).start()
+                  
+                  return [
+                       Track(
+                            service=self.name,
+                            name=title,
+                            url=url,
+                            type=TrackType.Default,
+                            format=format,
+                            extra_info=stream,
+                       )
+                  ]
 
         # If process=False, we are adding to queue (The "Radio" logic)
-        # 1. Identify Video ID
         video_id = None
         if extra_info and "videoId" in extra_info:
              video_id = extra_info["videoId"]
         elif url:
-             # Basic extraction of ID from URL if using ytmusicapi
-             # Or let yt-dlp extract ID quickly
-             # Let's try to pass the URL to ytmusicapi if it's a search result url, otherwise regex?
-             # For simplicity, let's assume we get a videoId from search mainly.
-             # If user pasted a link, we need to extract ID.
              if "v=" in url:
                   video_id = url.split("v=")[1].split("&")[0]
              elif "youtu.be" in url:
                   video_id = url.split("/")[-1]
         
         if not video_id:
-             # Fallback to simple single track if no ID found
              return [Track(service=self.name, url=url, type=TrackType.Dynamic)]
 
         # 2. Get Watch Playlist (Autoplay)
         try:
-             # radio=False ensures we get the "Up Next" / Autoplay queue, not a "Song Radio"
              watch_playlist = self.ytmusic_public.get_watch_playlist(videoId=video_id, limit=20, radio=False)
              tracks_data = watch_playlist.get("tracks", [])
              
              new_tracks: List[Track] = []
-             for i, item in enumerate(tracks_data):
-                  # Item structure from ytmusicapi
+             for item in tracks_data:
                   t_title = item.get("title")
                   t_artist = ""
                   if "artists" in item:
@@ -356,11 +333,8 @@ class YtmService(_Service):
                   
                   full_title = f"{t_title} - {t_artist}" if t_artist else t_title
                   t_video_id = item.get("videoId")
-                  # Optimization: Use www.youtube.com for faster extraction later
                   t_url = f"https://www.youtube.com/watch?v={t_video_id}"
                   
-                  # The first track is the requested one, subsequence are recommendations
-                  # extra_info stores data needed for later processing
                   new_tracks.append(
                        Track(service=self.name, url=t_url, name=full_title, type=TrackType.Dynamic, extra_info=item)
                   )
@@ -371,27 +345,53 @@ class YtmService(_Service):
 
         except Exception as e:
              logging.error(f"YTM Watch Playlist failed: {e}")
-             # Fallback to single track
              duration = (time.perf_counter() - start_time) * 1000
              logging.info(f"YTM Get (Fallback) finished in {duration:.2f}ms for {url}")
              return [Track(service=self.name, url=url, type=TrackType.Dynamic)]
 
+    async def _fetch_autoplay_async(self, video_id: str) -> None:
+         self._fetch_autoplay_sync(video_id)
+
+    def _fetch_autoplay_sync(self, video_id: str) -> None:
+         try:
+              logging.info(f"[YTM] Fetching autoplay for {video_id}")
+              watch_playlist = self.ytmusic_public.get_watch_playlist(videoId=video_id, limit=5)
+              
+              if 'tracks' in watch_playlist:
+                   new_tracks = []
+                   for t_info in watch_playlist['tracks'][1:]:
+                        title = t_info['title']
+                        if 'artists' in t_info:
+                             artists = ", ".join([a['name'] for a in t_info['artists']])
+                             title += f" - {artists}"
+                        
+                        v_id = t_info['videoId']
+                        track = Track(
+                             service=self.name,
+                             name=title,
+                             url=f"https://www.youtube.com/watch?v={v_id}",
+                             type=TrackType.Dynamic,
+                             extra_info=t_info
+                        )
+                        new_tracks.append(track)
+                   
+                   if new_tracks:
+                        logging.info(f"[YTM] Adding {len(new_tracks)} autoplay tracks to queue")
+                        self.bot.player.track_list.extend(new_tracks)
+         except Exception as e:
+              logging.error(f"[YTM] Autoplay fetch failed: {e}")
+
     def search(self, query: str) -> List[Track]:
         start_time = time.perf_counter()
-        # Optimization: Limit to 1 result directly in API call to reduce overhead
         results = self.ytmusic_public.search(query, filter="songs", limit=1)
         if not results:
              raise errors.NothingFoundError("")
         
-        # Limit results to 1 explicitly to avoid API fuzzy limits
         results = results[:1]
-        
-        # User wants "Next" to trigger Autoplay via background task, so search just returns the 1 result.
         
         duration = (time.perf_counter() - start_time) * 1000
         logging.info(f"YTM Search (Fast) finished in {duration:.2f}ms for query: {query}")
         
-        # We return the mapped track. The 'extra_info' will carry the videoId needed for the background fetch later.
         return self._create_tracks_from_results(results)
 
     def _create_tracks_from_results(self, results: List[Dict[str, Any]]) -> List[Track]:
@@ -404,8 +404,6 @@ class YtmService(_Service):
              
              full_title = f"{t_title} - {t_artist}" if t_artist else t_title
              t_video_id = item.get("videoId")
-             t_video_id = item.get("videoId")
-             # Optimization: Use www.youtube.com for faster extraction later
              t_url = f"https://www.youtube.com/watch?v={t_video_id}"
              
              tracks.append(
