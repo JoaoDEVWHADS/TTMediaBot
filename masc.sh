@@ -57,6 +57,8 @@ get_status() {
     # Check if active
     if [ "$active_status" == "active" ]; then
         echo -e "  Service: ${GREEN}Active (Running)${NC}"
+    elif [ "$active_status" == "activating" ]; then
+        echo -e "  Service: ${YELLOW}Activating...${NC}"
     else
         echo -e "  Service: ${RED}Inactive (Stopped)${NC}"
     fi
@@ -73,10 +75,10 @@ enable_auto_update() {
     echo "$SERVICE_TEMPLATE" > "$SERVICE_PATH"
     chmod 644 "$SERVICE_PATH"
     
-    # 3. Reload, enable, and start (non-blocking)
+    # 3. Reload, enable, and start
     systemctl daemon-reload
     systemctl enable "$SERVICE_NAME"
-    systemctl start --no-block "$SERVICE_NAME"
+    systemctl start "$SERVICE_NAME"
     
     echo -e "${GREEN}Auto-Updates enabled!${NC}"
     sleep 2
