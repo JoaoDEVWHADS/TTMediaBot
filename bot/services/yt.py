@@ -194,7 +194,7 @@ class YtService(_Service):
         try:
             # The library is designed to be async. using .result() might be synchronous wrapper 
             # but using .next() via asyncio.run is safer as per examples.
-            search_obj = VideosSearch(query, limit=10)
+            search_obj = VideosSearch(query, limit=4)
             search = asyncio.run(search_obj.next())
             
             # Check structure: it seems to return {'result': [Items...]}
