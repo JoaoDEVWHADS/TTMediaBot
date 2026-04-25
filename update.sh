@@ -203,8 +203,15 @@ update_and_fix_permissions() {
         NEEDS_PULL=false
         NEEDS_REBUILD=false
         
+        # Check if local is behind remote
         if [ "$REMOTE_HASH" != "$LOCAL_HASH" ]; then
-            NEEDS_PULL=true
+            if git merge-base --is-ancestor "$LOCAL_HASH" "$REMOTE_HASH"; then
+                NEEDS_PULL=true
+                echo -e "${YELLOW}Local version is behind remote.${NC}"
+            else
+                echo -e "${YELLOW}Local version has diverged or is ahead of remote. Auto-pull skipped to protect local changes.${NC}"
+                NEEDS_PULL=false
+            fi
         fi
         
         if [ "$LOCAL_HASH" != "$RUNNING_HASH" ]; then
@@ -212,12 +219,18 @@ update_and_fix_permissions() {
         fi
         
         if [ "$NEEDS_PULL" = true ] || [ "$NEEDS_REBUILD" = true ]; then
-            if [ "$RUNNING_HASH" == "none" ]; then
+            # Improved detection: Check for existance of image or bots directory/config
+            IMAGE_EXISTS=$(docker images -q ${BOT_IMAGE} 2>/dev/null)
+            
+            if [ -z "$IMAGE_EXISTS" ] && [ ! -d "$BOTS_ROOT" ] && [ ! -f "$SCRIPT_DIR/config.json" ]; then
                 echo -e "${GREEN}Initial Setup / Installation Required!${NC}"
                 IS_FIRST_INSTALL=true
             else
                 echo -e "${GREEN}Update or Version mismatch found!${NC}"
                 IS_FIRST_INSTALL=false
+                if [ "$RUNNING_HASH" == "none" ]; then
+                    echo -e "${YELLOW}Note: Running image exists but is missing version label.${NC}"
+                fi
             fi
             echo "Remote:  $REMOTE_HASH"
             echo "Local:   $LOCAL_HASH"
