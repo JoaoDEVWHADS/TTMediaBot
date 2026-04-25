@@ -212,7 +212,13 @@ update_and_fix_permissions() {
         fi
         
         if [ "$NEEDS_PULL" = true ] || [ "$NEEDS_REBUILD" = true ]; then
-            echo -e "${GREEN}Update or Version mismatch found!${NC}"
+            if [ "$RUNNING_HASH" == "none" ]; then
+                echo -e "${GREEN}Initial Setup / Installation Required!${NC}"
+                IS_FIRST_INSTALL=true
+            else
+                echo -e "${GREEN}Update or Version mismatch found!${NC}"
+                IS_FIRST_INSTALL=false
+            fi
             echo "Remote:  $REMOTE_HASH"
             echo "Local:   $LOCAL_HASH"
             echo "Running: $RUNNING_HASH"
@@ -249,18 +255,29 @@ update_and_fix_permissions() {
     
     if [ "$UPDATE_FOUND" == "true" ]; then
         echo ""
-        echo "This will:"
-        echo "1. Backup 'bots' folder (configs/cookies)"
-        echo "2. Clone/pull the latest repository code"
-        echo "3. Update all local files"
-        echo "4. Restore backup"
+        if [ "$IS_FIRST_INSTALL" == "true" ]; then
+            echo "This will:"
+            echo "1. Clone/pull the latest repository code"
+            echo "2. Build and setup the TTMediaBot Docker image"
+            echo "3. Initialize environment and fix permissions"
+        else
+            echo "This will:"
+            echo "1. Backup 'bots' folder (configs/cookies)"
+            echo "2. Clone/pull the latest repository code"
+            echo "3. Update all local files"
+            echo "4. Restore backup"
+        fi
         echo ""
         
         if [ "$AUTO_UPDATE" = "true" ]; then
             confirm_update="y"
             echo "Auto-Update mode detected. Proceeding automatically..."
         else
-            read -p "Proceed? (y/N): " confirm_update
+            if [ "$IS_FIRST_INSTALL" == "true" ]; then
+                read -p "Proceed with Installation? (y/N): " confirm_update
+            else
+                read -p "Proceed with Update? (y/N): " confirm_update
+            fi
         fi
             
         if [[ "$confirm_update" =~ ^[yY]$ ]]; then
