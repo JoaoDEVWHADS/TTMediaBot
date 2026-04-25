@@ -203,6 +203,13 @@ update_and_fix_permissions() {
         NEEDS_PULL=false
         NEEDS_REBUILD=false
         
+        # Check for uncommitted local changes
+        LOCAL_CHANGES=$(git status --porcelain)
+        HAS_LOCAL_CHANGES=false
+        if [ -n "$LOCAL_CHANGES" ]; then
+            HAS_LOCAL_CHANGES=true
+        fi
+        
         # Check if local is behind remote
         if [ "$REMOTE_HASH" != "$LOCAL_HASH" ]; then
             if git merge-base --is-ancestor "$LOCAL_HASH" "$REMOTE_HASH"; then
@@ -212,6 +219,11 @@ update_and_fix_permissions() {
                 echo -e "${YELLOW}Local version has diverged or is ahead of remote. Auto-pull skipped to protect local changes.${NC}"
                 NEEDS_PULL=false
             fi
+        fi
+
+        if [ "$HAS_LOCAL_CHANGES" = true ]; then
+             echo -e "${RED}Warning: You have uncommitted local changes!${NC}"
+             NEEDS_PULL=false # Default to false for safety if we have local changes
         fi
         
         if [ "$LOCAL_HASH" != "$RUNNING_HASH" ]; then
@@ -282,9 +294,22 @@ update_and_fix_permissions() {
         fi
         echo ""
         
-        confirm_update="y"
         if [ "$AUTO_UPDATE" = "true" ]; then
             echo "Auto-Update mode detected. Proceeding automatically..."
+            confirm_update="y"
+            # In auto-update, if we have local changes, we should probably skip to avoid data loss
+            if [ "$HAS_LOCAL_CHANGES" = true ]; then
+                echo -e "${RED}Auto-update skipped because of local changes.${NC}"
+                confirm_update="n"
+            fi
+        else
+            echo -e "${YELLOW}Local changes detected: ${HAS_LOCAL_CHANGES}${NC}"
+            if [ "$HAS_LOCAL_CHANGES" = true ]; then
+                echo -e "${RED}WARNING: Proceeding will OVERWRITE your local uncommitted changes!${NC}"
+                read -p "Do you REALLY want to overwrite your changes and update? [y/N]: " confirm_update
+            else
+                read -p "Update found. Do you want to proceed? [y/N]: " confirm_update
+            fi
         fi
             
         if [[ "$confirm_update" =~ ^[yY]$ ]]; then

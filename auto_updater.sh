@@ -77,7 +77,7 @@ while true; do
             echo "$(date): Running update.sh..."
             # Pass AUTO_UPDATE=true to skip service restarts within the script that would kill this process
             export AUTO_UPDATE=true
-            yes | ./update.sh
+            ./update.sh
             unset AUTO_UPDATE
             rm -f "$LOCK_FILE"
         fi

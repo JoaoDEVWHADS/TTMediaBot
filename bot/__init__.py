@@ -109,7 +109,7 @@ class Bot:
         
         # Periodic Pre-warming tracking
         self.last_pre_warm_time = time.time()
-        self.pre_warm_interval = 240 # 4 minutes
+        self.pre_warm_interval = 50 # 50 seconds (User request: 'oi' every 50s)
 
         self._close = False
         while not self._close:
