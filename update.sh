@@ -199,6 +199,15 @@ update_and_fix_permissions() {
         RUNNING_HASH=$(docker inspect ${BOT_IMAGE} --format '{{ index .Config.Labels "commit_hash" }}' 2>/dev/null | tr -d '[:space:]')
         [ -z "$RUNNING_HASH" ] && RUNNING_HASH="none"
         
+        # Basic State Detection (Image and Directories)
+        IMAGE_EXISTS=$(docker images -q ${BOT_IMAGE} 2>/dev/null)
+        
+        if [ -z "$IMAGE_EXISTS" ] && [ ! -d "$BOTS_ROOT" ] && [ ! -f "$SCRIPT_DIR/config.json" ]; then
+            IS_FIRST_INSTALL=true
+        else
+            IS_FIRST_INSTALL=false
+        fi
+
         # Determine if we need an update or a rebuild
         NEEDS_PULL=false
         NEEDS_REBUILD=false
@@ -231,15 +240,10 @@ update_and_fix_permissions() {
         fi
         
         if [ "$NEEDS_PULL" = true ] || [ "$NEEDS_REBUILD" = true ]; then
-            # Improved detection: Check for existance of image or bots directory/config
-            IMAGE_EXISTS=$(docker images -q ${BOT_IMAGE} 2>/dev/null)
-            
-            if [ -z "$IMAGE_EXISTS" ] && [ ! -d "$BOTS_ROOT" ] && [ ! -f "$SCRIPT_DIR/config.json" ]; then
+            if [ "$IS_FIRST_INSTALL" = "true" ]; then
                 echo -e "${GREEN}Initial Setup / Installation Required!${NC}"
-                IS_FIRST_INSTALL=true
             else
                 echo -e "${GREEN}Update or Version mismatch found!${NC}"
-                IS_FIRST_INSTALL=false
                 if [ "$RUNNING_HASH" == "none" ]; then
                     echo -e "${YELLOW}Note: Running image exists but is missing version label.${NC}"
                 fi
@@ -255,6 +259,15 @@ update_and_fix_permissions() {
             UPDATE_FOUND=false
         fi
     else
+        # Basic State Detection (Image and Directories)
+        IMAGE_EXISTS=$(docker images -q ${BOT_IMAGE} 2>/dev/null)
+        
+        if [ -z "$IMAGE_EXISTS" ] && [ ! -d "$BOTS_ROOT" ] && [ ! -f "$SCRIPT_DIR/config.json" ]; then
+            IS_FIRST_INSTALL=true
+        else
+            IS_FIRST_INSTALL=false
+        fi
+
         # Fallback to date-based check if not a git repo yet (first install)
         LATEST_COMMIT_DATE=$(curl -s "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/commits/$BRANCH" | jq -r '.commit.committer.date')
         
@@ -262,8 +275,12 @@ update_and_fix_permissions() {
             REMOTE_TS=$(date -d "$LATEST_COMMIT_DATE" +%s)
             LOCAL_TS=$(stat -c %Y "$SCRIPT_DIR/ttbotdocker.sh" 2>/dev/null || echo 0)
             
-            if [ "$REMOTE_TS" -gt "$LOCAL_TS" ]; then
-                echo -e "${GREEN}Update found (date-based)!${NC}"
+            if [ "$REMOTE_TS" -gt "$LOCAL_TS" ] || [ "$IS_FIRST_INSTALL" = "true" ]; then
+                if [ "$IS_FIRST_INSTALL" = "true" ]; then
+                    echo -e "${GREEN}Initial Setup / Installation Required!${NC}"
+                else
+                    echo -e "${GREEN}Update found (date-based)!${NC}"
+                fi
                 UPDATE_FOUND=true
             else
                 echo -e "${GREEN}Already up to date (date-based).${NC}"
@@ -271,8 +288,13 @@ update_and_fix_permissions() {
             fi
         else
             # If API fails, assume we might need update if we aren't a git repo
-            echo -e "${RED}Warning: Could not check updates via API (rate limit?).${NC}"
-            UPDATE_FOUND=false
+            if [ "$IS_FIRST_INSTALL" = "true" ]; then
+                echo -e "${YELLOW}API check failed but no installation found. Proceeding with Setup.${NC}"
+                UPDATE_FOUND=true
+            else
+                echo -e "${RED}Warning: Could not check updates via API (rate limit?).${NC}"
+                UPDATE_FOUND=false
+            fi
         fi
     fi
 
@@ -302,6 +324,12 @@ update_and_fix_permissions() {
                 echo -e "${RED}Auto-update skipped because of local changes.${NC}"
                 confirm_update="n"
             fi
+        elif [ "$IS_FIRST_INSTALL" = "true" ]; then
+            echo -e "${GREEN}First installation detected. Proceeding automatically...${NC}"
+            confirm_update="y"
+        elif [ -z "$IMAGE_EXISTS" ] && [ "$NEEDS_PULL" = "false" ] && [ "$HAS_LOCAL_CHANGES" = "false" ]; then
+            echo -e "${YELLOW}Docker image missing but code is up to date. Rebuilding automatically...${NC}"
+            confirm_update="y"
         else
             echo -e "${YELLOW}Local changes detected: ${HAS_LOCAL_CHANGES}${NC}"
             if [ "$HAS_LOCAL_CHANGES" = true ]; then
