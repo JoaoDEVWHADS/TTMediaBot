@@ -47,7 +47,7 @@ COPY requirements.txt .
 # Always ensure latest libraries and yt-dlp on every build
 RUN pip install -U -r requirements.txt \
     && pip install "httpx>=0.28.1" \
-    && pip install -U "yt-dlp[nightly]"
+    && pip install --pre -U "yt-dlp[default]"
 
 # Copy project files
 COPY . .
