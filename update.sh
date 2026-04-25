@@ -269,15 +269,9 @@ update_and_fix_permissions() {
         fi
         echo ""
         
+        confirm_update="y"
         if [ "$AUTO_UPDATE" = "true" ]; then
-            confirm_update="y"
             echo "Auto-Update mode detected. Proceeding automatically..."
-        else
-            if [ "$IS_FIRST_INSTALL" == "true" ]; then
-                read -p "Proceed with Installation? (y/N): " confirm_update
-            else
-                read -p "Proceed with Update? (y/N): " confirm_update
-            fi
         fi
             
         if [[ "$confirm_update" =~ ^[yY]$ ]]; then
