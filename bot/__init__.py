@@ -3,6 +3,7 @@ import logging
 import queue
 import sys
 import time
+import threading
 from typing import Optional
 from bot.TeamTalk.structs import Message, MessageType, User, UserType, UserStatusMode, UserState
 from bot import errors
@@ -105,6 +106,11 @@ class Bot:
         for command in self.config.general.start_commands:
             message = Message(text=command, user=startup_context_user, channel=self.ttclient.channel, type=MessageType.User)
             self.command_processor(message)
+        
+        # Periodic Pre-warming tracking
+        self.last_pre_warm_time = time.time()
+        self.pre_warm_interval = 240 # 4 minutes
+
         self._close = False
         while not self._close:
             try:
@@ -117,7 +123,30 @@ class Bot:
                 self.command_processor(message)
             except queue.Empty:
                 pass
+            
+            # Check for periodic pre-warming
+            if time.time() - self.last_pre_warm_time >= self.pre_warm_interval:
+                self.last_pre_warm_time = time.time()
+                threading.Thread(target=self._perform_periodic_pre_warm, daemon=True).start()
+
             time.sleep(app_vars.loop_timeout)
+
+    def _perform_periodic_pre_warm(self):
+        logging.info("Starting periodic pre-warming for services...")
+        try:
+            # Pre-warm YouTube if enabled
+            yt = self.service_manager.get_service("yt")
+            if yt and hasattr(yt, "_pre_warm"):
+                yt._pre_warm()
+            
+            # Pre-warm YouTube Music if enabled
+            ytm = self.service_manager.get_service("ytm")
+            if ytm and hasattr(ytm, "_pre_warm"):
+                ytm._pre_warm()
+                
+            logging.info("Periodic pre-warming cycle completed.")
+        except Exception as e:
+            logging.error(f"Error during periodic pre-warming: {e}")
 
     def close(self) -> None:
         logging.debug("Closing bot")

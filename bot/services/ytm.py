@@ -149,13 +149,16 @@ class YtmService(_Service):
         # Explicit public instance for search/metadata (User Request: No cookies for search)
         self.ytmusic_public = YTMusic()
 
+        # Persistent event loop for safer async operations if needed
+        self._loop = asyncio.new_event_loop()
+        threading.Thread(target=self._loop.run_forever, daemon=True).start()
+
         self._ydl_config = {
             "skip_download": True,
             "format": "bestaudio/best",
-            # Performance optimizations:
-            "format_sort": ["res:144", "codec:mp3", "codec:m4a", "codec:opus"], # Prioritize mp3/m4a for simplicity
-            "youtube_include_dash_manifest": False, # Skip DASH manifest download
-            "youtube_include_hls_manifest": False,  # Skip HLS manifest download
+            "format_sort": ["res:144", "codec:mp3", "codec:m4a", "codec:opus"],
+            "youtube_include_dash_manifest": False,
+            "youtube_include_hls_manifest": False,
             "socket_timeout": 5,
             "logger": logging.getLogger("root"),
             "js_runtimes": {"node": {}},
@@ -163,8 +166,22 @@ class YtmService(_Service):
             "no_warnings": True,
             "nocheckcertificate": True,
             "geo_bypass": True,
-            "extract_flat": "in_playlist", # Speed up if URL is a playlist, though we usually pass single video URLs here
+            "check_formats": False, # Skip extra network request for format validation
+            "noplaylist": True,    # Ensure we don't accidentally load playlists
+            "extract_flat": "in_playlist",
         }
+
+        # Pre-warming for YTM
+        threading.Thread(target=self._pre_warm, daemon=True).start()
+
+    def _pre_warm(self):
+        try:
+            logging.info("YTM Service pre-warming...")
+            # Establish initial connection to YTM
+            self.ytmusic_public.search("music", filter="songs", limit=1)
+            logging.info("YTM Service pre-warming finished.")
+        except Exception as e:
+            logging.debug(f"YTM Pre-warming failed: {e}")
 
     @contextmanager
     def _temp_cookie_file(self) -> Generator[Optional[str], None, None]:

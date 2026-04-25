@@ -54,7 +54,25 @@ class YtService(_Service):
             "no_warnings": True,
             "nocheckcertificate": True,
             "geo_bypass": True,
+            "check_formats": False, # Skip extra network request for format validation
+            "noplaylist": True,    # Ensure we don't accidentally load playlists
         }
+
+        # Persistent event loop for faster async operations
+        self._loop = asyncio.new_event_loop()
+        threading.Thread(target=self._loop.run_forever, daemon=True).start()
+
+        # Pre-warming: establishing connections early
+        threading.Thread(target=self._pre_warm, daemon=True).start()
+
+    def _pre_warm(self):
+        try:
+            # Establish initial connections to YouTube
+            logging.info("YT Service pre-warming...")
+            self.search("music")
+            logging.info("YT Service pre-warming finished.")
+        except Exception as e:
+            logging.debug(f"YT Pre-warming failed: {e}")
 
     @contextmanager
     def _temp_cookie_file(self) -> Generator[Optional[str], None, None]:
