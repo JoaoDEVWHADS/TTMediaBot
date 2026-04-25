@@ -5,6 +5,6 @@ portalocker
 pydantic
 pyshorteners
 requests
-yt-dlp
+yt-dlp[nightly]
 ytmusicapi
 py-yt-search
