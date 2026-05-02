@@ -2,8 +2,6 @@ from __future__ import annotations
 import html
 import logging
 import time
-import logging
-import time
 import threading
 from typing import Any, Dict, Callable, List, Optional, TYPE_CHECKING
 import random
@@ -13,6 +11,7 @@ import mpv
 from bot import errors
 from bot.player.enums import Mode, State, TrackType
 from bot.player.track import Track
+from bot.player.queue_manager import QueueManager
 from bot.sound_devices import SoundDevice, SoundDeviceType
 
 
@@ -46,6 +45,8 @@ class Player:
         self.state = State.Stopped
         self.mode = Mode.TrackList
         self.volume = self.config.default_volume
+
+                self.queue: QueueManager = QueueManager()
 
     def initialize(self) -> None:
         logging.debug("Initializing player")
@@ -108,16 +109,22 @@ class Player:
             self.cache_manager.save()
         self._player.pause = False
         self._player.play(arg)
-        # Prefetch next track to ensure gapless-like playback
-        # Delay slightly to let the current track buffering / playback start smoothly first
-        threading.Timer(1.0, self._prefetch_next_track).start()
+                threading.Timer(1.0, self._prefetch_next_track).start()
 
-    def _prefetch_next_track(self):
-        """Identifies and fetches the stream URL for the next track in background."""
-        try:
+    def _prefetch_next_track(self) -> None:
+                try:
+            # Se há faixa na fila, ela será a próxima — prefetch dela
+            next_from_queue = self.queue.peek_next()
+            if next_from_queue is not None:
+                if not next_from_queue._is_fetched:
+                    logging.info(f"Prefetching next track from queue: {next_from_queue.name}")
+                    _ = next_from_queue.url
+                    logging.info(f"Prefetch from queue completed: {next_from_queue.name}")
+                return
+
             if not self.track_list:
                 return
-                
+
             next_index = -1
             if self.mode == Mode.Random:
                 try:
@@ -133,19 +140,34 @@ class Player:
                     next_index = self.track_index + 1
                 elif self.mode == Mode.RepeatTrackList and len(self.track_list) > 0:
                     next_index = 0
-            
+
             if next_index != -1 and next_index < len(self.track_list):
                 next_track = self.track_list[next_index]
-                # Accessing .url property triggers the fetch/download/extraction if not already done
-                # verifying if it needs fetching is done inside the property
                 if not next_track._is_fetched:
                     logging.info(f"Prefetching next track: {next_track.name}")
-                    _ = next_track.url 
+                    _ = next_track.url
                     logging.info(f"Prefetch completed for: {next_track.name}")
         except Exception as e:
             logging.warning(f"Prefetch failed: {e}")
 
+    def play_from_queue(self) -> bool:
+                next_track = self.queue.pop_next()
+        if next_track is None:
+            return False
+
+        logging.info(f"Playing from queue: {next_track.name}")
+        self.track_list = [next_track]
+        self.track_index = 0
+        self.track = next_track
+        self._play(next_track.url)
+        self.state = State.Playing
+        return True
+
     def next(self) -> None:
+                if not self.queue.is_empty:
+            if self.play_from_queue():
+                return
+
         track_index = self.track_index
         if len(self.track_list) > 0:
             if self.mode == Mode.Random:
@@ -298,14 +320,24 @@ class Player:
     def on_end_file(self, event: mpv.MpvEvent) -> None:
         if self.state == State.Playing and self._player.idle_active:
             if self.mode == Mode.SingleTrack or self.track.type == TrackType.Direct:
-                self.stop()
+                # Mesmo em SingleTrack/Direct, a fila tem prioridade
+                if not self.queue.is_empty:
+                    self.play_from_queue()
+                else:
+                    self.stop()
             elif self.mode == Mode.RepeatTrack:
+                # RepeatTrack repete a atual — fila NÃO interrompe automaticamente
+                # O usuário pode usar 'qs' para pular para a fila manualmente
                 self.play_by_index(self.track_index)
             else:
-                try:
-                    self.next()
-                except errors.NoNextTrackError:
-                    self.stop()
+                # Para todos os outros modos, a fila tem prioridade
+                if not self.queue.is_empty:
+                    self.play_from_queue()
+                else:
+                    try:
+                        self.next()
+                    except errors.NoNextTrackError:
+                        self.stop()
 
     def on_metadata_update(self, name: str, value: Any) -> None:
         if self.state == State.Playing and (
