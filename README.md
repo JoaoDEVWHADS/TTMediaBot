@@ -1,8 +1,15 @@
 # TTMediaBot
 
+**Olá! Eu sou João Almeida.** Bem-vindo ao meu fork do **TTMediaBot**, um bot de streaming de mídia completo para TeamTalk 5. Este repositório é focado em trazer melhorias constantes, estabilidade e novas funcionalidades, como o suporte exclusivo para YouTube Music.
+
+> 🔗 **Meu Repositório:** [https://github.com/JoaoDEVWHADS/TTMediaBot](https://github.com/JoaoDEVWHADS/TTMediaBot)
+
+---
+
 > **Note:** This repository is a fork of the [original TTMediaBot](https://github.com/gumerov-amir/TTMediaBot).
 
 A feature-rich media streaming bot for TeamTalk 5, capable of playing music from various services (YouTube, YouTube Music, local files, URLs) with advanced control features.
+
 
 ## 📋 Changes from Original
 

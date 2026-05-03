@@ -19,16 +19,19 @@ msgstr ""
 "Generated-By: Babel 2.17.0\n"
 
 #: /root/TTMediaBot/bot/app_vars.py:12
-#, fuzzy
 msgid ""
-"A media streaming bot for TeamTalk.\n"
-"Authors: Amir Gumerov, Vladislav Kopylov, Beqa Gozalishvili, Kirill "
+"Hello! I am João Almeida. This is my fork of TTMediaBot for TeamTalk 5.\n"
+"This repository focuses on stability and support for YouTube Music.\n"
+"Repository: https://github.com/JoaoDEVWHADS/TTMediaBot\n"
+"Original Authors: Amir Gumerov, Vladislav Kopylov, Beqa Gozalishvili, Kirill "
 "Belousov.\n"
-"Home page: https://github.com/gumerov-amir/TTMediaBotLicense: Mit License"
 msgstr ""
-"TTMediaBot - TeamTalk için medya akış botu.\n"
-"Programcılar: Gumerov_amir, A11CF0, Beqa Gozalishvili.\n"
-"Ana sayfa: https://github.com/gumerov-amir/TTMediaBot"
+"Merhaba! Ben João Almeida. Bu, TeamTalk 5 için TTMediaBot fork'umdur.\n"
+"Bu depo istikrar ve YouTube Music desteğine odaklanmaktadır.\n"
+"Depo: https://github.com/JoaoDEVWHADS/TTMediaBot\n"
+"Orijinal Yazarlar: Amir Gumerov, Vladislav Kopylov, Beqa Gozalishvili, Kirill "
+"Belousov.\n"
+
 
 #: /root/TTMediaBot/bot/TeamTalk/__init__.py:150
 msgid "Send \"h\" for help"

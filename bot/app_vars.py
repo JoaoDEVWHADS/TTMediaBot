@@ -10,10 +10,10 @@ app_version = "4.0"
 client_name = app_name + "-V" + app_version
 about_text: Callable[[Translator], str] = lambda translator: translator.translate(
     """\
-A media streaming bot for TeamTalk.
-Authors: Amir Gumerov, Vladislav Kopylov, Beqa Gozalishvili, Kirill Belousov.
-Home page: https://github.com/gumerov-amir/TTMediaBot\
-License: Mit License\
+Hello! I am João Almeida. This is my fork of TTMediaBot for TeamTalk 5.
+This repository focuses on stability and support for YouTube Music.
+Repository: https://github.com/JoaoDEVWHADS/TTMediaBot
+Original Authors: Amir Gumerov, Vladislav Kopylov, Beqa Gozalishvili, Kirill Belousov.
 """
 )
 fallback_service = "yt"

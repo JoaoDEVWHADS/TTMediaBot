@@ -21,15 +21,18 @@ msgstr ""
 
 #: /root/TTMediaBot/bot/app_vars.py:12
 msgid ""
-"A media streaming bot for TeamTalk.\n"
-"Authors: Amir Gumerov, Vladislav Kopylov, Beqa Gozalishvili, Kirill "
+"Hello! I am João Almeida. This is my fork of TTMediaBot for TeamTalk 5.\n"
+"This repository focuses on stability and support for YouTube Music.\n"
+"Repository: https://github.com/JoaoDEVWHADS/TTMediaBot\n"
+"Original Authors: Amir Gumerov, Vladislav Kopylov, Beqa Gozalishvili, Kirill "
 "Belousov.\n"
-"Home page: https://github.com/gumerov-amir/TTMediaBotLicense: Mit License"
 msgstr ""
-"Бот потоковой передачи мультимедиа для TeamTalk.\n"
-"Авторы: Gumerov_amir, Vladislav Kopylov, Beqa Gozalishvili, Kirill "
+"Привет! Я Жоао Алмейда. Это мой форк TTMediaBot для TeamTalk 5.\n"
+"Этот репозиторий ориентирован на стабильность и поддержку YouTube Music.\n"
+"Репозиторий: https://github.com/JoaoDEVWHADS/TTMediaBot\n"
+"Оригинальные авторы: Amir Gumerov, Vladislav Kopylov, Beqa Gozalishvili, Kirill "
 "Belousov.\n"
-"Домашняя страница: https://github.com/gumerov-amir/TTMediaBot"
+
 
 #: /root/TTMediaBot/bot/TeamTalk/__init__.py:150
 msgid "Send \"h\" for help"
