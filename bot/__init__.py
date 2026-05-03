@@ -135,12 +135,12 @@ class Bot:
         logging.info("Starting periodic pre-warming for services...")
         try:
             # Pre-warm YouTube if enabled
-            yt = self.service_manager.get_service("yt")
+            yt = self.service_manager.get_service_by_name("yt")
             if yt and hasattr(yt, "_pre_warm"):
                 yt._pre_warm()
             
             # Pre-warm YouTube Music if enabled
-            ytm = self.service_manager.get_service("ytm")
+            ytm = self.service_manager.get_service_by_name("ytm")
             if ytm and hasattr(ytm, "_pre_warm"):
                 ytm._pre_warm()
                 

@@ -176,6 +176,10 @@ class YtmService(_Service):
             "geo_bypass": True,
             "check_formats": False,
             "noplaylist": True,
+            "js_runtimes": {"node": {}},
+            "allowed_extractors": ["youtube", "youtube:playlist", "youtube:search", "youtube:tab"],
+            "cachedir": False,
+            "lazy_playlist": True,
         }
 
         # Pre-warming for YTM

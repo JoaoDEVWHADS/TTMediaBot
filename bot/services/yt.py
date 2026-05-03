@@ -71,6 +71,10 @@ class YtService(_Service):
             "geo_bypass": True,
             "check_formats": False,
             "noplaylist": True,
+            "js_runtimes": {"node": {}},
+            "allowed_extractors": ["youtube", "youtube:playlist", "youtube:search", "youtube:tab"],
+            "cachedir": False,
+            "lazy_playlist": True,
         }
 
         # Persistent event loop for faster async operations
@@ -131,6 +135,7 @@ class YtService(_Service):
         
         # Instantiate per request for thread safety
         config = self._ydl_config.copy()
+        config["skip_download"] = False
         config["postprocessors"] = [{
             "key": "FFmpegExtractAudio",
             "preferredcodec": "mp3",
@@ -193,7 +198,10 @@ class YtService(_Service):
                     "Proceeding without cookies — YouTube may block this request."
                 )
             
+            ydl_start = time.perf_counter()
             with YoutubeDL(config) as ydl:
+                ydl_duration = (time.perf_counter() - ydl_start) * 1000
+                logging.info(f"YT Get: YoutubeDL initialized in {ydl_duration:.2f}ms")
                 if not extra_info:
                     try:
                         info = ydl.extract_info(url, process=False)
@@ -207,6 +215,8 @@ class YtService(_Service):
                             )
                         else:
                             logging.error(f"YT Get: yt-dlp DownloadError for '{url}': {error_msg}")
+                            if "Signature solving failed" in error_msg or "JavaScript runtime" in error_msg:
+                                logging.error("YT Get: Possible missing JavaScript runtime or challenge solver. Check if Node.js is correctly installed in the environment.")
                         raise errors.ServiceError(str(e))
                 else:
                     info = extra_info

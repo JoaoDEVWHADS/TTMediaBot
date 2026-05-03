@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pulseaudio \
     ca-certificates \
     ffmpeg \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js LTS (matching install.sh)
@@ -45,9 +46,10 @@ ARG CACHEBUST=1
 COPY requirements.txt .
 
 # Always ensure latest libraries and yt-dlp on every build
-RUN pip install -U -r requirements.txt \
-    && pip install "httpx>=0.28.1" \
-    && pip install -U "yt-dlp[default] @ https://github.com/yt-dlp/yt-dlp/archive/master.tar.gz"
+RUN pip install -U pip setuptools wheel \
+    && pip install -U -r requirements.txt \
+    && pip install -U "yt-dlp[default] @ https://github.com/yt-dlp/yt-dlp/archive/master.tar.gz" \
+    && pip install "httpx>=0.28.1"
 
 # Copy project files
 COPY . .
