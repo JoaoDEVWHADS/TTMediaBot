@@ -37,63 +37,69 @@ class Uploader:
     def run(self, track: Track, user: User) -> None:
         logging.info(f"Uploader started for track '{track.name}' (Type: {track.type}) requested by {user.username}")
         error_exit = False
-        if track.type == TrackType.Default or track.service in ['yt', 'ytm']:
-            temp_dir = tempfile.TemporaryDirectory()
-            logging.info(f"Uploader: Downloading track to {temp_dir.name}")
-            file_path = track.download(temp_dir.name)
-        else:
-            logging.info(f"Uploader: Using direct URL/path: {track.url}")
-            file_path = track.url
-        
-        logging.info(f"Uploader: Sending file '{file_path}' to channel {self.ttclient.channel.id}")
-        command_id = self.ttclient.send_file(self.ttclient.channel.id, file_path)
-        file_name = os.path.basename(file_path)
-        while True:
-            try:
-                file = self.ttclient.uploaded_files_queue.get_nowait()
-                if file.name == file_name:
-                    break
-                else:
-                    self.ttclient.uploaded_files_queue.put(file)
-            except Empty:
-                pass
-            try:
-                error = self.ttclient.errors_queue.get_nowait()
-                if (
-                    error.command_id == command_id
-                    and error.type == ErrorType.MaxDiskusageExceeded
-                ):
-                    self.ttclient.send_message(
-                        self.translator.translate("Error: {}").format(
-                            "Max diskusage exceeded"
-                        ),
-                        user,
-                    )
-                    error_exit = True
-                elif (
-                    error.command_id == command_id
-                    and error.type == ErrorType.NotAuthorised
-                ):
-                    self.ttclient.send_message(
-                        self.translator.translate("Error: {}").format(
-                            "Not authorized to upload files to this channel"
-                        ),
-                        user,
-                    )
-                    error_exit = True
-                else:
-                    self.ttclient.errors_queue.put(error)
-            except Empty:
-                pass
-            time.sleep(app_vars.loop_timeout)
-        time.sleep(app_vars.loop_timeout)
-        if track.type == TrackType.Default:
-            temp_dir.cleanup()
+        temp_dir = None
+        try:
+            if track.type == TrackType.Default or track.service in ['yt', 'ytm']:
+                temp_dir = tempfile.TemporaryDirectory()
+                logging.info(f"Uploader: Downloading track to {temp_dir.name}")
+                file_path = track.download(temp_dir.name)
+            else:
+                logging.info(f"Uploader: Using direct URL/path: {track.url}")
+                file_path = track.url
+            
+            logging.info(f"Uploader: Sending file '{file_path}' to channel {self.ttclient.channel.id}")
+            command_id = self.ttclient.send_file(self.ttclient.channel.id, file_path)
+            file_name = os.path.basename(file_path)
+            while True:
+                try:
+                    file = self.ttclient.uploaded_files_queue.get_nowait()
+                    if file.name == file_name:
+                        break
+                    else:
+                        self.ttclient.uploaded_files_queue.put(file)
+                except Empty:
+                    pass
+                try:
+                    error = self.ttclient.errors_queue.get_nowait()
+                    if (
+                        error.command_id == command_id
+                        and error.type == ErrorType.MaxDiskusageExceeded
+                    ):
+                        self.ttclient.send_message(
+                            self.translator.translate("Error: {}").format(
+                                "Max diskusage exceeded"
+                            ),
+                            user,
+                        )
+                        error_exit = True
+                    elif (
+                        error.command_id == command_id
+                        and error.type == ErrorType.NotAuthorised
+                    ):
+                        self.ttclient.send_message(
+                            self.translator.translate("Error: {}").format(
+                                "Not authorized to upload files to this channel"
+                            ),
+                            user,
+                        )
+                        error_exit = True
+                    else:
+                        self.ttclient.errors_queue.put(error)
+                except Empty:
+                    pass
+                time.sleep(app_vars.loop_timeout)
+        finally:
+            if temp_dir:
+                logging.debug("Uploader: Cleaning up local temporary directory")
+                temp_dir.cleanup()
+
         if error_exit:
             return
+        
         if self.config.general.delete_uploaded_files_after > 0:
             timeout = self.config.general.delete_uploaded_files_after
         else:
             return
+        
         time.sleep(timeout)
         self.ttclient.delete_file(file.channel.id, file.id)

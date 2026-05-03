@@ -245,8 +245,13 @@ class YtmService(_Service):
         config["outtmpl"] = file_path.rsplit(".", 1)[0] + ".%(ext)s"
 
         url = track.url
-        if track.extra_info and "videoId" in track.extra_info:
-            url = f"https://music.youtube.com/watch?v={track.extra_info['videoId']}"
+        if track.extra_info:
+            if "webpage_url" in track.extra_info:
+                url = track.extra_info["webpage_url"]
+            elif "id" in track.extra_info:
+                url = f"https://music.youtube.com/watch?v={track.extra_info['id']}"
+            elif "videoId" in track.extra_info:
+                url = f"https://music.youtube.com/watch?v={track.extra_info['videoId']}"
 
         with self._temp_cookie_file() as cookie_file:
             if cookie_file:
