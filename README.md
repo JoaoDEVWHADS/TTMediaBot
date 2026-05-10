@@ -20,7 +20,17 @@ This fork includes several modifications and optimizations:
 - **Docker Containerization:** The bot runs in Docker containers based on Debian 11 and Python 3.10, ensuring compatibility with legacy dependencies while maintaining stability
 - **Proven Stability:** Since I first encountered this bot in 2021, the adaptations made to work around YouTube's restrictions, combined with the optimizations from 2021/2022, have proven to be excellent and reliable
 
-## 🆕 Latest Updates (05/06/2026) - v1.6.0 "Playlist Power-Up" Update
+## 🆕 Latest Updates (05/09/2026) - v1.7.0 "Queue System" Update
+
+A huge shoutout and massive credits to **ericoamico** for his incredible dedication and a full week of hard work in developing this amazing feature! All credits for the new queue system go to him.
+
+- **🗂️ Advanced Queue System:** You can now queue multiple tracks to play sequentially!
+- **➕ Add to Queue:** Use the `qa` command to search for a track and seamlessly add it to your queue.
+- **📜 View Queue:** Check what's playing next with the `ql` command to list all queued tracks.
+- **🗑️ Queue Management:** Use `qr [number]` to remove a specific song, or `qc` to clear the entire queue at once.
+- **⏭️ Smart Skip:** The new `qs` command skips the current track and instantly plays the next one from the queue.
+
+## 🆕 Previous Updates (05/06/2026) - v1.6.0 "Playlist Power-Up" Update
 
 - **📦 New `dlp` Command:** Download entire YouTube/YouTube Music playlists and albums as organized ZIP archives directly to the TeamTalk channel.
 - **📂 Intelligent ZIP Structure:** Archives now wrap contents inside a subfolder named after the playlist/album, ensuring a clean extraction process.
@@ -134,6 +144,11 @@ Send these commands to the bot via private message (PM) or in the channel (if en
 | **dlp** | `[url]` | Downloads all tracks from a playlist/album URL, zips them, and uploads to the channel. |
 | **r** | `[number]` | Plays from Recents. `r` lists recents. |
 | **jc** | | Makes the bot join your current channel. |
+| **qa** | `[query]` | Adds a track to the queue. |
+| **ql** | | Lists all tracks currently in the queue. |
+| **qr** | `[number]` | Removes a specific track from the queue. |
+| **qc** | | Clears the entire queue. |
+| **qs** | | Skips current track and plays the next one from the queue. |
 | **a** | | Shows about info. |
 
 ### Admin Commands
