@@ -1442,13 +1442,7 @@ uninstall_all() {
     echo -e "${RED}=========================================${NC}"
     echo ""
     echo -e "${RED}WARNING: THIS ACTION IS DESTRUCTIVE!${NC}"
-    echo "It will do the following:"
-    echo "1. STOP and REMOVE all 'ttmediabot' containers."
-    echo "2. REMOVE the Docker image 'ttmediabot'."
-    echo "3. DELETE the '${BOTS_ROOT}' folder with all bots and configs."
-    echo "4. DISABLE and REMOVE the auto-updater systemd service."
-    echo "5. REMOVE Docker Engine and all residual files."
-    echo "6. REMOVE Docker APT repository and GPG key."
+    echo "It will remove EVERYTHING except the project folder '${SCRIPT_DIR}'."
     echo ""
 
     read -p "Type 'yes' to confirm total destruction: " confirm
@@ -1463,14 +1457,16 @@ uninstall_all() {
     docker stop -t 1 $(docker ps -a -q -f "label=role=ttmediabot") 2>/dev/null
     docker rm $(docker ps -a -q -f "label=role=ttmediabot") 2>/dev/null
 
-    echo -e "${YELLOW}2. Total Nuke on Docker (Images, Networks, Volumes)...${NC}"
+    echo -e "${YELLOW}2. Nuking all Docker resources (images, networks, volumes)...${NC}"
     docker system prune -a -f --volumes 2>/dev/null
 
     echo -e "${YELLOW}3. Stopping Docker service...${NC}"
     systemctl stop docker 2>/dev/null
     systemctl stop docker.socket 2>/dev/null
+    systemctl disable docker 2>/dev/null
+    systemctl disable docker.socket 2>/dev/null
 
-    echo -e "${YELLOW}4. Removing bot files...${NC}"
+    echo -e "${YELLOW}4. Removing bot files (configs/cookies)...${NC}"
     if [ -d "$BOTS_ROOT" ]; then
         rm -rf "$BOTS_ROOT"
     fi
@@ -1485,12 +1481,16 @@ uninstall_all() {
     rm -f /tmp/ttmediabot_update.lock
     rm -f /tmp/ttmediabot_last_running.txt
     rm -f /tmp/cookies_pasted.txt
+    rm -f /tmp/ttbot_destroy_*.sh
 
     echo ""
-    echo -e "${YELLOW}7. Uninstalling Docker and dependencies (Total Cleanup)...${NC}"
-    apt-get purge -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose
+    echo -e "${YELLOW}7. Uninstalling Docker Engine and all packages...${NC}"
+    apt-get purge -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose 2>/dev/null
 
-    echo "Removing residual configuration folders and files..."
+    echo -e "${YELLOW}   Removing extra packages installed by this script...${NC}"
+    apt-get purge -y jq curl gnupg lsb-release 2>/dev/null
+
+    echo "   Removing residual Docker files..."
     rm -rf /var/lib/docker
     rm -rf /var/lib/containerd
     rm -rf /etc/docker
@@ -1502,37 +1502,50 @@ uninstall_all() {
     rm -rf /home/*/.docker
     rm -rf /var/log/docker
     rm -rf /var/log/containerd
+    rm -f  /usr/local/bin/docker-compose
 
     echo -e "${YELLOW}8. Removing Docker APT repository and GPG key...${NC}"
     rm -f /etc/apt/sources.list.d/docker.list
     rm -f /etc/apt/keyrings/docker.gpg
     apt-get update -q 2>/dev/null
 
-    # Remove manual binary installs if any
-    rm -f /usr/local/bin/docker-compose
-
-    echo "Removing 'docker' group..."
+    echo -e "${YELLOW}9. Removing docker group...${NC}"
     groupdel docker 2>/dev/null || true
 
-    echo "Cleaning unused packages..."
+    echo -e "${YELLOW}10. Flushing Docker iptables rules...${NC}"
+    iptables -t filter -F DOCKER 2>/dev/null || true
+    iptables -t filter -F DOCKER-ISOLATION-STAGE-1 2>/dev/null || true
+    iptables -t filter -F DOCKER-ISOLATION-STAGE-2 2>/dev/null || true
+    iptables -t filter -F DOCKER-USER 2>/dev/null || true
+    iptables -t nat -F DOCKER 2>/dev/null || true
+    iptables -t nat -F POSTROUTING 2>/dev/null || true
+    iptables -t filter -X DOCKER 2>/dev/null || true
+    iptables -t filter -X DOCKER-ISOLATION-STAGE-1 2>/dev/null || true
+    iptables -t filter -X DOCKER-ISOLATION-STAGE-2 2>/dev/null || true
+    iptables -t filter -X DOCKER-USER 2>/dev/null || true
+    iptables -t nat -X DOCKER 2>/dev/null || true
+
+    echo -e "${YELLOW}11. Removing docker0 network interface...${NC}"
+    ip link set docker0 down 2>/dev/null || true
+    ip link delete docker0 2>/dev/null || true
+
+    echo ""
+    echo -e "${YELLOW}12. Cleaning unused packages and cache...${NC}"
     apt-get autoremove -y >/dev/null
     apt-get autoclean -y >/dev/null
 
-    echo -e "${YELLOW}9. Removing project folder '${SCRIPT_DIR}'...${NC}"
-    # setsid creates a completely new session (new PGID + no controlling TTY).
-    # This is stronger than nohup+disown: survives even if the terminal closes.
-    _DESTROY_SCRIPT=$(mktemp /tmp/ttbot_destroy_XXXXXX.sh)
-    printf '#!/bin/bash\nsleep 1\nrm -rf "%s"\nrm -f "%s"\n' "$SCRIPT_DIR" "$_DESTROY_SCRIPT" > "$_DESTROY_SCRIPT"
-    chmod +x "$_DESTROY_SCRIPT"
-    setsid bash "$_DESTROY_SCRIPT" >/dev/null 2>&1 &
-
     echo ""
-    echo -e "${GREEN}CLEANUP COMPLETED.${NC}"
-    echo "All containers, images, configurations, and Docker itself were removed from the system."
-    echo -e "${RED}Project folder '${SCRIPT_DIR}' will be deleted in 1 second.${NC}"
-    echo -e "${RED}Recommended to restart the server to clear network interfaces (docker0).${NC}"
+    echo -e "${GREEN}=========================================${NC}"
+    echo -e "${GREEN}      CLEANUP COMPLETED.                 ${NC}"
+    echo -e "${GREEN}=========================================${NC}"
+    echo ""
+    echo "Everything has been removed from the system."
+    echo -e "${GREEN}Project folder '${SCRIPT_DIR}' was KEPT.${NC}"
+    echo ""
+    echo -e "${YELLOW}Note: A reboot is recommended to fully clear any remaining kernel state.${NC}"
     exit 0
 }
+
 
 
 # Function: Clean Unused Docker Resources
