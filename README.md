@@ -20,13 +20,9 @@ This fork includes several modifications and optimizations:
 - **Docker Containerization:** The bot runs in Docker containers based on Debian 11 and Python 3.10, ensuring compatibility with legacy dependencies while maintaining stability
 - **Proven Stability:** Since I first encountered this bot in 2021, the adaptations made to work around YouTube's restrictions, combined with the optimizations from 2021/2022, have proven to be excellent and reliable
 
-## 🆕 Latest Update — v2.1.0 "Smart Search & Docker Polish" *(05/21/2026)*
+## 🆕 Latest Updates
 
-- 🔎 New `sr` command: toggle **Search Results Mode** — `p QUERY` shows a numbered list instead of playing immediately
-- 🎯 New `sl NUMBER` command: pick which result to play from the last search list
-- 🔢 New `slc NUMBER` command: set how many results are shown (default 5)
-- ⏱️ Docker Manager: new option to configure the **file deletion timer** on create & bulk update
-- 🎯 Docker Manager: Bulk Update now lets you choose **which bots** to apply changes to (all / one / subset)
+All recent features, improvements, updates, and releases are documented in our changelog.
 
 > 📋 **[See full changelog →](CHANGELOG.md)**
 
@@ -52,6 +48,26 @@ Switch between services using the `sv` command:
 
 > [!NOTE]
 > **Exclusive Feature:** YouTube Music support is exclusive to this fork and is not available in the original TTMediaBot project.
+
+## 🔗 Link-Based Downloading & Local Storage
+
+This fork includes an advanced link-based downloading system that allows users to queue media links, list them, manage them, and download them sequentially or in compressed archives.
+
+### Commands
+- **`aad [link]`**: Adds a single link to your list.
+- **`ad [link1] [link2] ...`**: Adds multiple space-separated links to your list.
+- **`ld`**: Lists all links currently in your list.
+- **`rd [number/link]`**: Removes a link from your list by index or URL.
+- **`ldd [link]`**: Downloads a link directly and uploads it to the channel.
+- **`ads`**: Downloads your list. Prompts you to select:
+  - **Option 1 (Normal):** Downloads each track individually and uploads it to the channel.
+  - **Option 2 (ZIP):** Resolves and compresses all tracks into a single ZIP archive, then uploads it to the channel.
+- **`adsc`**: Toggles **local download mode** (volatile). When enabled:
+  - Tracks from the `ads` list are stored directly on the VPS filesystem instead of uploaded to TeamTalk.
+  - Option 1 stores files under `data/Downloads/music/` (host: `bots/nomedobot/Downloads/music/`).
+  - Option 2 stores ZIP archives under `data/Downloads/zips/` (host: `bots/nomedobot/Downloads/zips/`).
+  - Files saved locally are never deleted automatically.
+  - Displays a final success/error report upon completion.
 
 ## 🚀 Easy Installation (Recommended)
 
@@ -106,8 +122,15 @@ Send these commands to the bot via private message (PM) or in the channel (if en
 | **f** | `[+/-][num]` | Favorites management. `f` lists. `f +` adds current. `f -` removes. `f [num]` plays. |
 | **gl** | | Gets a direct link to the current track. |
 | **dl** | | Downloads current track and uploads to channel. |
-| **dlv** | | Downloads current track as video and uploads to channel. |
+| **dlv** | | Downloads current track as video and uploads it to channel. |
 | **dlp** | `[url]` | Downloads all tracks from a playlist/album URL, zips them, and uploads to the channel. |
+| **aad** | `[link]` | Adds a single link/URL to your custom download list. |
+| **ad** | `[links]` | Adds multiple space-separated links to the download list. |
+| **ld** | | Lists all links currently in the download list. |
+| **rd** | `[number/link]` | Removes a link from the download list by its index or URL. |
+| **ldd** | `[link]` | Downloads a link directly and uploads to the TeamTalk channel. |
+| **ads** | `[1/2]` | Downloads list: Option 1 (Normal sequentially) or Option 2 (ZIP compressed). |
+| **adsc** | | Toggles local download mode: saves files locally to the VPS instead of uploading. |
 | **r** | `[number]` | Plays from Recents. `r` lists recents. |
 | **jc** | | Makes the bot join your current channel. |
 | **qa** | `[query]` | Adds a track to the queue. |

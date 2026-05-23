@@ -33,6 +33,9 @@ class CommandProcessor:
         self.locked = False
         self.current_command_id = 0
         self.pending_playlist_download = {}
+        self.pending_ads_option = {}
+        self.download_links = {}
+        self.adsc_enabled = False
         # Volatile search results state (reset on restart)
         self.search_results_count: int = 5
         self.pending_search_results: Dict[int, List] = {}
@@ -68,6 +71,14 @@ class CommandProcessor:
             "sr": user_commands.SearchResultsCommand,
             "sl": user_commands.SelectSearchResultCommand,
             "slc": user_commands.SearchResultsCountCommand,
+            # --- Download por link ---
+            "aad": user_commands.AddLinkCommand,
+            "ad": user_commands.AddMultipleLinksCommand,
+            "ads": user_commands.DownloadListCommand,
+            "ld": user_commands.ListLinksCommand,
+            "rd": user_commands.RemoveLinkCommand,
+            "ldd": user_commands.DownloadDirectCommand,
+            "adsc": user_commands.ToggleLocalDownloadCommand,
         }
         self.admin_commands_dict = {
             "cg": admin_commands.ChangeGenderCommand,
@@ -103,6 +114,10 @@ class CommandProcessor:
                 command_name = "dlp"
                 arg = message.text
                 del self.pending_playlist_download[message.user.id]
+            elif message.user.id in self.pending_ads_option:
+                command_name = "ads"
+                arg = message.text
+                del self.pending_ads_option[message.user.id]
             else:
                 command_name, arg = self.parse_command(message.text)
             

@@ -79,28 +79,14 @@ class Uploader:
                     pass
                 try:
                     error = self.ttclient.errors_queue.get_nowait()
-                    if (
-                        error.command_id == command_id
-                        and error.type == ErrorType.MaxDiskusageExceeded
-                    ):
+                    if error.command_id == command_id:
+                        logging.error(f"Uploader: Error uploading file: {error.message} (Type: {error.type})")
                         self.ttclient.send_message(
-                            self.translator.translate("Error: {}").format(
-                                self.translator.translate("Max diskusage exceeded")
-                            ),
+                            self.translator.translate("Error: {}").format(error.message),
                             user,
                         )
                         error_exit = True
-                    elif (
-                        error.command_id == command_id
-                        and error.type == ErrorType.NotAuthorised
-                    ):
-                        self.ttclient.send_message(
-                            self.translator.translate("Error: {}").format(
-                                self.translator.translate("Not authorized to upload files to this channel")
-                            ),
-                            user,
-                        )
-                        error_exit = True
+                        break
                     else:
                         self.ttclient.errors_queue.put(error)
                 except Empty:
@@ -113,11 +99,15 @@ class Uploader:
 
         if error_exit:
             return
-        
+
         if self.config.general.delete_uploaded_files_after > 0:
             timeout = self.config.general.delete_uploaded_files_after
-        else:
-            return
-        
-        time.sleep(timeout)
-        self.ttclient.delete_file(file.channel.id, file.id)
+            def delete_after_timeout():
+                time.sleep(timeout)
+                try:
+                    self.ttclient.delete_file(file.channel.id, file.id)
+                except Exception as e:
+                    logging.error(f"Uploader: Failed to delete file {file.id}: {e}")
+
+            threading.Thread(target=delete_after_timeout, daemon=True).start()
+

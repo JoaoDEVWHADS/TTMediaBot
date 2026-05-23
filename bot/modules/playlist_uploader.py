@@ -130,28 +130,14 @@ class PlaylistUploader:
                     pass
                 try:
                     error = self.ttclient.errors_queue.get_nowait()
-                    if (
-                        error.command_id == command_id
-                        and error.type == ErrorType.MaxDiskusageExceeded
-                    ):
+                    if error.command_id == command_id:
+                        logging.error(f"PlaylistUploader: Error uploading zip: {error.message} (Type: {error.type})")
                         self.ttclient.send_message(
-                            self.translator.translate("Error: {}").format(
-                                self.translator.translate("Max diskusage exceeded")
-                            ),
+                            self.translator.translate("Error: {}").format(error.message),
                             user,
                         )
                         error_exit = True
-                    elif (
-                        error.command_id == command_id
-                        and error.type == ErrorType.NotAuthorised
-                    ):
-                        self.ttclient.send_message(
-                            self.translator.translate("Error: {}").format(
-                                self.translator.translate("Not authorized to upload files to this channel")
-                            ),
-                            user,
-                        )
-                        error_exit = True
+                        break
                     else:
                         self.ttclient.errors_queue.put(error)
                 except Empty:

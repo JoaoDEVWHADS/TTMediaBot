@@ -1,11 +1,14 @@
 from __future__ import annotations
 import logging
+import os
+import tempfile
+import zipfile
 from typing import List, Optional, TYPE_CHECKING
 
 from bot.commands.command import Command
 from bot.player.enums import Mode, State, TrackType
 from bot.TeamTalk.structs import User, UserRight
-from bot import errors, app_vars
+from bot import errors, app_vars, utils
 
 if TYPE_CHECKING:
     from bot.TeamTalk.structs import User
@@ -995,3 +998,397 @@ class SearchResultsCountCommand(Command):
         return self.translator.translate(
             "Search results count set to {count}"
         ).format(count=count)
+
+
+class AddLinkCommand(Command):
+    @property
+    def help(self) -> str:
+        return self.translator.translate(
+            "LINK Adds a link to the download list."
+        )
+
+    def __call__(self, arg: str, user: User) -> Optional[str]:
+        if not arg:
+            raise errors.InvalidArgumentError()
+
+        link = arg.strip()
+        if user.id not in self.command_processor.download_links:
+            self.command_processor.download_links[user.id] = []
+
+        self.command_processor.download_links[user.id].append(link)
+        return self.translator.translate("Added link to the list. Total: {count}").format(
+            count=len(self.command_processor.download_links[user.id])
+        )
+
+
+class AddMultipleLinksCommand(Command):
+    @property
+    def help(self) -> str:
+        return self.translator.translate(
+            "LINK1 LINK2 ... Adds multiple space-separated links to the download list."
+        )
+
+    def __call__(self, arg: str, user: User) -> Optional[str]:
+        if not arg:
+            raise errors.InvalidArgumentError()
+
+        links = [l.strip() for l in arg.split(" ") if l.strip()]
+        if not links:
+            raise errors.InvalidArgumentError()
+
+        if user.id not in self.command_processor.download_links:
+            self.command_processor.download_links[user.id] = []
+
+        self.command_processor.download_links[user.id].extend(links)
+        return self.translator.translate("Added {added_count} links. Total list size: {count}").format(
+            added_count=len(links),
+            count=len(self.command_processor.download_links[user.id])
+        )
+
+
+class ListLinksCommand(Command):
+    @property
+    def help(self) -> str:
+        return self.translator.translate(
+            "Lists all links in the download list."
+        )
+
+    def __call__(self, arg: str, user: User) -> Optional[str]:
+        links = self.command_processor.download_links.get(user.id, [])
+        if not links:
+            return self.translator.translate("The list is empty")
+
+        lines = []
+        for i, link in enumerate(links):
+            lines.append(f"{i + 1}: {link}")
+
+        return "\n".join(lines)
+
+
+class RemoveLinkCommand(Command):
+    @property
+    def help(self) -> str:
+        return self.translator.translate(
+            "NUMBER_OR_LINK Removes a link from the download list by its index or URL."
+        )
+
+    def __call__(self, arg: str, user: User) -> Optional[str]:
+        if not arg:
+            raise errors.InvalidArgumentError()
+
+        links = self.command_processor.download_links.get(user.id, [])
+        if not links:
+            return self.translator.translate("The list is empty")
+
+        removed_link = None
+        # Try to parse index
+        try:
+            index = int(arg.strip())
+            if index < 1 or index > len(links):
+                return self.translator.translate("Out of list")
+            removed_link = links.pop(index - 1)
+        except ValueError:
+            # Match by URL string
+            target = arg.strip()
+            if target in links:
+                links.remove(target)
+                removed_link = target
+            else:
+                return self.translator.translate("Link not found in the list")
+
+        return self.translator.translate("Removed link: {link}").format(link=removed_link)
+
+
+class DownloadDirectCommand(Command):
+    @property
+    def help(self) -> str:
+        return self.translator.translate(
+            "LINK Downloads a link directly and uploads it to the channel."
+        )
+
+    def __call__(self, arg: str, user: User) -> Optional[str]:
+        if not arg:
+            raise errors.InvalidArgumentError()
+
+        self.run_async(self._process, arg, user)
+        return self.translator.translate("Searching and downloading...")
+
+    def _process(self, arg: str, user: User) -> None:
+        try:
+            tracks = self.module_manager.streamer.get(arg, user.is_admin)
+            if not tracks:
+                self.ttclient.send_message(
+                    self.translator.translate("Nothing is found for your query"),
+                    user
+                )
+                return
+
+            for track in tracks:
+                self.module_manager.uploader.run(track, user)
+        except Exception as e:
+            self.ttclient.send_message(
+                self.translator.translate("Error: {}").format(str(e)),
+                user
+            )
+
+
+class DownloadListCommand(Command):
+    @property
+    def help(self) -> str:
+        return self.translator.translate(
+            "Downloads all links in your list and uploads them to the channel. Can download normally or as a ZIP archive."
+        )
+
+    def __call__(self, arg: str, user: User) -> Optional[str]:
+        links = self.command_processor.download_links.get(user.id, [])
+        if not links:
+            return self.translator.translate("The list is empty")
+
+        arg = arg.strip()
+        if not arg:
+            self.command_processor.pending_ads_option[user.id] = True
+            return self.translator.translate(
+                "How do you want to download these links?\n"
+                "1. Download individually (Normal)\n"
+                "2. Compress all into a ZIP file\n"
+                "Respond only with 1 or 2."
+            )
+
+        if arg == "1":
+            links_copy = list(links)
+            self.command_processor.download_links[user.id] = []
+            if self.command_processor.adsc_enabled:
+                self.run_async(self._process_normal_local, links_copy, user)
+                return self.translator.translate("Starting local download of {count} links...").format(count=len(links_copy))
+            else:
+                self.run_async(self._process_normal, links_copy, user)
+                return self.translator.translate("Starting download of {count} links...").format(count=len(links_copy))
+        elif arg == "2":
+            links_copy = list(links)
+            self.command_processor.download_links[user.id] = []
+            if self.command_processor.adsc_enabled:
+                self.run_async(self._process_zip_local, links_copy, user)
+                return self.translator.translate("Resolving and zipping locally {count} links...").format(count=len(links_copy))
+            else:
+                self.run_async(self._process_zip, links_copy, user)
+                return self.translator.translate("Resolving and zipping {count} links...").format(count=len(links_copy))
+        else:
+            return self.translator.translate("Invalid option. Please send 'ads' again to select.")
+
+    def _process_normal(self, links: List[str], user: User) -> None:
+        for i, link in enumerate(links):
+            try:
+                self.ttclient.send_message(
+                    self.translator.translate("Processing link {number}/{total}: {link}").format(
+                        number=i + 1, total=len(links), link=link
+                    ),
+                    user
+                )
+                tracks = self.module_manager.streamer.get(link, user.is_admin)
+                if not tracks:
+                    self.ttclient.send_message(
+                        self.translator.translate("Nothing is found for: {link}").format(link=link),
+                        user
+                    )
+                    continue
+
+                for track in tracks:
+                    self.module_manager.uploader.run(track, user)
+            except Exception as e:
+                self.ttclient.send_message(
+                    self.translator.translate("Error downloading {link}: {error}").format(
+                        link=link, error=str(e)
+                    ),
+                    user
+                )
+
+    def _process_normal_local(self, links: List[str], user: User) -> None:
+        error_count = 0
+        dest_dir = "/home/ttbot/TTMediaBot/data/Downloads/music"
+        try:
+            os.makedirs(dest_dir, exist_ok=True)
+        except Exception as e:
+            logging.error(f"Failed to create directory {dest_dir}: {e}")
+            self.ttclient.send_message(
+                self.translator.translate("Error: {}").format(str(e)),
+                user
+            )
+            return
+
+        for i, link in enumerate(links):
+            try:
+                self.ttclient.send_message(
+                    self.translator.translate("Processing link {number}/{total}: {link}").format(
+                        number=i + 1, total=len(links), link=link
+                    ),
+                    user
+                )
+                tracks = self.module_manager.streamer.get(link, user.is_admin)
+                if not tracks:
+                    self.ttclient.send_message(
+                        self.translator.translate("Nothing is found for: {link}").format(link=link),
+                        user
+                    )
+                    error_count += 1
+                    continue
+
+                for track in tracks:
+                    try:
+                        if track.type == TrackType.Dynamic:
+                            track.url
+                        track.download(dest_dir)
+                    except Exception as download_err:
+                        logging.error(f"Local download failed for track {track.name}: {download_err}")
+                        error_count += 1
+            except Exception as e:
+                logging.error(f"Error processing link {link}: {e}")
+                error_count += 1
+
+        if error_count == 0:
+            self.ttclient.send_message(
+                self.translator.translate("All downloads completed successfully!"),
+                user
+            )
+        else:
+            self.ttclient.send_message(
+                self.translator.translate("Downloads completed with {error_count} error(s).").format(
+                    error_count=error_count
+                ),
+                user
+            )
+
+    def _process_zip(self, links: List[str], user: User) -> None:
+        try:
+            self.ttclient.send_message(
+                self.translator.translate("Resolving links..."),
+                user
+            )
+            tracks = []
+            for link in links:
+                try:
+                    resolved = self.module_manager.streamer.get(link, user.is_admin)
+                    if resolved:
+                        tracks.extend(resolved)
+                except Exception as e:
+                    logging.error(f"ADS ZIP: Failed to resolve {link}: {e}")
+
+            if not tracks:
+                self.ttclient.send_message(
+                    self.translator.translate("Error: No valid tracks found to download."),
+                    user
+                )
+                return
+
+            self.module_manager.playlist_uploader(tracks, user, "Compressed Links")
+        except Exception as e:
+            self.ttclient.send_message(
+                self.translator.translate("Error: {}").format(str(e)),
+                user
+            )
+
+    def _process_zip_local(self, links: List[str], user: User) -> None:
+        error_count = 0
+        try:
+            self.ttclient.send_message(
+                self.translator.translate("Resolving links..."),
+                user
+            )
+            tracks = []
+            for link in links:
+                try:
+                    resolved = self.module_manager.streamer.get(link, user.is_admin)
+                    if resolved:
+                        tracks.extend(resolved)
+                    else:
+                        error_count += 1
+                except Exception as e:
+                    logging.error(f"ADSC ZIP: Failed to resolve {link}: {e}")
+                    error_count += 1
+
+            if not tracks:
+                self.ttclient.send_message(
+                    self.translator.translate("Error: No valid tracks found to download."),
+                    user
+                )
+                return
+
+            temp_dir = tempfile.TemporaryDirectory()
+            downloaded_files = []
+
+            for i, track in enumerate(tracks):
+                try:
+                    if track.type == TrackType.Dynamic:
+                        track.url
+                    file_path = track.download(temp_dir.name)
+                    downloaded_files.append(file_path)
+                except Exception as e:
+                    logging.error(f"ADSC ZIP: Failed to download track {track.name}: {e}")
+                    error_count += 1
+
+            if not downloaded_files:
+                self.ttclient.send_message(
+                    self.translator.translate("Error: Failed to download any tracks from this playlist."),
+                    user
+                )
+                temp_dir.cleanup()
+                return
+
+            dest_dir = "/home/ttbot/TTMediaBot/data/Downloads/zips"
+            os.makedirs(dest_dir, exist_ok=True)
+
+            folder_name = "Compressed_Links"
+            zip_filename = folder_name + ".zip"
+            zip_path = os.path.join(dest_dir, zip_filename)
+
+            counter = 1
+            while os.path.exists(zip_path):
+                zip_filename = f"{folder_name}_{counter}.zip"
+                zip_path = os.path.join(dest_dir, zip_filename)
+                counter += 1
+
+            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                for file in downloaded_files:
+                    arcname = os.path.join(folder_name, os.path.basename(file))
+                    zipf.write(file, arcname)
+
+            temp_dir.cleanup()
+
+        except Exception as e:
+            logging.error(f"ADSC ZIP processing error: {e}", exc_info=True)
+            self.ttclient.send_message(
+                self.translator.translate("Error: {}").format(str(e)),
+                user
+            )
+            return
+
+        if error_count == 0:
+            self.ttclient.send_message(
+                self.translator.translate("All downloads completed successfully!"),
+                user
+            )
+        else:
+            self.ttclient.send_message(
+                self.translator.translate("Downloads completed with {error_count} error(s).").format(
+                    error_count=error_count
+                ),
+                user
+            )
+
+
+class ToggleLocalDownloadCommand(Command):
+    @property
+    def help(self) -> str:
+        return self.translator.translate(
+            "Toggles local download mode for the 'ads' command. When active, files are saved locally to the VPS instead of uploaded to TeamTalk."
+        )
+
+    def __call__(self, arg: str, user: User) -> Optional[str]:
+        self.command_processor.adsc_enabled = not self.command_processor.adsc_enabled
+        if self.command_processor.adsc_enabled:
+            return self.translator.translate("Local download mode (adsc) enabled.")
+        else:
+            return self.translator.translate("Local download mode (adsc) disabled.")
+
+
+
+

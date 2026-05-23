@@ -4,6 +4,48 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ---
 
+## 🆕 v2.2.0 — "Link-Based Downloading" Update *(05/23/2026)*
+
+### 🔗 Link-Based Downloading Commands
+
+- **➕ `aad LINK` Command — Add Link:**
+  Adds a single media link/URL to the user's custom download list.
+
+- **➕ `ad LINK1 LINK2 ...` Command — Add Multiple Links:**
+  Adds multiple space-separated links to the download list at once.
+
+- **📜 `ld` Command — List Links:**
+  Displays a numbered list of all links currently in the user's download list.
+
+- **🗑️ `rd NUMBER_OR_LINK` Command — Remove Link:**
+  Removes a link from the download list by its index or URL string.
+
+- **📥 `ldd LINK` Command — Download Direct:**
+  Directly downloads a link asynchronously and uploads it to the TeamTalk channel.
+
+- **⚡ `ads` Command — Download and Upload List:**
+  Asynchronously downloads the user's link list. Prompts the user to choose between:
+  1. Downloading individually (Normal sequential upload)
+  2. Compressing all resolved tracks into a single ZIP archive and uploading it.
+
+- **💾 `adsc` Command — Toggle Local VPS Download Mode:**
+  Toggles local download mode for the `ads` command (volatile, resets on bot restart).
+  When active, downloads are saved locally to the VPS filesystem under `data/Downloads/music/` (Option 1) or `data/Downloads/zips/` (Option 2) instead of uploaded to TeamTalk, and are excluded from auto-deletion. Outputs a final translated status report.
+
+### 🌍 100% Localization & Translations
+
+- Fully translated and compiled all 27 new strings (commands, prompts, errors, success reports) across all 7 supported languages: Arabic (`ar`), Spanish (`es`), Hungarian (`hu`), Indonesian (`id`), Portuguese-Brazil (`pt_BR`), Russian (`ru`), and Turkish (`tr`).
+
+### 🐛 Core Uploader & Stability Fixes
+
+- **⏱️ Non-blocking Deletion Timer:**
+  Changed the file deletion timer in the uploader to run in a background daemon thread, preventing batch downloads from blocking.
+
+- **🛡️ Server Error Infinite Loop Fix:**
+  Fixed a major bug where unhandled server error codes (e.g. `FileAlreadyExists`) would lock the uploader in an infinite loop. It now breaks and handles errors gracefully.
+
+---
+
 ## 🆕 v2.1.0 — "Smart Search & Docker Polish" Update *(05/21/2026)*
 
 ### 🔍 New Bot Commands — Search Results Mode
