@@ -10,7 +10,7 @@ echo "--- Exiting bot directory to configure environment in parent folder ---"
 cd ..
 
 echo "--- Installing system dependencies (sudo) ---"
-sudo apt-get update -y && sudo apt install -y libmpv-dev pulseaudio p7zip-full python3-venv git python3-pip
+sudo apt-get update -y && sudo apt install -y libmpv-dev pulseaudio p7zip-full python3-venv git python3-pip libportaudio2
 
 # Node.js LTS Installation
 echo "--- Configuring Node.js LTS Repository ---"

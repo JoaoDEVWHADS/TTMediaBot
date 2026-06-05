@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     ffmpeg \
     procps \
+    libportaudio2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js LTS (matching install.sh)
