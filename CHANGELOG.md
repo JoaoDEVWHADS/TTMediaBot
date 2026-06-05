@@ -14,6 +14,9 @@ All notable updates to this fork are documented here, in reverse chronological o
 - **🐳 Docker & Host Dependencies for ARM:**
   Added the `libportaudio2` library dependency to [Dockerfile](file:///home/admin/joao/TTMediaBot/Dockerfile) and [install.sh](file:///home/admin/joao/TTMediaBot/install.sh). This resolves the missing `libportaudio.so.2` runtime link errors when executing the ARM64 compiled TeamTalk SDK inside the Docker container or directly on the host system.
 
+- **⚙️ Conditional Package Installation (Minimal Footprint):**
+  Refactored dependency installation logic. The `libportaudio2` package is now conditionally installed ONLY when an ARM environment (`arm64`/`armhf`/`aarch64`) is detected. This ensures that `x86_64` environments remain minimal and untouched by ARM-specific runtime dependencies.
+
 ---
 
 ## 🆕 v2.3.0 — "Dynamic SSL Trust" Update *(05/30/2026)*
