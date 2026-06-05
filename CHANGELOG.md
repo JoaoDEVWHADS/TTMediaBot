@@ -17,6 +17,9 @@ All notable updates to this fork are documented here, in reverse chronological o
 - **📢 Improved Logging & Diagnostics:**
   Warmed-up connection attempts are now explicitly tracked via logs. If the pre-warming fails all retries, it raises a warning/error in the logs instead of failing silently at debug level.
 
+- **⚙️ Default Service Config Update:**
+  Changed the default search and stream service from YouTube (`yt`) to YouTube Music (`ytm`) in `config.json` and `config_default.json` templates to provide the music-oriented experience by default.
+
 ---
 
 ## 🆕 v2.4.0 — "Universal Docker & Configurable Search" Update *(06/05/2026)*

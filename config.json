@@ -49,7 +49,7 @@
         }
     },
     "services": {
-        "default_service": "yt",
+        "default_service": "ytm",
         "yt": {
             "enabled": true,
             "cookiefile_path": "/home/ttbot/cookies.txt",
