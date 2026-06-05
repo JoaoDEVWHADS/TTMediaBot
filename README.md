@@ -17,12 +17,14 @@ This fork includes several modifications and optimizations:
 
 - **Removed Services:** Yandex Music and VK integration have been removed
 - **TeamTalk SDK Upgrade:** Updated to TeamTalk SDK 5.8.1 for improved performance
+- **ARM64 Architecture Support:** Added native support for ARM64 architecture (such as Raspberry Pi and AWS Graviton servers) with automatic platform detection and library downloads during installation
 - **Docker Containerization:** The bot runs in Docker containers based on Debian 11 and Python 3.10, ensuring compatibility with legacy dependencies while maintaining stability
 - **Proven Stability:** Since I first encountered this bot in 2021, the adaptations made to work around YouTube's restrictions, combined with the optimizations from 2021/2022, have proven to be excellent and reliable
 
 ## 🆕 Latest Updates
 
-All recent features, improvements, updates, and releases are documented in our changelog.
+Our latest updates include:
+- **v2.4.0 (06/05/2026):** Full support for ARM64 architectures (Raspberry Pi/AWS Graviton) with automatic setup and dependency integration.
 
 > 📋 **[See full changelog →](CHANGELOG.md)**
 

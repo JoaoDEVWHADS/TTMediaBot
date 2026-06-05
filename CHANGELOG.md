@@ -4,6 +4,18 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ---
 
+## 🆕 v2.4.0 — "ARM64 Architecture Support" Update *(06/05/2026)*
+
+### 🖥️ Native ARM64 Compatibility
+
+- **🤖 Platform Auto-detection:**
+  Added system architecture auto-detection (`uname -m`) to [install_git_clone.sh](file:///home/admin/joao/TTMediaBot/install_git_clone.sh). The installer now automatically selects and downloads the appropriate TeamTalk library binary (`ttarm.zip` for ARM64 / ARM devices, or the standard `TeamTalk_DLL.zip` for x86_64 systems).
+
+- **🐳 Docker & Host Dependencies for ARM:**
+  Added the `libportaudio2` library dependency to [Dockerfile](file:///home/admin/joao/TTMediaBot/Dockerfile) and [install.sh](file:///home/admin/joao/TTMediaBot/install.sh). This resolves the missing `libportaudio.so.2` runtime link errors when executing the ARM64 compiled TeamTalk SDK inside the Docker container or directly on the host system.
+
+---
+
 ## 🆕 v2.3.0 — "Dynamic SSL Trust" Update *(05/30/2026)*
 
 ### 🔒 Dynamic SSL Trust & Peer Verification Bypass
