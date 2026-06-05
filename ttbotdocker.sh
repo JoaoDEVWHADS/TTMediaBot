@@ -73,50 +73,11 @@ install_dependencies() {
     echo -e "${YELLOW}Checking dependencies...${NC}"
 
     if ! command -v docker &> /dev/null; then
-        echo "Docker not found. Installing via official repository..."
+        echo "Docker not found. Installing via official script..."
+        curl -fsSL https://get.docker.com -o get-docker.sh
+        sh get-docker.sh
+        rm -f get-docker.sh
         
-        # 1. Update apt and install prerequisites
-        export DEBIAN_FRONTEND=noninteractive
-        apt-get update
-        apt-get install -y ca-certificates curl gnupg lsb-release
-
-        # 2. Detect OS and Codename
-        . /etc/os-release
-        OS_ID=$ID
-        CODENAME=$VERSION_CODENAME
-        
-        # Fallback if VERSION_CODENAME is empty (some older/different distros)
-        if [ -z "$CODENAME" ]; then
-            CODENAME=$(lsb_release -cs 2>/dev/null)
-        fi
-
-        case "$OS_ID" in
-            ubuntu|debian)
-                echo -e "Detected OS: ${GREEN}$OS_ID ($CODENAME)${NC}"
-                ;;
-            *)
-                echo -e "${RED}Unsupported OS: $OS_ID. Trying 'debian' as fallback...${NC}"
-                OS_ID="debian"
-                [ -z "$CODENAME" ] && CODENAME="stable"
-                ;;
-        esac
-
-        # 3. Add Docker's official GPG key
-        mkdir -p /etc/apt/keyrings
-        rm -f /etc/apt/keyrings/docker.gpg
-        curl -fsSL "https://download.docker.com/linux/$OS_ID/gpg" | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-        chmod a+r /etc/apt/keyrings/docker.gpg
-
-        # 4. Set up the repository
-        echo \
-          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$OS_ID \
-          $CODENAME stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-        # 5. Install Docker Engine
-        apt-get update
-        apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
-        # 6. Enable service
         systemctl enable --now docker
         
         REAL_USER=${SUDO_USER:-$USER}
@@ -130,8 +91,17 @@ install_dependencies() {
 
     if ! command -v jq &> /dev/null; then
         echo "jq not found. Installing..."
-        apt-get update
-        apt-get install -y jq
+        if command -v apt-get &> /dev/null; then
+            apt-get update && apt-get install -y jq
+        elif command -v dnf &> /dev/null; then
+            dnf install -y jq
+        elif command -v yum &> /dev/null; then
+            yum install -y jq
+        elif command -v pacman &> /dev/null; then
+            pacman -S --noconfirm jq
+        else
+            echo -e "${RED}Please install 'jq' manually.${NC}"
+        fi
     else
         echo -e "${GREEN}jq is already installed.${NC}"
     fi
