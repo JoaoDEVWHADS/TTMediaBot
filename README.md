@@ -20,6 +20,7 @@ This fork includes several modifications and optimizations:
 - **ARM64 Architecture Support:** Added native support for ARM64 architecture (such as Raspberry Pi and AWS Graviton servers) with automatic platform detection and library downloads during installation.
   > [!NOTE]
   > On `x86_64` systems, the installation remains untouched and minimal. On `ARM` systems, the installer and Dockerfile conditionally install additional dependencies (such as `libportaudio2`) required by the ARM version of the TeamTalk SDK to run.
+- **Universal Linux Distribution Support:** The installer (`ttbotdocker.sh` / `install_git_clone.sh`) now dynamically supports automatically setting up Docker and dependencies on any major distribution (Ubuntu, Debian, CentOS, RHEL, Fedora, Rocky Linux, AlmaLinux, Raspbian, Arch, etc.) using the official universal installer and dynamic package manager fallbacks for `jq`.
 - **Docker Containerization:** The bot runs in Docker containers based on Debian 11 and Python 3.10, ensuring compatibility with legacy dependencies while maintaining stability
 - **Proven Stability:** Since I first encountered this bot in 2021, the adaptations made to work around YouTube's restrictions, combined with the optimizations from 2021/2022, have proven to be excellent and reliable
 
