@@ -11,7 +11,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     ffmpeg \
     procps \
-    libportaudio2 \
+    && ARCH=$(dpkg --print-architecture) \
+    && if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "armhf" ]; then \
+        apt-get install -y --no-install-recommends libportaudio2; \
+       fi \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js LTS (matching install.sh)
