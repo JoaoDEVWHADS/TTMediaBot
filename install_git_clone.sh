@@ -128,34 +128,6 @@ echo "✅ TeamTalk_DLL folder is ready!"
     
     ls -la | grep TeamTalk_DLL
     
-    if [ -d "TeamTalk_DLL" ]; then
-        echo "✅ All checks passed!"
-        echo "✅ TeamTalk_DLL folder exists"
-        echo "✅ Ownership and permissions are set"
-        echo "========================================="
-        echo "--- Checking Docker Installation ---"
-        echo "========================================="
-
-        if ! command -v docker &> /dev/null; then
-            echo "Docker not found. Installing automatically..."
-            curl -fsSL https://get.docker.com | sh
-        else
-            echo "Docker is already installed."
-        fi
-
-        echo "--- Ensuring Docker service is running ---"
-        if command -v systemctl &> /dev/null; then
-            systemctl enable docker
-            systemctl start docker
-        fi
-
-        if command -v docker &> /dev/null && ! docker info &> /dev/null; then
-            echo "--- Adding user to docker group ---"
-            usermod -aG docker "$REAL_USER"
-            echo "Please log out and log back in for docker group changes to take effect."
-        fi
-
-        echo "Docker is ready."
         echo "========================================="
         echo "Setup Complete! Starting Docker Manager..."
         echo "========================================="
@@ -168,7 +140,3 @@ echo "✅ TeamTalk_DLL folder is ready!"
             echo "ERROR: ttbotdocker.sh not found!"
             exit 1
         fi
-    else
-        echo "ERROR: Verification failed. Please check manually."
-        exit 1
-    fi
