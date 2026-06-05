@@ -968,14 +968,14 @@ class SelectSearchResultCommand(Command):
 
 
 class SearchResultsCountCommand(Command):
-    """slc NUMBER — configura quantidade de resultados exibidos (volátil, padrão 5)."""
+    """slc NUMBER — configura quantidade de resultados exibidos (volátil, padrão 1)."""
 
     _MIN = 1
 
     @property
     def help(self) -> str:
         return self.translator.translate(
-            "NUMBER Sets how many results are shown when search results mode is active. Without a number shows current count. Resets to 5 on restart"
+            "NUMBER Sets how many results are shown when search results mode is active. Without a number shows current count. Resets to 1 on restart"
         )
 
     def __call__(self, arg: str, user: User) -> Optional[str]:

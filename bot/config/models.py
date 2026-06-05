@@ -61,12 +61,14 @@ class TeamTalkModel(BaseModel):
 class YtModel(BaseModel):
     enabled: bool = True
     cookiefile_path: str = ""
+    search_results: int = 1
 
 
 
 
 class YtmModel(BaseModel):
     enabled: bool = True
+    search_results: int = 1
 
 
 class ServicesModel(BaseModel):

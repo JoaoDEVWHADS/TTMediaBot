@@ -37,7 +37,7 @@ class CommandProcessor:
         self.download_links = {}
         self.adsc_enabled = False
         # Volatile search results state (reset on restart)
-        self.search_results_count: int = 5
+        self.search_results_count: int = 1
         self.pending_search_results: Dict[int, List] = {}
         self.commands_dict = {
             "h": user_commands.HelpCommand,

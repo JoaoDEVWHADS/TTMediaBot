@@ -289,7 +289,9 @@ class YtService(_Service):
                     Track(service=self.name, url=url, name=title, format=format, type=track_type, extra_info=stream)
                 ]
 
-    def search(self, query: str, limit: int = 1) -> List[Track]:
+    def search(self, query: str, limit: Optional[int] = None) -> List[Track]:
+        if limit is None:
+            limit = self.config.search_results
         start_time = time.perf_counter()
         # py-yt-search usage (async method)
         try:

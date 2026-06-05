@@ -437,7 +437,9 @@ class YtmService(_Service):
          except Exception as e:
               logging.error(f"[YTM] Autoplay fetch failed: {e}")
 
-    def search(self, query: str, limit: int = 1) -> List[Track]:
+    def search(self, query: str, limit: Optional[int] = None) -> List[Track]:
+        if limit is None:
+            limit = self.config.search_results
         start_time = time.perf_counter()
         results = self.ytmusic_public.search(query, filter="songs", limit=limit)
         if not results:

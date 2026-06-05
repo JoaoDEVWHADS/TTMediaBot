@@ -52,10 +52,12 @@
         "default_service": "yt",
         "yt": {
             "enabled": true,
-            "cookiefile_path": ""
+            "cookiefile_path": "",
+            "search_results": 1
         },
         "ytm": {
-            "enabled": true
+            "enabled": true,
+            "search_results": 1
         }
     },
     "logger": {

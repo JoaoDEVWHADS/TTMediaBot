@@ -38,7 +38,7 @@ class Service(ABC):
         ...
 
     @abstractmethod
-    def search(self, query: str, limit: int = 1) -> List[Track]:
+    def search(self, query: str, limit: Optional[int] = None) -> List[Track]:
         ...
 
 
