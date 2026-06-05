@@ -72,6 +72,14 @@ echo "--- Checking TeamTalk_DLL ---"
 echo "========================================="
 
 DLL_URL="https://github.com/JoaoDEVWHADS/TTMediaBot/releases/download/downloadttdll/TeamTalk_DLL.zip"
+ARCH=$(uname -m)
+if [[ "$ARCH" == "aarch64" || "$ARCH" =~ ^arm ]]; then
+    echo "ℹ️ ARM architecture detected ($ARCH). Using ARM DLL..."
+    DLL_URL="https://github.com/JoaoDEVWHADS/TTMediaBot/releases/download/downloadttdll/ttarm.zip"
+else
+    echo "ℹ️ x86_64/AMD64 architecture detected ($ARCH). Using x86 DLL..."
+    DLL_URL="https://github.com/JoaoDEVWHADS/TTMediaBot/releases/download/downloadttdll/TeamTalk_DLL.zip"
+fi
 DLL_FILE="TeamTalk_DLL.zip"
 
 if [ -d "TeamTalk_DLL" ] && [ -f "TeamTalk_DLL/libTeamTalk5.so" ]; then
@@ -80,24 +88,24 @@ else
     if [ -f "$DLL_FILE" ]; then
         echo "📦 TeamTalk_DLL.zip already exists. Skipping download."
     else
-        echo "📥 Downloading TeamTalk_DLL.zip..."
+        echo "📥 Downloading TeamTalk_DLL..."
         wget "$DLL_URL" -O "$DLL_FILE"
         if [ $? -ne 0 ]; then
-            echo "❌ Error downloading TeamTalk_DLL.zip."
+            echo "❌ Error downloading TeamTalk_DLL."
             exit 1
         fi
         echo "✅ Download complete!"
     fi
 
-    echo "--- Extracting TeamTalk_DLL.zip ---"
+    echo "--- Extracting TeamTalk_DLL ---"
     unzip -o "$DLL_FILE"
     if [ $? -ne 0 ]; then
-        echo "❌ Error extracting TeamTalk_DLL.zip."
+        echo "❌ Error extracting TeamTalk_DLL."
         exit 1
     fi
     echo "✅ Extraction complete!"
 
-    echo "--- Removing TeamTalk_DLL.zip ---"
+    echo "--- Removing TeamTalk_DLL zip ---"
     rm -f "$DLL_FILE"
     echo "✅ ZIP file removed."
 fi
