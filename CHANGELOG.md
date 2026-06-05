@@ -4,6 +4,21 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ---
 
+## 🆕 v2.4.1 — "YTM Search Performance Fix" Update *(06/05/2026)*
+
+### ⚡ Connection Pre-warming & Startup Polish
+
+- **⏱️ Docker Container Startup Settling:**
+  Added an initial `5 seconds` delay to the background pre-warming threads in both YouTube (`yt.py`) and YouTube Music (`ytm.py`) services. This allows the Docker container network interfaces and internal DNS resolvers to fully initialize before starting requests.
+  
+- **🔄 Robust Pre-warming Retry Mechanism:**
+  Introduced a 3-attempt retry loop (with a 5-second interval) for the initial search request. This prevents the connection pools from failing permanently if the network takes a few extra seconds to boot.
+  
+- **📢 Improved Logging & Diagnostics:**
+  Warmed-up connection attempts are now explicitly tracked via logs. If the pre-warming fails all retries, it raises a warning/error in the logs instead of failing silently at debug level.
+
+---
+
 ## 🆕 v2.4.0 — "Universal Docker & Configurable Search" Update *(06/05/2026)*
 
 ### 🖥️ Native ARM64 Compatibility & Code Cleanup

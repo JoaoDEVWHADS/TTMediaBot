@@ -186,13 +186,21 @@ class YtmService(_Service):
         threading.Thread(target=self._pre_warm, daemon=True).start()
 
     def _pre_warm(self):
-        try:
-            logging.info("YTM Service pre-warming...")
-            # Establish initial connection to YTM
-            self.ytmusic_public.search("music", filter="songs", limit=1)
-            logging.info("YTM Service pre-warming finished.")
-        except Exception as e:
-            logging.debug(f"YTM Pre-warming failed: {e}")
+        # Wait a few seconds for Docker network interface to fully settle
+        time.sleep(5)
+        for attempt in range(1, 4):
+            try:
+                logging.info(f"YTM Service pre-warming (attempt {attempt}/3)...")
+                # Establish initial connection to YTM
+                self.ytmusic_public.search("music", filter="songs", limit=1)
+                logging.info("YTM Service pre-warming finished successfully.")
+                return
+            except Exception as e:
+                if attempt < 3:
+                    logging.warning(f"YTM Pre-warming attempt {attempt} failed: {e}. Retrying in 5 seconds...")
+                    time.sleep(5)
+                else:
+                    logging.error(f"YTM Pre-warming failed after 3 attempts: {e}")
 
     @contextmanager
     def _temp_cookie_file(self) -> Generator[Optional[str], None, None]:
