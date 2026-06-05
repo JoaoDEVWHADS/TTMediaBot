@@ -4,9 +4,9 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ---
 
-## 🆕 v2.4.0 — "ARM64 Architecture Support" Update *(06/05/2026)*
+## 🆕 v2.4.0 — "Universal Docker & Configurable Search" Update *(06/05/2026)*
 
-### 🖥️ Native ARM64 Compatibility
+### 🖥️ Native ARM64 Compatibility & Code Cleanup
 
 - **🤖 Platform Auto-detection:**
   Added system architecture auto-detection (`uname -m`) to [install_git_clone.sh](file:///home/admin/joao/TTMediaBot/install_git_clone.sh). The installer now automatically selects and downloads the appropriate TeamTalk library binary (`ttarm.zip` for ARM64 / ARM devices, or the standard `TeamTalk_DLL.zip` for x86_64 systems).
@@ -16,6 +16,31 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 - **⚙️ Conditional Package Installation (Minimal Footprint):**
   Refactored dependency installation logic. The `libportaudio2` package is now conditionally installed ONLY when an ARM environment (`arm64`/`armhf`/`aarch64`) is detected. This ensures that `x86_64` environments remain minimal and untouched by ARM-specific runtime dependencies.
+
+- **🧹 Code Cleanup:**
+  Removed redundant Docker installation checks from [install_git_clone.sh](file:///home/admin/joao/TTMediaBot/install_git_clone.sh), delegating all environment dependencies verification and setup to [ttbotdocker.sh](file:///home/admin/joao/TTMediaBot/ttbotdocker.sh).
+
+### 🔍 Configurable Search Results Default
+
+- **⚙️ Config-Driven Search Limits:**
+  Added the `search_results: int = 1` option to both YouTube (`yt`) and YouTube Music (`ytm`) configuration models in [models.py](file:///home/admin/joao/TTMediaBot/bot/config/models.py), defaulted in [config.json](file:///home/admin/joao/TTMediaBot/config.json) and [config_default.json](file:///home/admin/joao/TTMediaBot/config_default.json).
+  
+- **🔄 Dynamic Fallback in Services:**
+  Updated the base service search interface in [__init__.py](file:///home/admin/joao/TTMediaBot/bot/services/__init__.py) and implementations in [yt.py](file:///home/admin/joao/TTMediaBot/bot/services/yt.py) and [ytm.py](file:///home/admin/joao/TTMediaBot/bot/services/ytm.py) to use the configuration-defined default search results limit (1) when the dynamic limit parameter is omitted.
+
+- **🔢 Search Results Mode Command Updates:**
+  Changed the default volatile search count for the `sr`/`slc`/`sl` commands from `5` to `1` in [__init__.py](file:///home/admin/joao/TTMediaBot/bot/commands/__init__.py) and [user_commands.py](file:///home/admin/joao/TTMediaBot/bot/commands/user_commands.py).
+
+### 🐳 Universal Docker Setup
+
+- **🚀 Support for Any Linux Distribution:**
+  Upgraded the Docker environment checks in [ttbotdocker.sh](file:///home/admin/joao/TTMediaBot/ttbotdocker.sh) to use the official universal `get.docker.com` script. This enables automatic setup of Docker Engine across all major distributions (Ubuntu, Debian, CentOS, RHEL, Fedora, Rocky, Alma, Raspbian).
+  
+- **🧹 Installer Script Cleanup:**
+  The downloaded `get-docker.sh` installer script is automatically deleted immediately after completion to keep the host directory clean.
+
+- **📦 Multi-Distribution dependency installer:**
+  Added fallback detection for package managers (`apt`, `dnf`, `yum`, `pacman`) to install the `jq` dependency dynamically on any supported Linux distribution.
 
 ---
 
