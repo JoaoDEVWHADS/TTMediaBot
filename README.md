@@ -27,6 +27,7 @@ This fork includes several modifications and optimizations:
 ## 🆕 Latest Updates
 
 Our latest updates include:
+- **v2.4.2 (06/09/2026):** Added portable Backup & Restore system for bots configuration/cache and a logs cleanup option to `ttbotdocker.sh`.
 - **v2.4.0 (06/05/2026):** Full support for ARM64 architectures (Raspberry Pi/AWS Graviton) with automatic setup and dependency integration.
 
 > 📋 **[See full changelog →](CHANGELOG.md)**
@@ -191,7 +192,7 @@ Creates a new bot instance with full configuration wizard:
   - Prevents conflicts on the same TeamTalk server
 
 #### 2. Manage Bots
-Comprehensive bot management submenu with 10 options:
+Comprehensive bot management submenu with 12 options:
 
 **2.1. Start All Bots**
 - Starts all stopped bot containers
@@ -254,7 +255,15 @@ Comprehensive bot management submenu with 10 options:
 > [!WARNING]
 > **Important:** This feature is designed for bots on the **same server**. If you have bots connected to multiple different TeamTalk servers, you'll need to update them manually. Using this feature will configure all bots with the same server settings.
 
-**2.10. Return to Main Menu**
+**2.10. Backup / Restore Bots**
+- Portable backup/restore utility for bots config and cache.
+- Saves compressed backups (`.tar.gz`) to a `backups/` directory.
+- Restoring dynamically redeploys bot configurations and recreates Docker containers.
+
+**2.11. Clear All Bot Logs**
+- Quick-clear utility that deletes all `*.log` files from all bot data folders to free up disk space.
+
+**2.12. Return to Main Menu**
 
 #### 3. Rebuild Image / Update Code
 Updates the bot code and rebuilds the Docker image:

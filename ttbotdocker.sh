@@ -1546,6 +1546,172 @@ clean_docker_unused() {
     read -p "Press Enter to continue..."
 }
 
+# Function: Backup Bots
+backup_bots() {
+    header
+    echo -e "${YELLOW} --- Backup Bots Config & Cache --- ${NC}"
+    
+    if [ ! -d "$BOTS_ROOT" ] || [ -z "$(ls -A "$BOTS_ROOT" 2>/dev/null)" ]; then
+        echo -e "${RED}Error: No bots found to backup.${NC}"
+        read -p "Press Enter to continue..."
+        return
+    fi
+    
+    BACKUP_DIR="${SCRIPT_DIR}/backups"
+    mkdir -p "$BACKUP_DIR"
+    
+    TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+    BACKUP_FILE="${BACKUP_DIR}/backup_bots_${TIMESTAMP}.tar.gz"
+    
+    echo -e "${YELLOW}Backing up 'bots/' folder to:${NC}"
+    echo "  $BACKUP_FILE"
+    echo ""
+    
+    # Compress bots/ directory
+    tar -czf "$BACKUP_FILE" -C "$SCRIPT_DIR" bots
+    
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}Backup completed successfully!${NC}"
+    else
+        echo -e "${RED}Error: Backup failed.${NC}"
+    fi
+    read -p "Press Enter to continue..."
+}
+
+# Function: Restore Bots
+restore_bots() {
+    header
+    echo -e "${YELLOW} --- Restore Bots Config & Cache --- ${NC}"
+    
+    BACKUP_DIR="${SCRIPT_DIR}/backups"
+    if [ ! -d "$BACKUP_DIR" ] || [ -z "$(ls -A "$BACKUP_DIR"/*.tar.gz 2>/dev/null)" ]; then
+        echo -e "${RED}No backup files (.tar.gz) found in 'backups/' directory.${NC}"
+        read -p "Press Enter to continue..."
+        return
+    fi
+    
+    # List available backups
+    echo "Available Backups:"
+    backups=()
+    for f in "$BACKUP_DIR"/*.tar.gz; do
+        if [ -f "$f" ]; then
+            backups+=("$(basename "$f")")
+        fi
+    done
+    
+    for i in "${!backups[@]}"; do
+        echo "$((i+1)). ${backups[$i]}"
+    done
+    echo "0. Return"
+    echo ""
+    
+    read -p "Choose a backup number to restore: " choice
+    if [[ -z "$choice" || "$choice" == "0" ]]; then
+        return
+    fi
+    
+    if [[ ! "$choice" =~ ^[0-9]+$ ]] || [ "$choice" -lt 1 ] || [ "$choice" -gt "${#backups[@]}" ]; then
+        echo -e "${RED}Invalid choice.${NC}"
+        read -p "Press Enter to continue..."
+        return
+    fi
+    
+    selected_backup="${backups[$((choice-1))]}"
+    selected_path="${BACKUP_DIR}/${selected_backup}"
+    
+    echo -e "${RED}WARNING: This will overwrite your current 'bots/' folder and configuration files!${NC}"
+    read -p "Are you sure you want to proceed? (y/N): " confirm
+    if [[ ! "$confirm" =~ ^[yY]$ ]]; then
+        return
+    fi
+    
+    echo ""
+    echo -e "${YELLOW}Stopping all running bots...${NC}"
+    # Stop containers
+    RUNNING_BOTS=$(docker ps -q -f "label=role=ttmediabot")
+    if [ -n "$RUNNING_BOTS" ]; then
+        docker stop -t 1 $RUNNING_BOTS >/dev/null 2>&1
+    fi
+    
+    # Remove containers
+    ALL_BOTS=$(docker ps -a -q -f "label=role=ttmediabot")
+    if [ -n "$ALL_BOTS" ]; then
+        echo -e "${YELLOW}Removing existing bot containers...${NC}"
+        docker rm $ALL_BOTS >/dev/null 2>&1
+    fi
+    
+    echo -e "${YELLOW}Restoring 'bots/' folder...${NC}"
+    # Delete current bots folder
+    rm -rf "$BOTS_ROOT"
+    
+    # Extract
+    tar -xzf "$selected_path" -C "$SCRIPT_DIR"
+    
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}Extraction completed!${NC}"
+        echo -e "${YELLOW}Recreating bot containers from restored configs...${NC}"
+        
+        # We need to recreate containers
+        recreate_bot_containers
+        
+        # Start them
+        echo -e "${YELLOW}Starting restored bots...${NC}"
+        docker start $(docker ps -a -q -f "label=role=ttmediabot") >/dev/null 2>&1
+        
+        echo -e "${GREEN}Restore completed and bots started!${NC}"
+    else
+        echo -e "${RED}Error during extraction!${NC}"
+    fi
+    read -p "Press Enter to continue..."
+}
+
+# Function: Backup/Restore Menu
+backup_restore_menu() {
+    while true; do
+        header
+        echo -e "${YELLOW} --- Backup / Restore Bots --- ${NC}"
+        echo "1. Backup current bots configuration & cache"
+        echo "2. Restore bots from a backup"
+        echo "3. Return to Manage Bots"
+        echo ""
+        read -p "Choose an option: " opt_br
+        
+        case $opt_br in
+            1)
+                backup_bots
+                ;;
+            2)
+                restore_bots
+                ;;
+            3|*)
+                return
+                ;;
+        esac
+    done
+}
+
+# Function: Clear Bot Logs
+clear_bot_logs() {
+    header
+    echo -e "${YELLOW} --- Clear All Bot Logs --- ${NC}"
+    echo "This will delete all *.log files in all bot folders."
+    echo ""
+    read -p "Are you sure you want to clear all log files? (y/N): " confirm
+    if [[ ! "$confirm" =~ ^[yY]$ ]]; then
+        return
+    fi
+    
+    echo ""
+    if [ -d "$BOTS_ROOT" ]; then
+        # Find and delete .log files
+        find "$BOTS_ROOT" -name "*.log" -type f -delete
+        echo -e "${GREEN}All log files deleted!${NC}"
+    else
+        echo -e "${YELLOW}No bots folder found. Nothing to clear.${NC}"
+    fi
+    read -p "Press Enter to continue..."
+}
+
 # Function: Manage Bots
 manage_bots() {
     # Show menu once
@@ -1561,7 +1727,9 @@ manage_bots() {
         echo "7. Update Cookies (All Bots)"
         echo "8. Restart with Timer (Stop -> Wait -> Start)"
         echo "9. Bulk Update Configuration"
-        echo "10. Return to Main Menu"
+        echo "10. Backup / Restore Bots"
+        echo "11. Clear All Bot Logs"
+        echo "12. Return to Main Menu"
         echo ""
         read -p "Choose an option: " opt_manage
         
@@ -1618,6 +1786,14 @@ manage_bots() {
                 header
                 ;;
             10)
+                backup_restore_menu
+                header
+                ;;
+            11)
+                clear_bot_logs
+                header
+                ;;
+            12)
                 return
                 ;;
             *)

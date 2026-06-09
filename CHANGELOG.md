@@ -4,6 +4,21 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ---
 
+## 🆕 v2.4.2 — "Backup, Restore & Logs Cleanup" Update *(06/09/2026)*
+
+### 🐳 Docker Manager (`ttbotdocker.sh`) Extensions
+
+- **📦 Backup & Restore System (Portability):**
+  Added a portable configuration and cache backup/restore system. Backups are saved as compressed `.tar.gz` files containing all bots configurations, cookies, and cache in a dedicated `backups/` directory. Restoring dynamically cleans old environments, extracts configs, and reconstructs Docker containers on any host machine.
+  
+- **🧹 Log Cleanup Option:**
+  Added a quick-clear command that purges all `*.log` files within bot data folders in a single action, reclaiming storage space.
+
+- **⚙️ Menu Rearrangement:**
+  Reordered the "Manage Bots" submenu options: "Backup / Restore Bots" is now option **10**, "Clear All Bot Logs" is option **11**, and the "Return to Main Menu" (previously option 10) has been moved to option **12**.
+
+---
+
 ## 🆕 v2.4.1 — "YTM Search Performance Fix" Update *(06/05/2026)*
 
 ### ⚡ Connection Pre-warming & Startup Polish
