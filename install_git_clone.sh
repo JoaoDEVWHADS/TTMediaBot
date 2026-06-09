@@ -4,11 +4,12 @@
 # Auto Installer & Cloner - TTMediaBot
 # ================================================================= #
 
-# Check if running as root
+# Auto-elevate to root via sudo if needed
 if [ "$EUID" -ne 0 ]; then
-  echo "Please run this script as root (sudo)."
-  exit 1
+    echo "Not running as root. Re-launching with sudo..."
+    exec sudo bash "$0" "$@"
 fi
+
 
 REPO_URL="https://github.com/JoaoDEVWHADS/TTMediaBot.git"
 

@@ -3,6 +3,12 @@
 # masc.sh - TTMediaBot Auto-Update Controller
 # This script manages the masking and activation of the auto-updater service.
 
+# Auto-elevate to root via sudo if needed
+if [ "$EUID" -ne 0 ]; then
+    echo "Not running as root. Re-launching with sudo..."
+    exec sudo bash "$0" "$@"
+fi
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -11,6 +17,7 @@ NC='\033[0m' # No Color
 SERVICE_NAME="ttmediabot-updater.service"
 SERVICE_PATH="/etc/systemd/system/$SERVICE_NAME"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 
 # Template to ensure we can always restore the service
 SERVICE_TEMPLATE="[Unit]

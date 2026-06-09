@@ -17,11 +17,12 @@ fi
 
 BOT_IMAGE="ttmediabot"
 
-# Check if running as root
+# Auto-elevate to root via sudo if needed
 if [ "$EUID" -ne 0 ]; then
-  echo "Please run this script as root (sudo)."
-  exit 1
+    echo "Not running as root. Re-launching with sudo..."
+    exec sudo bash "$0" "$@"
 fi
+
 
 # Colors
 RED='\033[0;31m'
