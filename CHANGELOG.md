@@ -4,6 +4,15 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ---
 
+## 🆕 v2.4.3 — "Node.js v22 Upgrade" *(06/11/2026)*
+
+### 🐳 Docker & Dependencies Update
+
+- **🟢 Node.js Upgrade to v22:**
+  Upgraded the Node.js version installed in the Dockerfile from v20 to v22. This matches the new minimum JavaScript runtime requirements introduced in the latest `yt-dlp` (2026.06.09+), restoring YouTube signature solving (n-challenge) and resolving the "Requested format is not available" errors.
+
+---
+
 ## 🆕 v2.4.2 — "Backup, Restore & Logs Cleanup" Update *(06/09/2026)*
 
 ### 🐳 Docker Manager (`ttbotdocker.sh`) Extensions
