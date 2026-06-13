@@ -27,4 +27,8 @@ class TaskProcessor(Thread):
         while True:
             task = self.task_queue.get()
             if task.command_id == self.command_processor.current_command_id:
-                task.function(*task.args, **task.kwargs)
+                try:
+                    task.function(*task.args, **task.kwargs)
+                except Exception as e:
+                    import logging
+                    logging.error(f"TaskProcessor: Error executing task: {e}", exc_info=True)
