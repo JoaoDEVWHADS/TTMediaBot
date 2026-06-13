@@ -162,6 +162,9 @@ class YtmService(_Service):
         self._loop = asyncio.new_event_loop()
         threading.Thread(target=self._loop.run_forever, daemon=True).start()
 
+        # Connection Keep-Alive to prevent TCP/SSL handshake lag
+        threading.Thread(target=self._connection_keeper, daemon=True).start()
+
         self._ydl_config = {
             "skip_download": True,
             "format": "bestaudio/best",
@@ -476,3 +479,12 @@ class YtmService(_Service):
                   Track(service=self.name, url=t_url, name=full_title, type=TrackType.Dynamic, extra_info=item)
              )
         return tracks
+
+    def _connection_keeper(self):
+        while True:
+            time.sleep(15)
+            try:
+                if self.ytmusic_public and hasattr(self.ytmusic_public, "_session"):
+                     self.ytmusic_public._session.get("https://music.youtube.com/generate_204", timeout=5)
+            except Exception:
+                pass
