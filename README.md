@@ -26,9 +26,7 @@ This fork includes several modifications and optimizations:
 
 ## 🆕 Latest Updates
 
-Our latest updates include:
-- **v2.4.2 (06/09/2026):** Added portable Backup & Restore system for bots configuration/cache and a logs cleanup option to `ttbotdocker.sh`.
-- **v2.4.0 (06/05/2026):** Full support for ARM64 architectures (Raspberry Pi/AWS Graviton) with automatic setup and dependency integration.
+To view the complete history of updates, including all new features, bug fixes, and optimizations, please check the changelog.
 
 > 📋 **[See full changelog →](CHANGELOG.md)**
 
