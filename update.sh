@@ -87,17 +87,6 @@ perform_image_rebuild() {
     STATE_FILE="/tmp/ttmediabot_last_running.txt"
     RUNNING_NAMES=$(docker ps --format "{{.Names}}" -f "label=role=ttmediabot")
     
-    if [ -z "$RUNNING_NAMES" ] && [ -f "$STATE_FILE" ]; then
-        RUNNING_NAMES=$(cat "$STATE_FILE")
-        echo -e "${YELLOW}Recovery: Found interrupted update state. Will attempt to restart: $RUNNING_NAMES${NC}"
-    fi
-
-    if [ ! -z "$RUNNING_NAMES" ]; then
-        echo "$RUNNING_NAMES" > "$STATE_FILE"
-        echo -e "${YELLOW}Stopping bots for update (User Choice: Stop before Build)...${NC}"
-        echo "$RUNNING_NAMES" | xargs docker stop -t 1 > /dev/null 2>&1
-    fi
-
     # Build the image with a commit hash label for version tracking
     CURRENT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
     echo "Building new image with version label: $CURRENT_HASH"
@@ -105,6 +94,17 @@ perform_image_rebuild() {
     
     if [ $? -eq 0 ]; then
          echo -e "${GREEN}Image built successfully!${NC}"
+         
+         if [ -z "$RUNNING_NAMES" ] && [ -f "$STATE_FILE" ]; then
+             RUNNING_NAMES=$(cat "$STATE_FILE")
+             echo -e "${YELLOW}Recovery: Found interrupted update state. Will attempt to restart: $RUNNING_NAMES${NC}"
+         fi
+
+         if [ ! -z "$RUNNING_NAMES" ]; then
+             echo "$RUNNING_NAMES" > "$STATE_FILE"
+             echo -e "${YELLOW}Stopping bots for update...${NC}"
+             echo "$RUNNING_NAMES" | xargs docker stop -t 1 > /dev/null 2>&1
+         fi
          
          # Recreate containers to use new image
          recreate_bot_containers

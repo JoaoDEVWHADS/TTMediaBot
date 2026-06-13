@@ -205,16 +205,16 @@ force_rebuild_image() {
     # Capture NAMES of running bots to restart them later
     RUNNING_NAMES=$(docker ps --format "{{.Names}}" -f "label=role=ttmediabot")
     
-    if [ ! -z "$RUNNING_NAMES" ]; then
-        echo -e "${YELLOW}Stopping bots for update...${NC}"
-        echo "$RUNNING_NAMES" | xargs docker stop -t 1 > /dev/null 2>&1
-    fi
-    
     echo -e "${YELLOW}Building new image (updating code and PIP libraries)...${NC}"
     docker build --build-arg CACHEBUST=$(date +%s) -t ${BOT_IMAGE} .
     
     if [ $? -eq 0 ]; then
          echo -e "${GREEN}Image updated successfully!${NC}"
+         
+         if [ ! -z "$RUNNING_NAMES" ]; then
+             echo -e "${YELLOW}Stopping bots for update...${NC}"
+             echo "$RUNNING_NAMES" | xargs docker stop -t 1 > /dev/null 2>&1
+         fi
          
          # Recreate containers to use new image
          recreate_bot_containers
