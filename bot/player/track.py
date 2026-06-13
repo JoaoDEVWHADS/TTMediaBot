@@ -33,6 +33,7 @@ class Track:
         self.type = type
         self._lock = Lock()
         self._is_fetched = False
+        self._fetch_failed = False
 
     def download(self, directory: str, video: bool = False) -> str:
         service: Service = get_service_by_name(self.service)
@@ -44,7 +45,7 @@ class Track:
         return file_path
 
     def _fetch_stream_data(self):
-        if self.type != TrackType.Dynamic or self._is_fetched:
+        if self.type != TrackType.Dynamic or self._is_fetched or self._fetch_failed:
             return
         self._original_track = copy.deepcopy(self)
         service: Service = get_service_by_name(self.service)
@@ -52,6 +53,7 @@ class Track:
             track = service.get(self._url, extra_info=self.extra_info, process=True)[0]
         except Exception as e:
             logging.error(f"Failed to fetch stream data for '{self._name or self._url}': {e}")
+            self._fetch_failed = True
             raise
         self.url = track.url
         self.name = track.name
