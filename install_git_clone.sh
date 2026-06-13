@@ -13,10 +13,31 @@ fi
 
 REPO_URL="https://github.com/JoaoDEVWHADS/TTMediaBot.git"
 
+# Function to detect package manager and install packages
+install_packages() {
+    local PKGS=("$@")
+    if command -v apt-get &> /dev/null; then
+        apt-get update && apt-get install -y "${PKGS[@]}"
+    elif command -v dnf &> /dev/null; then
+        dnf install -y "${PKGS[@]}"
+    elif command -v yum &> /dev/null; then
+        yum install -y "${PKGS[@]}"
+    elif command -v pacman &> /dev/null; then
+        pacman -S --noconfirm "${PKGS[@]}"
+    elif command -v zypper &> /dev/null; then
+        zypper install -y "${PKGS[@]}"
+    elif command -v apk &> /dev/null; then
+        apk add --no-cache "${PKGS[@]}"
+    else
+        echo "Error: Package manager not found. Please install manually: ${PKGS[*]}"
+        exit 1
+    fi
+}
+
 echo "--- Checking for Git ---"
 if ! command -v git &> /dev/null; then
     echo "Git not found. Installing..."
-    apt-get update && apt-get install -y git
+    install_packages git
 else
     echo "Git is already installed."
 fi
@@ -24,7 +45,7 @@ fi
 echo "--- Checking for unzip (ZIP extractor) ---"
 if ! command -v unzip &> /dev/null; then
     echo "unzip not found. Installing..."
-    apt-get install -y unzip
+    install_packages unzip
 else
     echo "unzip is already installed."
 fi

@@ -9,20 +9,63 @@
 echo "--- Exiting bot directory to configure environment in parent folder ---"
 cd ..
 
-echo "--- Installing system dependencies (sudo) ---"
+echo "--- Detecting package manager and installing dependencies ---"
 ARCH=$(uname -m)
-EXTRA_PACKAGES=""
-if [[ "$ARCH" == "aarch64" || "$ARCH" =~ ^arm ]]; then
-    EXTRA_PACKAGES="libportaudio2"
-fi
-sudo apt-get update -y && sudo apt install -y libmpv-dev pulseaudio p7zip-full python3-venv git python3-pip $EXTRA_PACKAGES
 
-# Node.js LTS Installation
-echo "--- Configuring Node.js LTS Repository ---"
-sudo apt update
-sudo apt install -y ca-certificates curl gnupg
-curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-sudo apt install -y nodejs
+# Package mappings and installation based on package manager
+if command -v apt-get &> /dev/null; then
+    EXTRA_PACKAGES=""
+    if [[ "$ARCH" == "aarch64" || "$ARCH" =~ ^arm ]]; then
+        EXTRA_PACKAGES="libportaudio2"
+    fi
+    sudo apt-get update -y
+    sudo apt-get install -y libmpv-dev pulseaudio p7zip-full python3-venv git python3-pip ca-certificates curl gnupg $EXTRA_PACKAGES
+
+    # Node.js LTS Installation via NodeSource for APT
+    echo "--- Configuring Node.js LTS Repository ---"
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+
+elif command -v dnf &> /dev/null; then
+    EXTRA_PACKAGES=""
+    if [[ "$ARCH" == "aarch64" || "$ARCH" =~ ^arm ]]; then
+        EXTRA_PACKAGES="portaudio"
+    fi
+    sudo dnf install -y mpv-devel pulseaudio p7zip python3 git python3-pip ca-certificates curl gnupg2 nodejs $EXTRA_PACKAGES
+
+elif command -v yum &> /dev/null; then
+    EXTRA_PACKAGES=""
+    if [[ "$ARCH" == "aarch64" || "$ARCH" =~ ^arm ]]; then
+        EXTRA_PACKAGES="portaudio"
+    fi
+    sudo yum install -y epel-release || true
+    sudo yum install -y mpv-devel pulseaudio p7zip python3 git python3-pip ca-certificates curl gnupg2 nodejs $EXTRA_PACKAGES
+
+elif command -v pacman &> /dev/null; then
+    EXTRA_PACKAGES=""
+    if [[ "$ARCH" == "aarch64" || "$ARCH" =~ ^arm ]]; then
+        EXTRA_PACKAGES="portaudio"
+    fi
+    sudo pacman -Sy --noconfirm mpv pulseaudio p7zip python git python-pip ca-certificates curl gnupg nodejs $EXTRA_PACKAGES
+
+elif command -v zypper &> /dev/null; then
+    EXTRA_PACKAGES=""
+    if [[ "$ARCH" == "aarch64" || "$ARCH" =~ ^arm ]]; then
+        EXTRA_PACKAGES="portaudio"
+    fi
+    sudo zypper install -y mpv-devel pulseaudio p7zip python3 git python3-pip ca-certificates curl gpg2 nodejs $EXTRA_PACKAGES
+
+elif command -v apk &> /dev/null; then
+    EXTRA_PACKAGES=""
+    if [[ "$ARCH" == "aarch64" || "$ARCH" =~ ^arm ]]; then
+        EXTRA_PACKAGES="portaudio"
+    fi
+    sudo apk add --no-cache mpv-dev pulseaudio p7zip python3 git py3-pip ca-certificates curl gnupg nodejs $EXTRA_PACKAGES
+
+else
+    echo "Error: Unsupported package manager. Please install dependencies manually."
+    exit 1
+fi
 
 # Python Environment Setup in the parent directory
 echo "--- Creating and activating virtual environment (venv) ---"

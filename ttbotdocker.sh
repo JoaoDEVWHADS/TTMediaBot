@@ -79,7 +79,11 @@ install_dependencies() {
         sh get-docker.sh
         rm -f get-docker.sh
         
-        systemctl enable --now docker
+        if command -v systemctl &> /dev/null; then
+            systemctl enable --now docker
+        else
+            echo -e "${YELLOW}Warning: systemctl not found. Please ensure the Docker daemon is started manually.${NC}"
+        fi
         
         REAL_USER=${SUDO_USER:-$USER}
         if [ "$REAL_USER" != "root" ]; then
@@ -100,6 +104,10 @@ install_dependencies() {
             yum install -y jq
         elif command -v pacman &> /dev/null; then
             pacman -S --noconfirm jq
+        elif command -v zypper &> /dev/null; then
+            zypper install -y jq
+        elif command -v apk &> /dev/null; then
+            apk add --no-cache jq
         else
             echo -e "${RED}Please install 'jq' manually.${NC}"
         fi
@@ -1432,10 +1440,12 @@ uninstall_all() {
     docker system prune -a -f --volumes 2>/dev/null
 
     echo -e "${YELLOW}3. Stopping Docker service...${NC}"
-    systemctl stop docker 2>/dev/null
-    systemctl stop docker.socket 2>/dev/null
-    systemctl disable docker 2>/dev/null
-    systemctl disable docker.socket 2>/dev/null
+    if command -v systemctl &> /dev/null; then
+        systemctl stop docker 2>/dev/null
+        systemctl stop docker.socket 2>/dev/null
+        systemctl disable docker 2>/dev/null
+        systemctl disable docker.socket 2>/dev/null
+    fi
 
     echo -e "${YELLOW}4. Removing bot files (configs/cookies)...${NC}"
     if [ -d "$BOTS_ROOT" ]; then
@@ -1443,10 +1453,14 @@ uninstall_all() {
     fi
 
     echo -e "${YELLOW}5. Disabling and removing auto-updater service...${NC}"
-    systemctl stop ttmediabot-updater.service 2>/dev/null
-    systemctl disable ttmediabot-updater.service 2>/dev/null
-    rm -f /etc/systemd/system/ttmediabot-updater.service
-    systemctl daemon-reload 2>/dev/null
+    if command -v systemctl &> /dev/null; then
+        systemctl stop ttmediabot-updater.service 2>/dev/null
+        systemctl disable ttmediabot-updater.service 2>/dev/null
+        rm -f /etc/systemd/system/ttmediabot-updater.service
+        systemctl daemon-reload 2>/dev/null
+    else
+        rm -f /etc/systemd/system/ttmediabot-updater.service
+    fi
 
     echo -e "${YELLOW}6. Cleaning temp and lock files...${NC}"
     rm -f /tmp/ttmediabot_update.lock
@@ -1456,10 +1470,21 @@ uninstall_all() {
 
     echo ""
     echo -e "${YELLOW}7. Uninstalling Docker Engine and all packages...${NC}"
-    apt-get purge -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose 2>/dev/null
-
-    echo -e "${YELLOW}   Removing extra packages installed by this script...${NC}"
-    apt-get purge -y jq curl gnupg lsb-release git 2>/dev/null
+    if command -v apt-get &> /dev/null; then
+        apt-get purge -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose 2>/dev/null
+        echo -e "${YELLOW}   Removing extra packages installed by this script...${NC}"
+        apt-get purge -y jq curl gnupg lsb-release git 2>/dev/null
+    elif command -v dnf &> /dev/null; then
+        dnf remove -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose jq curl gnupg2 git 2>/dev/null
+    elif command -v yum &> /dev/null; then
+        yum remove -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose jq curl gnupg2 git 2>/dev/null
+    elif command -v pacman &> /dev/null; then
+        pacman -Rns --noconfirm docker docker-compose jq curl gnupg git 2>/dev/null
+    elif command -v zypper &> /dev/null; then
+        zypper remove -y docker docker-compose jq curl gpg2 git 2>/dev/null
+    elif command -v apk &> /dev/null; then
+        apk del docker docker-compose jq curl gnupg git 2>/dev/null
+    fi
 
     echo "   Removing residual Docker files..."
     rm -rf /var/lib/docker
@@ -1476,9 +1501,11 @@ uninstall_all() {
     rm -f  /usr/local/bin/docker-compose
 
     echo -e "${YELLOW}8. Removing Docker APT repository and GPG key...${NC}"
-    rm -f /etc/apt/sources.list.d/docker.list
-    rm -f /etc/apt/keyrings/docker.gpg
-    apt-get update -q 2>/dev/null
+    if command -v apt-get &> /dev/null; then
+        rm -f /etc/apt/sources.list.d/docker.list
+        rm -f /etc/apt/keyrings/docker.gpg
+        apt-get update -q 2>/dev/null
+    fi
 
     echo -e "${YELLOW}9. Removing docker group...${NC}"
     groupdel docker 2>/dev/null || true
@@ -1502,8 +1529,20 @@ uninstall_all() {
 
     echo ""
     echo -e "${YELLOW}12. Cleaning unused packages and cache...${NC}"
-    apt-get autoremove -y >/dev/null
-    apt-get autoclean -y >/dev/null
+    if command -v apt-get &> /dev/null; then
+        apt-get autoremove -y >/dev/null
+        apt-get autoclean -y >/dev/null
+    elif command -v dnf &> /dev/null; then
+        dnf clean all >/dev/null
+    elif command -v yum &> /dev/null; then
+        yum clean all >/dev/null
+    elif command -v pacman &> /dev/null; then
+        pacman -Scc --noconfirm >/dev/null
+    elif command -v zypper &> /dev/null; then
+        zypper clean -a >/dev/null
+    elif command -v apk &> /dev/null; then
+        apk cache clean >/dev/null
+    fi
 
     echo ""
     echo -e "${GREEN}=========================================${NC}"
