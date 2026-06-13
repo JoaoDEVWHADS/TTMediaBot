@@ -304,7 +304,7 @@ class YtService(_Service):
         # py-yt-search usage (async method)
         try:
             search_obj = VideosSearch(query, limit=limit)
-            search = asyncio.run(search_obj.next())
+            search = asyncio.run_coroutine_threadsafe(search_obj.next(), self._loop).result()
             
             # Check structure: it seems to return {'result': [Items...]}
             if search and "result" in search and search["result"]:
