@@ -7,6 +7,7 @@ BOTS_ROOT="${SCRIPT_DIR}/bots"
 
 # Fix git safe directory issue when running as root on a repository owned by another user (common in VPS)
 git config --global --add safe.directory "$SCRIPT_DIR" 2>/dev/null
+git config core.fileMode false 2>/dev/null
 
 # Discover real user and set SSH key command dynamically for root (so we can authenticate with user's key)
 REAL_USER=$(stat -c '%U' "$SCRIPT_DIR" 2>/dev/null || echo "admin")

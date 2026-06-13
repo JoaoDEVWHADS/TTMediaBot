@@ -95,6 +95,7 @@ if [ -d "TTMediaBot" ]; then
 
     # Final permission adjustment
     echo "--- Applying 775 permissions to files ---"
+    git config core.fileMode false 2>/dev/null
     chmod -R 775 .
 
     echo "---------------------------------------------------------------------"

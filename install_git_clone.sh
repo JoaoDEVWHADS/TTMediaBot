@@ -79,6 +79,7 @@ fi
 # Enter directory and set permissions
 # Set permissions and ownership
 echo "--- Setting Permissions and Ownership ---"
+git config core.fileMode false 2>/dev/null
 
 REAL_USER=${SUDO_USER:-$USER}
 
