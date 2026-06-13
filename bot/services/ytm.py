@@ -14,7 +14,8 @@ import httpx
 class HTTP2Session(requests.Session):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.httpx_client = httpx.Client(http2=True, timeout=30.0)
+        limits = httpx.Limits(max_keepalive_connections=5, keepalive_expiry=30.0)
+        self.httpx_client = httpx.Client(http2=True, limits=limits, timeout=30.0)
 
     def request(self, method, url, **kwargs):
         hk = {}
@@ -512,7 +513,7 @@ class YtmService(_Service):
 
     def _connection_keeper(self):
         while True:
-            time.sleep(15)
+            time.sleep(4)
             try:
                 if self.ytmusic_public and hasattr(self.ytmusic_public, "_session"):
                      self.ytmusic_public._session.get("https://music.youtube.com/generate_204", timeout=5)
