@@ -11,6 +11,12 @@ All notable updates to this fork are documented here, in reverse chronological o
 - **🔥 Persistent HTTP/2 Keep-Alive:**
   Configured `httpx.Limits(keepalive_expiry=30.0)` in `ytm.py` and reduced the background connection keeper sleep interval to `4 seconds`. This keeps the YTM session warm in the background and drops search response latency from ~1000ms to ~500ms.
 
+- **⚡ HTTP/2 Support (YTM):**
+  Integrated `httpx[http2]` inside `ytm.py` to enable HTTP/2 multiplexing, header compression, and connection persistence.
+
+- **⏱️ YouTube Traditional (`yt.py`) Keep-Alive:**
+  Added a background connection keeper to the standard YouTube service, dropping search pre-warming and query latencies from ~3.5 seconds to ~800ms.
+
 ### 🐳 Optimized Docker Rebuild Flow (Zero Downtime)
 
 - **🚀 Rebuild Before Stop:**
