@@ -4,6 +4,18 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ---
 
+## 🆕 v2.4.5 — "Multi-Distribution Compatibility" *(06/13/2026)*
+
+### 🖥️ Shell Scripts & Package Manager Abstraction
+
+- **🌐 Dynamic Package Manager Detection:**
+  Added the `install_packages` function in `install_git_clone.sh` and custom package manager mapping in `install.sh` to dynamically handle system packages for Debian/Ubuntu (APT), Fedora/RHEL/CentOS (DNF/YUM), Arch Linux (Pacman), openSUSE (Zypper), and Alpine (APK).
+
+- **🐳 Docker Manager (`ttbotdocker.sh`) Generalization:**
+  Upgraded dependency checks to install `jq` on Zypper and APK systems, wrapped all `systemctl` calls to avoid crashing on systemd-less environments, and replaced hardcoded `apt-get` calls in `uninstall_all` with appropriate commands for the detected package manager.
+
+---
+
 ## 🆕 v2.4.4 — "Stability & Search Optimization" *(06/13/2026)*
 
 ### ⚡ Performance & Connectivity
