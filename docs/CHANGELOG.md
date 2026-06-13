@@ -4,6 +4,20 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ---
 
+## 🆕 v2.4.6 — "Search Performance & Docker Optimization" *(06/13/2026)*
+
+### ⚡ YouTube Music Search Speed Optimization
+
+- **🔥 Persistent HTTP/2 Keep-Alive:**
+  Configured `httpx.Limits(keepalive_expiry=30.0)` in `ytm.py` and reduced the background connection keeper sleep interval to `4 seconds`. This keeps the YTM session warm in the background and drops search response latency from ~1000ms to ~500ms.
+
+### 🐳 Optimized Docker Rebuild Flow (Zero Downtime)
+
+- **🚀 Rebuild Before Stop:**
+  Modified `ttbotdocker.sh` and `update.sh` to run `docker build` first while the bot containers are still online. The containers are stopped and recreated ONLY after the build completes, reducing user downtime from 30+ seconds to just 2-3 seconds.
+
+---
+
 ## 🆕 v2.4.5 — "Multi-Distribution Compatibility" *(06/13/2026)*
 
 ### 🖥️ Shell Scripts & Package Manager Abstraction
