@@ -22,6 +22,11 @@ All notable updates to this fork are documented here, in reverse chronological o
 - **🚀 Rebuild Before Stop:**
   Modified `ttbotdocker.sh` and `update.sh` to run `docker build` first while the bot containers are still online. The containers are stopped and recreated ONLY after the build completes, reducing user downtime from 30+ seconds to just 2-3 seconds.
 
+### 🔧 Permissions & Updater Polish
+
+- **🛡️ Ignore File Permission Drifts in Git:**
+  Added `git config core.fileMode false` dynamically in `update.sh`, `auto_updater.sh`, `install.sh`, and `install_git_clone.sh`. This ensures that recursive permission adjustments (`chmod`) performed by the installer or updater do not cause text or translation files (such as `docs/README.*.md`) to appear as unstaged mode changes (`new mode 100755`) on users' systems.
+
 ---
 
 ## 🆕 v2.4.5 — "Multi-Distribution Compatibility" *(06/13/2026)*
