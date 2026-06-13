@@ -9,18 +9,18 @@ All notable updates to this fork are documented here, in reverse chronological o
 ### ⚡ Performance & Connectivity
 
 - **🎵 YouTube Music Keep-Alive (Lag Reduction):**
-  Added a background connection-warming thread in [ytm.py](file:///home/admin/TTMediaBot/bot/services/ytm.py) that pings YouTube Music (`/generate_204`) every 15 seconds. This keeps the TCP/SSL connection warm, dropping latency by eliminating the TLS/SSL handshake penalty and lowering search times from ~1000ms to ~650ms.
+  Added a background connection-warming thread in `ytm.py` that pings YouTube Music (`/generate_204`) every 15 seconds. This keeps the TCP/SSL connection warm, dropping latency by eliminating the TLS/SSL handshake penalty and lowering search times from ~1000ms to ~650ms.
 
 - **🔍 Thread-Safe YT Search Event Loop:**
-  Refactored [yt.py](file:///home/admin/TTMediaBot/bot/services/yt.py) to run async searches thread-safely on a persistent background event loop (`self._loop`) using `asyncio.run_coroutine_threadsafe(...).result()`. This resolves intermittent "Event loop is closed" errors during search execution.
+  Refactored `yt.py` to run async searches thread-safely on a persistent background event loop (`self._loop`) using `asyncio.run_coroutine_threadsafe(...).result()`. This resolves intermittent "Event loop is closed" errors during search execution.
 
 ### 🐛 Stability & Crash Prevention
 
 - **🛡️ TaskProcessor Resilience:**
-  Wrapped task execution inside [task_processor.py](file:///home/admin/TTMediaBot/bot/commands/task_processor.py) in a `try-except` block. If resolving/playing a track fails, the worker thread no longer crashes, keeping the commands queue and playback system fully operational.
+  Wrapped task execution inside `task_processor.py` in a `try-except` block. If resolving/playing a track fails, the worker thread no longer crashes, keeping the commands queue and playback system fully operational.
 
 - **🚫 Unreleased / Private Video Loop Protection:**
-  Added a `self._fetch_failed` state in [track.py](file:///home/admin/TTMediaBot/bot/player/track.py) to prevent the bot from entering infinite resolution retries when trying to play private, deleted, or unreleased Premiere videos (such as videos that haven't premiered yet).
+  Added a `self._fetch_failed` state in `track.py` to prevent the bot from entering infinite resolution retries when trying to play private, deleted, or unreleased Premiere videos (such as videos that haven't premiered yet).
 
 ---
 
@@ -71,32 +71,32 @@ All notable updates to this fork are documented here, in reverse chronological o
 ### 🖥️ Native ARM64 Compatibility & Code Cleanup
 
 - **🤖 Platform Auto-detection:**
-  Added system architecture auto-detection (`uname -m`) to [install_git_clone.sh](file:///home/admin/joao/TTMediaBot/install_git_clone.sh). The installer now automatically selects and downloads the appropriate TeamTalk library binary (`ttarm.zip` for ARM64 / ARM devices, or the standard `TeamTalk_DLL.zip` for x86_64 systems).
+  Added system architecture auto-detection (`uname -m`) to `install_git_clone.sh`. The installer now automatically selects and downloads the appropriate TeamTalk library binary (`ttarm.zip` for ARM64 / ARM devices, or the standard `TeamTalk_DLL.zip` for x86_64 systems).
 
 - **🐳 Docker & Host Dependencies for ARM:**
-  Added the `libportaudio2` library dependency to [Dockerfile](file:///home/admin/joao/TTMediaBot/Dockerfile) and [install.sh](file:///home/admin/joao/TTMediaBot/install.sh). This resolves the missing `libportaudio.so.2` runtime link errors when executing the ARM64 compiled TeamTalk SDK inside the Docker container or directly on the host system.
+  Added the `libportaudio2` library dependency to `Dockerfile` and `install.sh`. This resolves the missing `libportaudio.so.2` runtime link errors when executing the ARM64 compiled TeamTalk SDK inside the Docker container or directly on the host system.
 
 - **⚙️ Conditional Package Installation (Minimal Footprint):**
   Refactored dependency installation logic. The `libportaudio2` package is now conditionally installed ONLY when an ARM environment (`arm64`/`armhf`/`aarch64`) is detected. This ensures that `x86_64` environments remain minimal and untouched by ARM-specific runtime dependencies.
 
 - **🧹 Code Cleanup:**
-  Removed redundant Docker installation checks from [install_git_clone.sh](file:///home/admin/joao/TTMediaBot/install_git_clone.sh), delegating all environment dependencies verification and setup to [ttbotdocker.sh](file:///home/admin/joao/TTMediaBot/ttbotdocker.sh).
+  Removed redundant Docker installation checks from `install_git_clone.sh`, delegating all environment dependencies verification and setup to `ttbotdocker.sh`.
 
 ### 🔍 Configurable Search Results Default
 
 - **⚙️ Config-Driven Search Limits:**
-  Added the `search_results: int = 1` option to both YouTube (`yt`) and YouTube Music (`ytm`) configuration models in [models.py](file:///home/admin/joao/TTMediaBot/bot/config/models.py), defaulted in [config.json](file:///home/admin/joao/TTMediaBot/config.json) and [config_default.json](file:///home/admin/joao/TTMediaBot/config_default.json).
+  Added the `search_results: int = 1` option to both YouTube (`yt`) and YouTube Music (`ytm`) configuration models in `models.py`, defaulted in `config.json` and `config_default.json`.
   
 - **🔄 Dynamic Fallback in Services:**
-  Updated the base service search interface in [__init__.py](file:///home/admin/joao/TTMediaBot/bot/services/__init__.py) and implementations in [yt.py](file:///home/admin/joao/TTMediaBot/bot/services/yt.py) and [ytm.py](file:///home/admin/joao/TTMediaBot/bot/services/ytm.py) to use the configuration-defined default search results limit (1) when the dynamic limit parameter is omitted.
+  Updated the base service search interface in `__init__.py` and implementations in `yt.py` and `ytm.py` to use the configuration-defined default search results limit (1) when the dynamic limit parameter is omitted.
 
 - **🔢 Search Results Mode Command Updates:**
-  Changed the default volatile search count for the `sr`/`slc`/`sl` commands from `5` to `1` in [__init__.py](file:///home/admin/joao/TTMediaBot/bot/commands/__init__.py) and [user_commands.py](file:///home/admin/joao/TTMediaBot/bot/commands/user_commands.py).
+  Changed the default volatile search count for the `sr`/`slc`/`sl` commands from `5` to `1` in `__init__.py` and `user_commands.py`.
 
 ### 🐳 Universal Docker Setup
 
 - **🚀 Support for Any Linux Distribution:**
-  Upgraded the Docker environment checks in [ttbotdocker.sh](file:///home/admin/joao/TTMediaBot/ttbotdocker.sh) to use the official universal `get.docker.com` script. This enables automatic setup of Docker Engine across all major distributions (Ubuntu, Debian, CentOS, RHEL, Fedora, Rocky, Alma, Raspbian).
+  Upgraded the Docker environment checks in `ttbotdocker.sh` to use the official universal `get.docker.com` script. This enables automatic setup of Docker Engine across all major distributions (Ubuntu, Debian, CentOS, RHEL, Fedora, Rocky, Alma, Raspbian).
   
 - **🧹 Installer Script Cleanup:**
   The downloaded `get-docker.sh` installer script is automatically deleted immediately after completion to keep the host directory clean.
