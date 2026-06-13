@@ -4,7 +4,7 @@ Welcome to the **TTMediaBot** repository! This project is a feature-rich, optimi
 
 ---
 
-### 🌐 Read this in your preferred language / Leia no seu idioma escolhido:
+# 🌐 Read this in your preferred language / Leia no seu idioma escolhido:
 
 Please select your language below to view the documentation:
 

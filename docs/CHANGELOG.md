@@ -22,6 +22,15 @@ All notable updates to this fork are documented here, in reverse chronological o
 - **🚫 Unreleased / Private Video Loop Protection:**
   Added a `self._fetch_failed` state in `track.py` to prevent the bot from entering infinite resolution retries when trying to play private, deleted, or unreleased Premiere videos (such as videos that haven't premiered yet).
 
+### 📋 Documentation & Metadata
+
+- **🌐 Multi-Language Documentation Restructuring:**
+  Moved `CHANGELOG.md` to `docs/CHANGELOG.md` and created 6 naturally translated versions of the README (`docs/README.en.md`, `docs/README.pt.md`, `docs/README.es.md`, `docs/README.es-419.md`, `docs/README.ar.md`, `docs/README.ru.md`).
+  Replaced the root `README.md` with a clean, H1-level language entrypoint gateway to select the preferred documentation translation.
+
+- **🏷️ Repository Metadata Update:**
+  Updated the repository description on GitHub to: *"An enhanced music streaming bot for TeamTalk Servers with native YouTube Music support and Docker orchestration."*
+
 ---
 
 ## 🆕 v2.4.3 — "Node.js v22 Upgrade" *(06/11/2026)*

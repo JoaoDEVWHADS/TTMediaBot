@@ -1,590 +1,599 @@
 # TTMediaBot
 
-**¡Hola! Soy João Almeida.** Bienvenido a mi fork de **TTMediaBot**, un bot completo de transmisión de música y medios para TeamTalk 5. Este repositorio está enfocado en ofrecer mejoras constantes, estabilidad y nuevas características, como el soporte exclusivo para YouTube Music.
+**¡Hola! Soy João Almeida.** Bienvenido a mi bifurcación **TTMediaBot**, un completo robot de transmisión de medios para TeamTalk 5. Este repositorio se centra en ofrecer mejoras constantes, estabilidad y nuevas funciones, como soporte exclusivo para YouTube Music.
 
-> 🔗 **Mi Repositorio:** [https://github.com/JoaoDEVWHADS/TTMediaBot](https://github.com/JoaoDEVWHADS/TTMediaBot)
+> 🔗 **Mi repositorio:** [https://github.com/JoaoDEVWHADS/TTMediaBot](https://github.com/JoaoDEVWHADS/TTMediaBot)
 
 ---
 
-> **Nota:** Este repositorio es un fork del [TTMediaBot original](https://github.com/gumerov-amir/TTMediaBot).
+> **Nota:** Este repositorio es una bifurcación de [TTMediaBot original](https://github.com/gumerov-amir/TTMediaBot).
 
-Un bot de streaming de medios completo para TeamTalk 5, capaz de reproducir música desde varios servicios (YouTube, YouTube Music, archivos locales, URLs) con funciones de control avanzadas.
+Un bot de transmisión de medios rico en funciones para TeamTalk 5, capaz de reproducir música desde varios servicios (YouTube, YouTube Music, archivos locales, URL) con funciones de control avanzadas.
 
 
-## 📋 Diferencias con el Original
+## 📋 Cambios respecto al original
 
-Este fork incluye varias modificaciones y optimizaciones:
+Esta bifurcación incluye varias modificaciones y optimizaciones:
 
-- **Servicios Eliminados:** Se eliminó la integración con Yandex Music y VK.
-- **Actualización del SDK de TeamTalk:** Actualizado a la versión 5.8.1 para un mejor rendimiento.
-- **Soporte para Arquitectura ARM64:** Se añadió soporte nativo para ARM64 (como Raspberry Pi y servidores AWS Graviton) con detección automática de plataforma y descarga de librerías durante la instalación.
+- **Servicios eliminados:** Se eliminó la integración de Yandex Music y VK
+- **Actualización de TeamTalk SDK:** Actualizado a TeamTalk SDK 5.8.1 para mejorar el rendimiento
+- **Soporte de arquitectura ARM64:** Se agregó soporte nativo para la arquitectura ARM64 (como servidores Raspberry Pi y AWS Graviton) con detección automática de plataforma y descargas de biblioteca durante la instalación.
   > [!NOTE]
-  > En sistemas `x86_64`, la instalación se mantiene mínima y sin cambios. En sistemas `ARM`, el instalador y el Dockerfile instalan de manera condicional las dependencias adicionales (como `libportaudio2`) requeridas por la versión ARM del SDK de TeamTalk.
-- **Soporte para Distribuciones Linux Universal:** El instalador (`ttbotdocker.sh` / `install_git_clone.sh`) ahora soporta de forma dinámica la configuración automática de Docker y dependencias en cualquier distribución principal (Ubuntu, Debian, CentOS, RHEL, Fedora, Rocky Linux, AlmaLinux, Raspbian, Arch, etc.) usando el instalador oficial universal y fallbacks de administradores de paquetes para `jq`.
-- **Contenedores Docker:** El bot se ejecuta en contenedores Docker basados en Debian 11 y Python 3.10, asegurando la compatibilidad con dependencias heredadas y manteniendo la estabilidad.
-- **Estabilidad Comprobada:** Desde que conocí este bot en 2021, las adaptaciones realizadas para evadir las restricciones de YouTube, combinadas con las optimizaciones de 2021/2022, han demostrado ser excelentes y confiables.
 
-## 🆕 Últimas Actualizaciones
+> En los sistemas `x86_64`, la instalación permanece intacta y es mínima. En los sistemas `ARM`, el instalador y Dockerfile instalan condicionalmente dependencias adicionales (como `libportaudio2`) requeridas por la versión ARM del SDK de TeamTalk para ejecutarse.
+- **Compatibilidad con distribución universal de Linux:** El instalador (`ttbotdocker.sh` / `install_git_clone.sh`) ahora admite dinámicamente la configuración automática de Docker y las dependencias en cualquier distribución principal (Ubuntu, Debian, CentOS, RHEL, Fedora, Rocky Linux, AlmaLinux, Raspbian, Arch, etc.) utilizando el instalador universal oficial y las alternativas del administrador de paquetes dinámicos para `jq`.
+- **Docker Containerization:** El bot se ejecuta en contenedores Docker basados ​​en Debian 11 y Python 3.10, lo que garantiza la compatibilidad con dependencias heredadas y al mismo tiempo mantiene la estabilidad.
+- **Estabilidad comprobada:** Desde que encontré este bot por primera vez en 2021, las adaptaciones realizadas para evitar las restricciones de YouTube, combinadas con las optimizaciones de 2021/2022, han demostrado ser excelentes y confiables.
 
-Para ver el historial completo de cambios, incluyendo todas las nuevas funciones, correcciones de errores y optimizaciones, por favor consulta el changelog.
+## 🆕 Últimas actualizaciones
 
-> 📋 **[Ver changelog completo →](CHANGELOG.md)**
+Para ver el historial completo de actualizaciones, incluidas todas las funciones nuevas, correcciones de errores y optimizaciones, consulte el registro de cambios.
+
+> 📋 **[Ver registro de cambios completo →](CHANGELOG.md)**
 
 
-## 🎵 Soporte para YouTube Music
+## 🎵 Soporte de música de YouTube
 
-Este fork incluye soporte optimizado para **YouTube Music** junto con el YouTube estándar:
+Esta bifurcación incluye soporte optimizado para **YouTube Music** junto con YouTube normal:
 
-- **Integración con la API de Búsqueda de YouTube:** Utiliza la API de Búsqueda de YouTube para una búsqueda de música rápida y confiable.
-- **Librerías Optimizadas:** 
-  - YouTube utiliza `py-yt-search`: una librería de Python rápida y moderna para búsquedas en YouTube.
-  - YouTube Music utiliza `ytmusicapi`: la librería oficial de la API de YouTube Music.
+
+- **Integración de la API de búsqueda de YouTube:** Utiliza la API de búsqueda de YouTube para un descubrimiento de música rápido y confiable.
+- **Bibliotecas optimizadas:**
+  - YouTube utiliza `py-yt-search`, una biblioteca Python rápida y moderna para búsquedas en YouTube
+  - YouTube Music utiliza `ytmusicapi`, la biblioteca API oficial de YouTube Music
   - Ambos servicios utilizan `yt-dlp` para la extracción de audio.
-- **Enfoque en el Rendimiento:** Diseñado para ejecutarse con los mínimos cuellos de botella, garantizando una reproducción fluida y resultados de búsqueda rápidos.
-- **Sistema Unificado de Cookies:** Tanto YouTube como YouTube Music comparten la misma configuración de cookies para la autenticación.
-- **📦 Descarga de Listas de Reproducción y Álbumes:** Soporte completo para descargar colecciones completas mediante el comando `dlp` con nombres inteligentes basados en metadados.
-- **🕵️ Progresso en Tiempo Real por Mensaje Privado (PV):** Mantente al tanto de tus descargas sin saturar el chat del canal.
+- **Enfoque en el rendimiento:** Diseñado para ejecutarse con cuellos de botella mínimos, lo que garantiza una reproducción fluida y resultados de búsqueda rápidos.
+- **Sistema de cookies unificado:** Tanto YouTube como YouTube Music utilizan la misma configuración de cookies para la autenticación.
+- **📦 Descargas de listas de reproducción y álbumes:** Soporte completo para descargar colecciones enteras mediante el comando `dlp` con nombres que tienen en cuenta los metadatos
+- **🕵️ Progreso de PM en tiempo real:** Manténgase actualizado sobre sus descargas sin saturar el canal
 
-Cambia entre servicios usando el comando `sv`:
+Cambie entre servicios usando el comando `sv`:
 - `sv yt` - Cambiar a YouTube
 - `sv ytm` - Cambiar a YouTube Music
 
 > [!NOTE]
-> **Función Exclusiva:** El soporte para YouTube Music es exclusivo de este fork y no está disponible en el proyecto TTMediaBot original.
+
+> **Función exclusiva:** La compatibilidad con YouTube Music es exclusiva de esta bifurcación y no está disponible en el proyecto TTMediaBot original.
 
 ## 🔗 Descarga basada en enlaces y almacenamiento local
 
-Este fork incluye un sistema avanzado de descarga basado en enlaces que permite a los usuarios encolar enlaces de medios, listarlos, gestionarlos y descargarlos de forma secuencial o en archivos comprimidos.
+Esta bifurcación incluye un sistema avanzado de descarga basado en enlaces que permite a los usuarios poner en cola enlaces de medios, enumerarlos, administrarlos y descargarlos secuencialmente o en archivos comprimidos.
 
 ### Comandos
-- **`aad [enlace]`**: Añade un único enlace a tu lista de descargas.
-- **`ad [enlace1] [enlace2] ...`**: Añade múltiples enlaces separados por espacio a tu lista.
-- **`ld`**: Lista todos los enlaces actualmente en tu lista.
-- **`rd [número/enlace]`**: Elimina un enlace de tu lista por índice o URL.
+- **`aad [enlace]`**: Agrega un único enlace a su lista.
+- **`ad [enlace1] [enlace2] ...`**: Agrega múltiples enlaces separados por espacios a su lista.
+- **`ld`**: enumera todos los enlaces actualmente en su lista.
+- **`tercer [número/enlace]`**: Elimina un enlace de su lista por índice o URL.
 - **`ldd [enlace]`**: Descarga un enlace directamente y lo sube al canal.
-- **`ads`**: Descarga tu lista. Te permite seleccionar:
+- **`ads`**: Descarga tu lista. Le solicita que seleccione:
   - **Opción 1 (Normal):** Descarga cada pista individualmente y la sube al canal.
-  - **Opción 2 (ZIP):** Resuelve y comprime todas las pistas en un único archivo ZIP, y luego lo sube al canal.
-- **`adsc`**: Alterna el **modo de descarga local** (volátil). Cuando está activo:
-  - Las pistas de la lista `ads` se guardan directamente en el sistema de archivos del VPS en lugar de subirse a TeamTalk.
-  - La Opción 1 guarda los archivos en `data/Downloads/music/` (host: `bots/nombre_bot/Downloads/music/`).
-  - La Opción 2 guarda los archivos ZIP en `data/Downloads/zips/` (host: `bots/nombre_bot/Downloads/zips/`).
-  - Los archivos guardados localmente nunca se eliminan de forma automática.
-  - Muestra un reporte final de éxito/error al finalizar.
+  - **Opción 2 (ZIP):** Resuelve y comprime todas las pistas en un único archivo ZIP y luego lo sube al canal.
+- **`adsc`**: alterna el **modo de descarga local** (volátil). Cuando está habilitado:
+  - Las pistas de la lista de "anuncios" se almacenan directamente en el sistema de archivos VPS en lugar de cargarse en TeamTalk.
+  - La opción 1 almacena archivos en `data/Downloads/music/` (host: `bots/nomedobot/Downloads/music/`).
+  - La opción 2 almacena archivos ZIP en `data/Downloads/zips/` (host: `bots/nomedobot/Downloads/zips/`).
+  - Los archivos guardados localmente nunca se eliminan automáticamente.
+  - Muestra un informe final de éxito/error al finalizar.
 
-## 🚀 Instalación Fácil (Recomendado)
+## 🚀 Fácil instalación (recomendado)
 
-Este script instalará automáticamente Git (si es necesario), clonará el repositorio y configurará el entorno Docker.
+Este script instalará Git automáticamente (si es necesario), clonará el repositorio y configurará el entorno Docker.
 
-1.  **Descarga y ejecuta el instalador:**
+1. **Descargue y ejecute el instalador:**
     ```bash
     wget https://raw.githubusercontent.com/JoaoDEVWHADS/TTMediaBot/master/install_git_clone.sh
     sudo chmod +x install_git_clone.sh
     sudo ./install_git_clone.sh
     ```
 
-2.  **Monitorea la terminal:**
-    *   El script instalará automáticamente todas las dependências (incluido Docker si es necesario).
-    *   Presta atención a la salida de la terminal para seguir el progreso de la instalación.
-    *   Puedes administrar múltiples bots, actualizar el código y cambiar configuraciones a través del administrador de Docker.
+2. **Monitorear la terminal:**
+    *   El script instalará automáticamente todas las dependencias (incluido Docker si es necesario).
+    *   Esté atento a la salida del terminal para seguir el progreso de la instalación.
+    *   Puede administrar varios bots, actualizar código y cambiar configuraciones a través del administrador de Docker.
 
 ---
 
-## ⚙️ Configuración Manual
+## ⚙️ Configuración manual
 
-Si necesitas editar manualmente las configuraciones del bot después de la instalación:
+Si necesita editar manualmente las configuraciones del bot después de la instalación:
 
-1. Los **archivos de configuración** se encuentran en el directorio `bots` dentro de la carpeta `TTMediaBot` después de la configuración inicial.
-2. **Realiza tus cambios** en los archivos de configuración según sea necesario.
-3. **Reinicia el bot** usando uno de estos métodos:
-   - **Vía script de Docker:** Ejecuta `./ttbotdocker.sh`, selecciona la opción `2` (Manage Bots) y luego elige la opción de reiniciar (usualmente la opción `2`).
-   - **Vía comando de bot:** Envía `rs` como mensaje privado al bot (requiere privilegios de administrador).
+1. **Los archivos de configuración** se encuentran en el directorio `bots` dentro de la carpeta `TTMediaBot` después de la configuración inicial.
+2. **Haga sus cambios** en los archivos de configuración según sea necesario
+3. **Reinicie el bot** usando uno de estos métodos:
+   - **A través del script Docker:** Ejecute `./ttbotdocker.sh`, seleccione la opción `2` (Administrar Bots), luego elija la opción de reinicio (generalmente la opción `2`)
+   - **A través del comando del bot:** Enviar `rs` como mensaje privado al bot (requiere privilegios de administrador)
 
 ---
 
 ## 🎮 Comandos
 
-Envía estos comandos al bot mediante mensaje privado (PV) o en el canal (si está habilitado).
+Envía estos comandos al bot mediante mensaje privado (PM) o en el canal (si está habilitado).
 
-### Comandos de Usuario
-| Comando | Argumentos | Descripción |
+### Comandos de usuario
+| Dominio | Argumentos | Descripción |
 | :--- | :--- | :--- |
-| **h** | | Muestra la ayuda de los comandos. |
-| **p** | `[búsqueda]` | Reproduce pistas encontradas para la búsqueda. Si no hay argumento, pausa/reanuda. |
-| **u** | `[url]` | Reproduce una transmisión/archivo desde una URL directa. |
-| **s** | | Detiene la reproducción. |
-| **n** | | Reproduce la siguiente pista. |
-| **b** | | Reproduce la pista anterior. |
-| **v** | `[0-100]` | Ajusta el volumen. Sin argumento muestra el nivel de volumen actual. |
-| **sb** | `[segundos]` | Retrocede en la reproducción. Paso por defecto si no hay argumento. |
-| **sf** | `[segundos]` | Avanza en la reproducción. Paso por defecto si no hay argumento. |
-| **c** | `[número]` | Selecciona una pista por número desde los resultados de búsqueda. |
-| **m** | `[modo]` | Define el modo de reproducción: `SingleTrack`, `RepeatTrack`, `TrackList`, `RepeatTrackList`, `Random`. |
-| **sp** | `[0.25-4]` | Define la velocidad de reproducción. |
-| **sv** | `[servicio]` | Cambia de servicio (ej: `sv yt`, `sv ytm`). |
-| **f** | `[+/-][num]` | Gestión de Favoritos. `f` lista. `f +` añade la actual. `f -` elimina. `f [num]` reproduce. |
-| **gl** | | Obtiene el enlace directo a la pista actual. |
-| **dl** | | Descarga la pista actual y la sube al canal. |
-| **dlv** | | Descarga la pista actual como video y la sube al canal. |
-| **dlp** | `[url]` | Descarga todas las pistas de una lista de reproducción/álbum de YouTube, las comprime en ZIP y las sube al canal. |
-| **aad** | `[enlace]` | Añade un único enlace/URL a tu lista de descargas personalizada. |
-| **ad** | `[enlaces]` | Añade múltiples enlaces separados por espacio a la lista de descargas. |
-| **ld** | | Lista todos los enlaces actualmente en la lista de descargas. |
-| **rd** | `[número/enlace]` | Elimina un enlace de la lista de descargas por índice o URL. |
-| **ldd** | `[enlace]` | Descarga un enlace directamente y lo sube al canal de TeamTalk. |
-| **ads** | `[1/2]` | Descarga la lista: Opción 1 (Normal secuencial) o Opción 2 (ZIP comprimido). |
-| **adsc** | | Alterna el modo de descarga local: guarda los archivos localmente en el VPS en vez de subirlos. |
-| **r** | `[número]` | Reproduce desde Recientes. `r` lista los recientes. |
-| **jc** | | Hace que el bot se una a tu canal actual. |
-| **qa** | `[búsqueda]` | Añade una pista a la cola de reproducción. |
-| **ql** | | Lista todas las pistas actualmente en la cola. |
+| **h** || Muestra ayuda de comando. |
+| **pag** | `[consulta]` | Reproduce pistas encontradas para consulta. Si no hay ninguna consulta, se detiene/reanuda. |
+| **tú** | `[URL]` | Reproduce una secuencia/archivo desde una URL directa. |
+| **s** || Detiene la reproducción. |
+| **norte** || Reproduce la siguiente pista. |
+| **b** || Reproduce la pista anterior. |
+| **v** | `[0-100]` | Establece el volumen. Ningún argumento muestra el volumen actual. |
+| **algo** | `[segundos]` | Busca hacia atrás. Paso predeterminado si no hay argumento. |
+| **sf** | `[segundos]` | Busca adelante. Paso predeterminado si no hay argumento. |
+| **do** | `[número]` | Selecciona una pista por número de los resultados de búsqueda. |
+| **metro** | `[modo]` | Establece el modo de reproducción: `SingleTrack`, `RepeatTrack`, `TrackList`, `RepeatTrackList`, `Random`. |
+| **sp** | `[0,25-4]` | Establece la velocidad de reproducción. |
+| **sv** | `[servicio]` | Cambia el servicio (por ejemplo, `sv yt`, `sv ytm`). |
+| **F** | `[+/-][núm]` | Gestión de favoritos. Listas `f`. `f +` agrega corriente. `f -` elimina. Se reproduce `f [núm]`. |
+| **gl** || Obtiene un enlace directo a la pista actual. |
+| **dl** || Descarga la pista actual y la sube al canal. |
+| **dlv** || Descarga la pista actual como video y la sube al canal. |
+| **dlp** | `[URL]` | Descarga todas las pistas de una lista de reproducción/URL de álbum, las comprime y las sube al canal. |
+| **ad** | `[enlace]` | Agrega un único enlace/URL a su lista de descargas personalizada. |
+| **anuncio** | `[enlaces]` | Agrega múltiples enlaces separados por espacios a la lista de descargas. |
+| **viejo** || Enumera todos los enlaces actualmente en la lista de descargas. |
+| **tercer** | `[número/enlace]` | Elimina un enlace de la lista de descargas por su índice o URL. |
+| **ldd** | `[enlace]` | Descarga un enlace directamente y lo sube al canal TeamTalk. |
+| **anuncios** | `[1/2]` | Lista de descargas: Opción 1 (Normal secuencialmente) u Opción 2 (comprimido ZIP). |
+| **adsc** || Alterna el modo de descarga local: guarda archivos localmente en el VPS en lugar de cargarlos. |
+| **r** | `[número]` | Reproducciones de recientes. `r` enumera los recientes. |
+| **jc** || Hace que el bot se una a tu canal actual. |
+| **qa** | `[consulta]` | Agrega una pista a la cola. |
+| **ql** || Enumera todas las pistas actualmente en la cola. |
 | **qr** | `[número]` | Elimina una pista específica de la cola. |
-| **qc** | | Limpia toda la cola de reproducción. |
-| **qs** | | Salta la pista actual y reproduce la siguiente de la cola de inmediato. |
-| **sr** | `[on/off]` | Alterna el Modo de Resultados de Búsqueda. Cuando está activo, `p BÚSQUEDA` muestra una lista numerada en lugar de reproducir inmediatamente. Guarda con `sc`. |
-| **sl** | `[número]` | Selecciona y reproduce el resultado NÚMERO de la última búsqueda con el modo `sr` activo. |
-| **slc** | `[número]` | Establece cuántos resultados se muestran en el modo `sr` (por defecto 5). Sin argumento muestra el conteo actual. |
-| **a** | | Muestra información sobre el bot. |
+| **control de calidad** || Borra toda la cola. |
+| **preguntas** || Salta la pista actual y reproduce la siguiente de la cola. |
+| **sr** | `[activar/desactivar]` | Alterna el modo de resultados de búsqueda. Cuando está activo, `p QUERY` muestra una lista numerada en lugar de reproducirse inmediatamente. Guardar con `sc`. |
+| **sl** | `[número]` | Selecciona y reproduce el resultado NÚMERO de la última lista de búsqueda `sr`. |
+| **slc** | `[número]` | Establece cuántos resultados se muestran en el modo `sr` (predeterminado 5). Ningún argumento muestra el recuento actual. |
+| **a** || Muestra sobre información. |
 
-### Comandos de Administrador
+### Comandos de administrador
 *Requiere privilegios de administrador definidos en `config.json`.*
 
-| Comando | Argumentos | Descripción |
+| Dominio | Argumentos | Descripción |
 | :--- | :--- | :--- |
-| **cg** | `[n/m/f]` | Cambia el género del bot (neutro, masculino, femenino). |
-| **cl** | `[código]` | Cambia el idioma (ej: `en`, `ru`, `pt_BR`). |
+| **cg** | `[n/m/f]` | Cambia el género del bot. |
+| **cl** | `[código]` | Cambia el idioma (por ejemplo, `en`, `ru`, `pt_BR`). |
 | **cn** | `[nombre]` | Cambia el apodo del bot. |
-| **cs** | `[texto]` | Cambia el texto de estado del bot. |
-| **cc** | `[r/f]` | Limpia el caché (`r`=recientes, `f`=favoritos). |
-| **cm** | | Alterna el envío de mensajes al canal. |
-| **ajc** | `[id] [contraseña]`| Fuerza la entrada a un canal por ID. |
-| **bc** | `[+/-cmd]` | Bloquea/Desbloquea un comando. |
-| **l** | | Bloquea/Desbloquea el bot (solo admins pueden usarlo). |
-| **ua** | `[+/-user]` | Añade/Elimina usuarios administradores. |
-| **ub** | `[+/-user]` | Añade/Elimina usuarios baneados. |
-| **eh** | | Alterna el procesamiento de eventos internos. |
-| **sc** | | Guarda la configuración actual en el archivo. |
-| **va** | | Alterna la transmisión de voz. |
-| **rs** | | Reinicia el bot. |
-| **q** | | Apaga/Cierra el bot. |
-| **gcid** | | Obtiene el ID del canal actual. |
+| **cs** | `[texto]` | Cambia el texto del estado del bot. |
+| **cc** | `[r/f]` | Borra el caché (`r`=recientes, `f`=favoritos). |
+| **centímetro** || Alterna el envío de mensajes del canal. |
+| **ajc** | `[id] [contraseña]` | Forzar la entrada al canal por ID. |
+| **antes de Cristo** | `[+/-cmd]` | Bloquea/Desbloquea un comando. |
+| **l** || Bloquea/desbloquea el bot (solo los administradores pueden usarlo). |
+| **ua** | `[+/-usuario]` | Agrega o elimina usuarios administradores. |
+| **ub** | `[+/-usuario]` | Agrega/elimina usuarios prohibidos. |
+| **eh** || Alterna el manejo de eventos internos. |
+| **Carolina del Sur** || Guarda la configuración actual en un archivo. |
+| **Virginia** || Alterna la transmisión de voz. |
+| **rs** || Reinicia el bot. |
+| **q** || Sale del robot. |
+| **gcid** || Obtiene el ID del canal actual. |
 
 ---
 
-## 🐳 Script de Gestión de Docker (`ttbotdocker.sh`)
+## 🐳 Script de administración de Docker (`ttbotdocker.sh`)
 
-El script `ttbotdocker.sh` es una herramienta integral de administración para el TTMediaBot. Proporciona una interfaz basada en menús para manejar todos los aspectos de despliegue y control de bots.
+El script `ttbotdocker.sh` es una herramienta de gestión integral para TTMediaBot. Proporciona una interfaz basada en menús para manejar todos los aspectos de la implementación y administración de bots.
 
-### Opciones del Menú Principal
+### Opciones del menú principal
 
-#### 1. Crear Bot
+#### 1. Crear robot
 Crea una nueva instancia de bot con un asistente de configuración completo:
-- **Nombre del bot:** Nombre del contenedor y de la carpeta.
-- **Configuración del servidor:** Dirección del servidor, puertos TCP/UDP, cifrado.
-- **Credenciales:** Usuario y contraseña.
-- **Cookies:** Ruta hacia el archivo de cookies de YouTube.
-- **Creación en lote:** Crea múltiples bots de una vez con numeración automática:
-  - Detecta automáticamente números de bots existentes y continúa la secuencia.
-  - Nombres separados para contenedores y apodos.
-  - Evita conflictos en el mismo servidor TeamTalk.
+- **Nombre del bot:** Nombre del contenedor y de la carpeta
+- **Configuración del servidor:** Nombre de host, puertos TCP/UDP, cifrado
+- **Credenciales:** Nombre de usuario y contraseña
+- **Cookies:** Ruta al archivo de cookies de YouTube
+- **Creación por lotes:** Crea varios bots a la vez con numeración automática
+  - Detecta automáticamente los números de bot existentes y continúa la secuencia
+  - Nomenclatura separada para contenedores y apodos
+  - Previene conflictos en el mismo servidor TeamTalk
 
-#### 2. Gestionar Bots
-Submenú completo de administración de bots con 12 opciones:
+#### 2. Administrar robots
+Submenú de gestión integral de bots con 12 opciones:
 
-**2.1. Iniciar Todos los Bots**
-- Inicia todos los contenedores de bots detenidos.
-- Usa filtrado por etiquetas de Docker (`role=ttmediabot`).
+**2.1. Iniciar todos los bots**
+- Inicia todos los contenedores de bots detenidos
+- Utiliza el filtrado de etiquetas de Docker (`role=ttmediabot`)
 
-**2.2. Reiniciar Todos os Bots**
-- Detiene todos los bots (tiempo límite de 1 segundo).
-- Los inicia nuevamente de inmediato.
-- Útil para aplicar cambios de configuración.
+**2.2. Reiniciar todos los bots**
+- Detiene todos los bots (tiempo de espera de 1 segundo)
+- Inmediatamente los inicia nuevamente
+- Útil para aplicar cambios de configuración
 
-**2.3. Detener Todos los Bots**
-- Detiene de forma limpia todos los bots en ejecución (tiempo límite de 1 segundo).
+**2.3. Detener todos los robots**
+- Detiene con gracia todos los bots en ejecución
+- Tiempo de espera de 1 segundo para un apagado limpio
 
-**2.4. Eliminar Bot**
-- Menú interactivo para seleccionar y eliminar un único bot.
-- Mostra una lista numerada de todos los bots.
+**2.4. Eliminar bot**
+- Menú interactivo para seleccionar y eliminar un solo bot
+- Muestra una lista numerada de todos los bots.
 - Elimina tanto el contenedor como la carpeta de configuración.
-- Requiere confirmación antes de la eliminación.
+- Requiere confirmación antes de la eliminación
 
-**2.5. Eliminación en Lote de Bots**
-- Elimina múltiples bots en una sola operación.
-- Introduce números separados por espacio (ej: `1 3 5`).
-- Usa la opción `0` para **eliminar TODOS los bots** simultáneamente.
-- Muestra un resumen antes del borrado para una eliminación eficiente y paralela.
+**2.5. Eliminación masiva de bots**
+- Eliminar varios bots en una sola operación
+- Ingrese números separados por espacios (por ejemplo, `1 3 5`)
+- Utilice la opción `0` para **eliminar TODOS los bots** simultáneamente
+- Muestra un resumen antes de la eliminación
+- Eliminación eficiente de contenedores en paralelo
 
-**2.6. Duplicar Bot**
-- Clona la configuración de un bot existente.
-- Selecciona el bot de origen desde la lista numerada.
+**2.6. Bot duplicado**
+- Clonar la configuración de un bot existente
+- Seleccione el bot de origen de la lista numerada
 - Muestra la dirección del servidor para cada bot.
-- Soporte para duplicación en lote (crear múltiples copias).
-- Numeración automática de contenedores y solicita el **PREFIJO DEL APODO**.
-- Detención inteligente de conflictos: evita la clonación si el nombre base ya existe.
+- Soporte de duplicación por lotes (cree múltiples copias)
+- Numeración automática para contenedores y solicita explícitamente **NICKNAME BASE**
+- Detección inteligente de conflictos: evita la clonación si el nombre base elegido ya existe
 
-**2.7. Actualizar Cookies (Todos los Bots)**
-- Actualiza las cookies de YouTube para todos los bots de una vez.
-- Copia el nuevo archivo de cookies a todas las carpetas de bots.
-- Reinicia automáticamente todos los bots para aplicar los cambios.
-- Define los permisos correctos del archivo (1000:1000).
+**2.7. Actualizar cookies (todos los bots)**
+- Actualiza las cookies de YouTube para todos los bots a la vez
+- Copia el nuevo archivo de cookies a todos los directorios del bot.
+- Reinicia automáticamente todos los bots para aplicar cambios.
+- Establece permisos de archivos correctos (1000:1000)
 
-**2.8. Reiniciar con Temporizador**
-- Detiene todos los bots, espera el tiempo especificado y luego los inicia.
-- Útil para mantenimiento coordinado del servidor.
-- Cronómetro visual de cuenta regresiva.
-- Tiempo especificado en segundos.
+**2.8. Reiniciar con temporizador**
+- Detiene todos los bots, espera el tiempo especificado y luego los inicia
+- Útil para el mantenimiento coordinado del servidor
+- Temporizador visual de cuenta regresiva
+- Tiempo especificado en segundos
 
-**2.9. Actualización de Configuración en Lote**
-- Actualiza la configuración para todos los bots simultáneamente.
-- Elige qué actualizar:
-  1. Servidor (hostname)
-  2. Puertos (TCP/UDP)
-  3. Cifrado
-  4. Credenciales (usuario/contraseña)
-  5. Todo
+**2.9. Configuración de actualización masiva**
+- Actualizar la configuración para todos los bots simultáneamente
+- Elija qué actualizar:
+1. Servidor (nombre de host)
+2. Puertos (TCP/UDP)
+3. Cifrado
+4. Credenciales (nombre de usuario/contraseña)
+5. Todo
 - Muestra la configuración actual del primer bot.
-- Vista previa de cambios antes de aplicar.
-- Actualiza todos los archivos `config.json` de los bots.
+- Vista previa de los cambios antes de aplicar
+- Actualiza todos los archivos del bot `config.json`
 
 > [!WARNING]
-> **Importante:** Esta característica está diseñada para bots en el **mismo servidor**. Si tienes bots conectados a varios servidores TeamTalk diferentes, tendrás que actualizarlos manualmente. El uso de esta opción configurará todos los bots con los mismos ajustes de servidor.
 
-**2.10. Backup / Restauración de Bots**
-- Utilidad portátil de respaldo/restauración para la configuración y caché de los bots.
-- Guarda respaldos comprimidos (`.tar.gz`) en un directorio `backups/`.
-- La restauración redespliega dinámicamente las configuraciones y recrea los contenedores Docker.
+> **Importante:** Esta función está diseñada para bots en el **mismo servidor**. Si tiene bots conectados a varios servidores TeamTalk diferentes, deberá actualizarlos manualmente. El uso de esta función configurará todos los bots con la misma configuración de servidor.
 
-**2.11. Limpiar Todos los Logs de los Bots**
-- Utilidad de limpieza rápida que elimina todos los archivos `*.log` de todas las carpetas de datos de los bots para liberar espacio en disco.
+**2.10. Bots de copia de seguridad/restauración**
+- Utilidad portátil de copia de seguridad/restauración para configuración y caché de bots.
+- Guarda las copias de seguridad comprimidas (`.tar.gz`) en un directorio `backups/`.
+- La restauración vuelve a implementar dinámicamente las configuraciones del bot y recrea los contenedores Docker.
 
-**2.12. Volver al Menú Principal**
+**2.11. Borrar todos los registros de bots**
+- Utilidad de borrado rápido que elimina todos los archivos `*.log` de todas las carpetas de datos del bot para liberar espacio en el disco.
 
-#### 3. Reconstruir Imagen / Actualizar Código
+**2.12. Volver al menú principal**
+
+#### 3. Reconstruir imagen/actualizar código
 Actualiza el código del bot y reconstruye la imagen de Docker:
-- Reconstruye la imagen Docker con `CACHEBUST` para garantizar código nuevo.
-- Recria los contenedores con la nueva imagen.
-- Reinicia solo los bots que estaban corriendo previamente.
+- Reconstruye la imagen de Docker con `CACHEBUST` para garantizar un código nuevo
+- Recrea contenedores con nueva imagen.
+- Reinicia solo los bots que se ejecutan anteriormente
 
-#### 4. Desinstalar Todo
+#### 4. Desinstalar todo
 Limpieza completa de la instalación de TTMediaBot:
-- Detiene todos los contenedores de bots.
-- Elimina todos los contenedores.
-- Borra todas las carpetas de bots.
-- Remueve la imagen de Docker.
-- **Advertencia:** ¡Esta acción es irreversible!
+- Detiene todos los contenedores de bots
+- Elimina todos los contenedores
+- Elimina todas las carpetas del bot.
+- Elimina la imagen de Docker
+- **Advertencia:** ¡Esto es irreversible!
 
-#### 5. Verificar Actualizaciones
-Verifica automáticamente si hay actualizaciones en el repositorio de GitHub.
-- Usa `update.sh` para comparar el código local con el repositorio remoto.
-- Realiza una copia de seguridad segura de la configuración antes de actualizar.
-- Incluye una pausa al final para que los usuarios puedan leer la salida del terminal.
+#### 5. Busque actualizaciones
+Comprueba automáticamente el repositorio de GitHub en busca de actualizaciones.
+- Utiliza `update.sh` para comparar el código local con el repositorio remoto
+- Realiza copias de seguridad de la configuración de forma segura antes de actualizar
+- Incluye una pausa al final para que los usuarios puedan leer la consola.
 
-#### 6. Activar/Desactivar Actualizaciones Automáticas
-Menú dedicado para alternar las actualizaciones automáticas en segundo plano mediante systemd.
+#### 6. Activar/desactivar actualizaciones automáticas
+Menú dedicado para alternar actualizaciones en segundo plano mediante el enmascaramiento systemd.
 
-#### 7. Limpiar Caché de Docker
-Herramienta de limpieza avanzada para recuperar espacio en disco sin afectar los bots en ejecución:
+#### 7. Limpiar caché de Docker (sin usar)
+Herramienta de limpieza avanzada para recuperar espacio en disco sin afectar a los bots en ejecución:
 - **Docker Prune:** Elimina contenedores detenidos e imágenes no utilizadas.
-- **Buildx Cleanup:** Limpia la caché de construcción persistente.
-- **Logs del Sistema:** Limpia logs de `journalctl` con más de 1 día de antigüedad.
-- **Huella Cero:** Garantiza que el sistema host permanezca limpio.
+- **Limpieza de Buildx:** Limpia los cachés de compilación persistentes.
+- **Registros del sistema:** Aspira registros `journalctl` de más de 1 día.
+- **Huella cero:** Garantiza que el sistema host se mantenga eficiente.
 
 #### 8. Salir
-Cierra el script.
+Cierra el guión
 
-### Características Automáticas
+### Funciones automáticas
 
-El script hace automáticamente:
-- **Verificación de actualizaciones** en el arranque si `update.sh` está presente.
-- **Instalación de dependencias** (Docker, jq) en la primera ejecución.
-- **Construcción de la imagen Docker** automáticamente y fuerza a PIP a actualizar las librerías (`-U`) en cada reconstrucción.
-- **Sin prompts al inicio:** La reconstrucción ahora es una opción de menú manual (Opción 3), agilizando el arranque.
-- **Crea la estructura del directorio** `bots`.
-- **Detecta conflictos** (nombres de contenedores, apodos en el mismo servidor).
-- **Define los permisos** correctos para los volúmenes de Docker.
-- **Usa etiquetas** para una fácil filtración de contenedores.
+El guión automáticamente:
+- **Comprueba si hay actualizaciones** automáticamente al iniciar si `update.sh` está presente
+- **Instala dependencias** (Docker, jq) en la primera ejecución
+- **Crea una imagen de Docker** automáticamente y obliga a PIP a actualizar las bibliotecas (`-U`) en cada reconstrucción
+- **Sin mensajes de inicio:** La reconstrucción ahora es una opción de menú manual (Opción 3), lo que hace que el inicio sea más rápido
+- **Crea la estructura del directorio `bots`**
+- **Detecta conflictos** (nombres de contenedores, apodos en el mismo servidor)
+- **Establece permisos** correctamente para volúmenes Docker
+- **Utiliza etiquetas** para filtrar fácilmente los contenedores
 
 ---
 
-## 🔄 Script de Actualización Independiente (`update.sh`)
+## 🔄 Script de actualización independiente (`update.sh`)
 
-Si ya tienes los bots instalados y solo deseas actualizar el código sin usar el administrador de Docker completo, puedes utilizar el script independiente `update.sh`.
+Si ya tiene bots instalados y solo desea actualizar el código sin usar el administrador Docker completo, puede usar el script independiente `update.sh`.
 
-**Cómo usar:**
-1. Descarga el script a tu carpeta `TTMediaBot`:
+**Cómo utilizar:**
+1. Descargue el script a su carpeta `TTMediaBot`:
    ```bash
    wget https://raw.githubusercontent.com/JoaoDEVWHADS/TTMediaBot/master/update.sh
    chmod +x update.sh
    ```
-2. Ejecútalo:
+2. Ejecútelo:
    ```bash
    sudo ./update.sh
    ```
 
-Este script actualizará el repositorio, reconstruirá la imagen y recreará los contenedores, garantizando que todo esté al día.
+Este script actualizará el repositorio, reconstruirá la imagen y recreará los contenedores, asegurando que todo esté actualizado.
 
 ---
 
-## 🍪 Configuración de Cookies de YouTube & YouTube Music
+## 🍪 Configuración de cookies de YouTube y YouTube Music
 
-Las cookies son **esenciales** para que el bot reproduzca música de **YouTube** y de **YouTube Music** debido a restricciones de las plataformas.
+Las cookies son **esenciales** para que el bot reproduzca música tanto de **YouTube** como de **YouTube Music** debido a restricciones de la plataforma.
 
-### Por qué las cookies son necesarias
+### Por qué se necesitan las cookies
 
-YouTube y YouTube Music han implementado restricciones que requieren autenticación para acceder a ciertos contenidos. Las cookies de una sesión activa de navegador permiten que el bot evada estas restricciones y reproduzca música de ambos servicios.
+YouTube y YouTube Music han implementado restricciones que requieren autenticación para acceder a determinado contenido. Las cookies de una sesión de navegador autenticada permiten que el bot evite estas restricciones y reproduzca música desde ambos servicios.
 
 ### Cómo obtener cookies
 
-1. **Inicia sesión en tu cuenta de Google** en tu navegador (Chrome, Edge o Firefox).
+1. **Inicie sesión en su cuenta de Google** en su navegador (Chrome, Edge o Firefox)
 
-2. **Instala la extensión Get cookies.txt:**
-   - Chrome/Edge: [Get cookies.txt LOCALLY](https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid)
+2. **Instale la extensión Obtener cookies.txt:**
+   - Cromo/Borde: [Obtener cookies.txt LOCALMENTE](https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid)
    - Firefox: [cookies.txt](https://addons.mozilla.org/en-US/firefox/addon/cookies-txt/)
 
-3. **Ve a YouTube:** Accede a `youtube.com`.
+3. **Navega a YouTube:** Ve a `youtube.com`
 
-4. **Exporta los cookies:**
-   - Haz clic en el **menú de extensiones** de tu navegador.
-   - Haz clic en el icono de la extensión **Get cookies.txt LOCALLY**.
-   - Haz clic en **"Export All Cookies"**.
-   - Haz clic en el botón de **Download**.
-   - El navegador puede preguntar dónde guardar el archivo (elige un lugar accesible).
-   - De lo contrario, estará en la carpeta **Downloads**.
+4. **Exportar cookies:**
+   - Haga clic en el **menú Extensiones** en su navegador
+   - Haga clic en el ícono de extensión **Obtener cookies.txt LOCALMENTE**
+   - Haga clic en **"Exportar todas las cookies"**
+   - Haga clic en el **botón Descargar**
+   - Es posible que su navegador le pregunte dónde guardar el archivo; elija una ubicación a la que pueda acceder
+   - Si no se le solicita, el archivo estará en su carpeta **Descargas**
 
-5. **Sube el archivo** a un directorio accesible en tu servidor (ej: `/root/cookies.txt`).
+5. **Coloque el archivo** en una ubicación accesible en su servidor (por ejemplo, `/root/cookies.txt`)
 
-### Obtención de la ruta del archivo de cookies
+### Obtener la ruta del archivo de cookies
 
-Al crear o actualizar bots, el script solicitará la **ruta absoluta** de tu archivo de cookies. Si subiste el archivo a tu servidor, utiliza este comando para obtener la ruta completa:
+Al crear o actualizar bots, el script le pedirá la **ruta completa** a su archivo de cookies. Si cargó el archivo en su servidor, use este comando para obtener la ruta absoluta:
 
-**Ejemplo: si estás en la carpeta donde subiste el cookies.txt**
+**Ejemplo: si estás en el directorio donde subiste cookies.txt**
 
 ```bash
-# Navega al directorio que contiene el cookies.txt
-cd /ruta/hacia/tu/carpeta
+# Navigate to the directory containing cookies.txt
+cd /path/to/your/directory
 
-# Obtén la ruta completa
+# Get the full path
 pwd
-# Salida: /root/mis-cookies
+# Output: /root/my-cookies
 
-# O bien obtén la ruta directamente del archivo
+# Or get the full path directly
 realpath cookies.txt
-# Salida: /root/mis-cookies/cookies.txt
+# Output: /root/my-cookies/cookies.txt
 ```
 
 **Comando rápido para obtener la ruta:**
 ```bash
 echo "$(pwd)/cookies.txt"
-# Salida: /root/mis-cookies/cookies.txt
+# Output: /root/my-cookies/cookies.txt
 ```
 
-Copia esta ruta completa y pégala cuando el script de creación o actualización del bot la solicite.
+Copie esta ruta completa y péguela cuando el script de creación o actualización del bot solicite la ubicación del archivo de cookies.
 
 > [!IMPORTANT]
-> **Nota:** No utilices archivos de cookies muy grandes. Si el archivo de cookies es demasiado grande, yt-dlp podría no reconocerlo y el bot no reproducirá música. Usa cookies únicamente de los dominios de YouTube/Google.
 
-### Actualización de cookies expiradas
+> **Nota:** No utilice archivos de cookies muy grandes. Si el archivo de cookies es demasiado grande, es posible que yt-dlp no lo reconozca y el bot no reproduzca música. Utilice cookies únicamente de dominios de YouTube/Google.
 
-Los cookies expiran periódicamente. Cuando la reproducción de YouTube deje de funcionar:
+### Actualización de cookies caducadas
 
-1. **Genera nuevas cookies** siguiendo los pasos de arriba.
-2. **Actualiza todos los bots** con el script de Docker:
-   - Ejecuta `./ttbotdocker.sh`.
-   - Selecciona la opción `2` (Manage Bots).
-   - Selecciona la opción `7` (Update Cookies - All Bots).
-   - Introduce la ruta a tu nuevo archivo de cookies.
+Las cookies caducan periódicamente. Cuando la reproducción de YouTube deja de funcionar:
+
+1. **Generar nuevas cookies** siguiendo los pasos anteriores
+2. **Actualice todos los bots** usando el script Docker:
+   - Ejecute `./ttbotdocker.sh`
+   - Seleccione la opción `2` (Administrar Bots)
+   - Seleccione la opción `7` (Actualizar Cookies - Todos los Bots)
+   - Ingrese la ruta a su nuevo archivo de cookies
    - El script actualizará y reiniciará automáticamente todos los bots.
 
 ### Actualización manual de cookies
 
-Alternativamente, actualiza los cookies manualmente:
-1. Copia el nuevo `cookies.txt` en cada carpeta del bot en `bots/[nombre_bot]/`.
-2. Reinicia los bots afectados.
+Alternativamente, actualice las cookies manualmente:
+1. Copie el nuevo `cookies.txt` a cada carpeta de bot en `bots/[bot_name]/`
+2. Reinicie los bots afectados
 
 ---
 
-## 🌍 Idiomas Soportados
+## 🌍 Idiomas admitidos
 
-TTMediaBot soporta múltiples idiomas. Cambia el idioma usando el comando de administrador `cl`.
+TTMediaBot admite varios idiomas. Cambie el idioma usando el comando de administración `cl`.
 
 **Idiomas disponibles:**
-- `ar` - Árabe
-- `en` - Inglés
-- `es` - Español
-- `hu` - Húngaro
-- `id` - Indonesio
-- `pt_BR` - Portugués de Brasil
-- `ru` - Ruso
-- `tr` - Turco
+- `ar` - árabe
+- `en` - inglés
+- `es` - español
+- `hu` - húngaro
+- `id` - indonesio
+- `pt_BR` - portugués brasileño
+- `ru` - ruso
+- `tr` - turco
 
-**Ejemplo:** Envía `cl pt_BR` para cambiar el idioma a Portugués de Brasil.
+**Ejemplo:** Envíe `cl pt_BR` para cambiar al portugués brasileño.
 
 ---
 
-## 🔧 Solución de Problemas
+## 🔧 Solución de problemas
 
-### El bot no reproduce música de YouTube
+### El robot no reproduce música de YouTube
 
-**Sintomas:** El bot se conecta pero no reproduce pistas de YouTube.
+**Síntomas:** El bot se conecta pero no reproduce pistas de YouTube
 
 **Soluciones:**
-1. **Verifica los cookies:**
-   - Los cookies pueden haber expirado.
-   - Genera nuevas cookies y actualiza (ver la sección Cookies).
-   - Verifica la ruta del archivo de cookies en el `config.json`.
+1. **Comprueba las cookies:**
+   - Es posible que las cookies hayan caducado
+   - Generar nuevas cookies y actualizar (ver apartado Cookies de YouTube)
+   - Verifique la ruta del archivo de cookies en `config.json`
 
-2. **Verifica que el archivo de cookies existe:**
+2. **Verifique que el archivo de cookies exista:**
    ```bash
-   ls -la bots/[nombre_bot]/cookies.txt
+   ls -la bots/[bot_name]/cookies.txt
    ```
 
-3. **Verifica los logs del bot:**
-   - **Logs de Docker:**
+3. **Verifique los registros del bot:**
+   - **Registros de Docker:**
      ```bash
-     docker logs [nombre_bot]
+     docker logs [bot_name]
      ```
-   - **Archivo de log:** Verifica `bots/[nombre_bot]/TTMediaBot.log` directamente.
+   - **Archivo de registro:** Verifique `bots/[bot_name]/TTMediaBot.log` directamente.
 
 ### El bot no se conecta al servidor
 
-**Sintomas:** El bot no aparece en línea.
+**Síntomas:** El bot no aparece en línea
 
 **Soluciones:**
-1. **Verifica los datos del servidor:**
-   - Comprueba la dirección y los puertos en `config.json`.
-   - Prueba la conectividad con el servidor: `ping [direccion_servidor]`.
+1. **Verificar los detalles del servidor:**
+   - Verifique el nombre de host y los puertos en `config.json`
+   - Probar la conectividad del servidor: `ping [nombre de host]`
 
-2. **Verifica las credenciales:**
-   - Asegúrate de que el usuario y la contraseña sean correctos.
-   - Confirma que la cuenta del bot existe en el servidor TeamTalk.
+2. **Verificar credenciales:**
+   - Verifique que el nombre de usuario y la contraseña sean correctos
+   - Asegúrese de que la cuenta del bot exista en el servidor TeamTalk
 
-3. **Verifica el ajuste de cifrado:**
-   - Si el servidor utiliza cifrado, establece `"encrypted": true` en la configuración.
-   - **Nota:** El bot obtiene y confía en el certificado SSL del servidor dinámicamente si no se proporciona un archivo de certificado local (`ttservercert.pem`).
+3. **Compruebe la configuración de cifrado:**
+   - Si el servidor usa cifrado, configure `"cifrado": verdadero` en la configuración.
+   - **Nota:** El bot busca automáticamente y confía en el certificado SSL del servidor de forma dinámica (similar al cliente de Windows) si no se proporciona ningún certificado de CA local (`ttservercert.pem`).
 
-4. **Mira los logs:**
-   - **Docker:** `docker logs [nombre_bot]`
+4. **Ver registros:**
+   - **Docker:** `registros de Docker [nombre_bot]`
    - **Archivo:** `bots/[nombre_bot]/TTMediaBot.log`
 
-### Problemas de Audio / Sin Sonido
+### Problemas de audio/Sin sonido
 
-**Sintomas:** El bot se conecta pero no hay salida de audio.
-
-**Soluciones:**
-1. **Verifica PulseAudio:**
-   - PulseAudio se ejecuta dentro del contenedor.
-   - Reinicia el bot: `docker restart [nombre_bot]`.
-
-2. **Verifica el volumen:**
-   - Envía el comando `v` para verificar el volumen actual.
-   - Ajusta el volumen: `v 50`.
-
-3. **Verifica la configuración del dispositivo de sonido:**
-   - Comprueba la sección `sound_devices` en `config.json`.
-
-### El contenedor no se inicia
-
-**Sintomas:** El contenedor de Docker se apaga inmediatamente tras arrancar.
+**Síntomas:** El bot se conecta pero no hay salida de audio
 
 **Soluciones:**
-1. **Verifica los logs:**
-   - **Docker:** `docker logs [nombre_bot]`
+1. **Comprueba PulseAudio:**
+   - PulseAudio se ejecuta dentro del contenedor
+   - Reinicie el bot: `docker restart [bot_name]`
+
+2. **Verificar volumen:**
+   - Envíe el comando `v` para verificar el volumen actual
+   - Establecer volumen: `v 50`
+
+3. **Verifique la configuración del dispositivo de audio:**
+   - Consulte la sección `sound_devices` en `config.json`
+
+### El contenedor no arranca
+
+**Síntomas:** El contenedor Docker sale inmediatamente
+
+**Soluciones:**
+1. **Verificar registros:**
+   - **Docker:** `registros de Docker [nombre_bot]`
    - **Archivo:** `bots/[nombre_bot]/TTMediaBot.log`
 
-2. **Verifica la configuración:**
-   - Asegúrate de que `config.json` sea un JSON válido.
-   - Comprueba si hay errores de sintaxis.
+2. **Verificar configuración:**
+   - Asegúrese de que `config.json` sea JSON válido
+   - Comprobar errores de sintaxis
 
-3. **Recrea el contenedor:**
-   - Elimina y vuelve a crear el bot usando `ttbotdocker.sh`.
+3. **Recrear contenedor:**
+   - Elimina y recrea el bot usando `ttbotdocker.sh`
 
-### Errores de Permiso
+### Errores de permiso
 
-**Sintomas:** El bot no puede leer o escribir archivos.
+**Síntomas:** El robot no puede leer ni escribir archivos.
 
 **Soluciones:**
-1. **Corrige los permisos:**
+1. **Reparar permisos:**
    ```bash
-   sudo chown -R 1000:1000 bots/[nombre_bot]
+   sudo chown -R 1000:1000 bots/[bot_name]
    ```
 
-2. **Ejecuta el script como root:**
-   - Usa siempre `sudo ./ttbotdocker.sh`.
+2. **Ejecutar script como root:**
+   - Utilice siempre `sudo ./ttbotdocker.sh`
 
 ---
 
-## ❓ FAQ (Preguntas Frecuentes)
+## ❓ Preguntas frecuentes (Preguntas frecuentes)
 
 ### P: ¿Puedo ejecutar varios bots en el mismo servidor?
-**R:** Sí. El bot soporta múltiples instancias. Usa la función de creación por lote en `ttbotdocker.sh` o créalos uno a uno. Cada bot tendrá su propio contenedor y configuración.
+**R:** ¡Sí! El bot admite múltiples instancias. Utilice la función de creación por lotes en `ttbotdocker.sh` o cree bots individualmente. Cada bot tiene su propio contenedor y configuración.
 
-### P: ¿Cómo añado más administradores?
-**R:** De dos formas:
-- **Mediante comando:** Envía `ua +nombre_usuario` al bot (requiere privilegios previos de administrador).
-- **Mediante configuración:** Edita `bots/[nombre_bot]/config.json`, añade el nombre de usuario al arreglo `teamtalk.users.admins` y reinicia.
+### P: ¿Cómo agrego más administradores?
+**R:** Dos maneras:
+- **A través del comando:** Envíe `ua +nombre de usuario` al bot (requiere privilegios de administrador existentes)
+- **A través de configuración:** Edite `bots/[bot_name]/config.json`, agregue el nombre de usuario a la matriz `teamtalk.users.admins` y luego reinicie
 
-### P: ¿Cómo realizo una copia de seguridad de mis configuraciones?
-**R:** Copia todo el directorio `bots`:
+### P: ¿Cómo hago una copia de seguridad de las configuraciones de mi bot?
+**R:** Simplemente copie todo el directorio `bots`:
 ```bash
-cp -r bots bots_respaldo_$(date +%Y%m%d)
+cp -r bots bots_backup_$(date +%Y%m%d)
 ```
 
-### P: ¿Puedo usar las mismas cookies para todos los bots?
-**R:** Sí. Usa la opción "Update Cookies (All Bots)" en el menú de gestión para aplicar el mismo archivo de cookies a todos a la vez.
+### P: ¿Puedo utilizar las mismas cookies para todos los bots?
+**R:** ¡Sí! Utilice la función "Actualizar cookies (todos los bots)" en el menú de administración para aplicar el mismo archivo de cookies a todos los bots a la vez.
 
-### P: El bot se desconecta continuamente. ¿Qué hago?
-**R:** Comprueba:
-- La estabilidad de la red.
-- El estado del servidor.
-- Los logs del bot: `docker logs [nombre_bot]` o `bots/[nombre_bot]/TTMediaBot.log`.
-- Aumenta el valor de `reconnection_timeout` en `config.json`.
+### P: El bot sigue desconectándose. ¿Qué tengo que hacer?
+**R:** Verificar:
+- Estabilidad de la red
+- Estado del servidor
+- Registros de bot: `docker logs [bot_name]` o marque `bots/[bot_name]/TTMediaBot.log`
+- Aumentar `reconnection_timeout` en `config.json`
 
 ### P: ¿Cómo cambio el apodo del bot?
-**R:** De dos formas:
-- **Mediante comando:** Envía `cn NuevoApodo` (solo administradores).
-- **Mediante configuración:** Modifica `teamtalk.nickname` en `config.json` y reinicia.
+**R:** Dos maneras:
+- **A través del comando:** Enviar `cn NewNickname` (solo administrador)
+- **A través de configuración:** Edite `teamtalk.nickname` en `config.json`, luego reinicie
 
-### P: ¿Puedo conectar bots a diferentes servidores TeamTalk?
-**R:** ¡Por supuesto! Cada contenedor de bot puede conectarse a un servidor diferente. Solo especifica las direcciones correspondientes en la creación o configuración.
+### P: ¿Puedo ejecutar bots en diferentes servidores TeamTalk?
+**R:** ¡Absolutamente! Cada bot puede conectarse a un servidor diferente. Simplemente especifique diferentes nombres de host durante la creación o en la configuración.
 
-### P: ¿Cuántos recursos consume cada bot?
-**R:** Aproximadamente por contenedor:
-- **RAM:** 100-200 MB (inactivo), 200-400 MB (reproduciendo).
-- **CPU:** Mínimo al estar inactivo, moderado al transcodificar.
-- **Disco:** ~500 MB por bot (incluidas dependencias).
+### P: ¿Cuántos recursos utiliza cada bot?
+**R:** Cada contenedor de bot utiliza aproximadamente:
+- **RAM:** 100-200 MB (inactivo), 200-400 MB (reproduciendo)
+- **CPU:** Mínimo cuando está inactivo, moderado al transcodificar audio
+- **Disco:** ~500 MB por bot (incluidas las dependencias)
 
-### P: ¿Qué ocurre si actualizo el código del repositorio?
-**R:** Las configuraciones en el directorio `bots` se mantendrán intactas. Tras actualizar el repositorio:
-1. Reconstruye la imagen Docker: `docker build -t ttmediabot .`
-2. Recrea los contenedores usando la opción correspondiente en el script.
+### P: ¿Qué sucede si actualizo el código del repositorio?
+**R:** Las configuraciones de su bot en el directorio `bots` se conservan. Después de obtener actualizaciones:
+1. Reconstruya la imagen de Docker: `docker build -t ttmediabot.`
+2. Recrea contenedores usando la función de recreación del script.
 
 ---
 
-## 📊 Logs y Monitoreo
+---
 
-### Visualización de Logs en Tiempo Real
+## 📊 Registros y seguimiento
 
-**Para un bot en particular:**
+### Ver registros en tiempo real
+
+**Para un bot específico:**
 ```bash
-docker logs -f [nombre_bot]
+docker logs -f [bot_name]
 ```
 
-**Para todos los bots:**
+**Para todos los robots:**
 ```bash
 docker logs -f $(docker ps -q -f "label=role=ttmediabot")
 ```
 
-### Ubicación de los Archivos de Log
+### Ubicación de los archivos de registro
 
-Cada bot almacena logs en su directorio:
+Cada bot almacena registros en su directorio:
 ```
-bots/[nombre_bot]/TTMediaBot.log
+bots/[bot_name]/TTMediaBot.log
 ```
 
-### Configuración del Log
+### Configuración de registro
 
-Edita los parámetros en `config.json`:
+Edite la configuración del registro en `config.json`:
 
 ```json
 "logger": {
@@ -598,28 +607,29 @@ Edita los parámetros en `config.json`:
 }
 ```
 
-**Niveles de log:**
-- `DEBUG`: Información detallada para diagnóstico.
-- `INFO`: Mensajes informativos generales (por defecto).
-- `WARNING`: Mensajes de advertencia.
-- `ERROR`: Solo mensajes de error.
+**Niveles de registro:**
+- `DEBUG`: información detallada para diagnosticar problemas
+- `INFO` - Mensajes informativos generales (predeterminado)
+- `WARNING` - Mensajes de advertencia
+- `ERROR`: solo mensajes de error
 
-**Activar log de depuración (debug):**
-Cambia `"level": "INFO"` por `"level": "DEBUG"` y reinicia el bot.
+**Habilitar registro de depuración:**
+Cambie `"level": "INFO"` a `"level": "DEBUG"` y reinicie el bot.
 
-### Monitoreo del Estado de los Bots
+### Monitoreo del estado del robot
 
-**Ver contenedores activos:**
+**Comprueba los bots en ejecución:**
 ```bash
 docker ps -f "label=role=ttmediabot"
 ```
 
-**Ver todos los contenedores (incluyendo detenidos):**
+**Verifique todos los bots (incluidos los detenidos):**
 ```bash
 docker ps -a -f "label=role=ttmediabot"
 ```
 
-**Ver estadísticas de recursos:**
+**Verificar uso de recursos:**
 ```bash
 docker stats $(docker ps -q -f "label=role=ttmediabot")
 ```
+  - Confirmación de prueba final: jueves 14 de mayo a las 12:50:00 UTC de 2026
