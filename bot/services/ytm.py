@@ -8,6 +8,33 @@ import json
 import http.cookiejar
 import shutil
 import tempfile
+import requests
+import httpx
+
+class HTTP2Session(requests.Session):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.httpx_client = httpx.Client(http2=True, timeout=30.0)
+
+    def request(self, method, url, **kwargs):
+        hk = {}
+        for k in ['headers', 'params', 'data', 'json', 'cookies', 'auth', 'verify', 'cert']:
+            if k in kwargs:
+                hk[k] = kwargs[k]
+        if 'timeout' in kwargs:
+            hk['timeout'] = kwargs['timeout']
+        if 'allow_redirects' in kwargs:
+            hk['follow_redirects'] = kwargs['allow_redirects']
+        try:
+            r = self.httpx_client.request(method, url, **hk)
+            resp = requests.Response()
+            resp.status_code = r.status_code
+            resp._content = r.content
+            resp.headers.update(r.headers)
+            resp.url = str(r.url)
+            return resp
+        except Exception as e:
+            return super().request(method, url, **kwargs)
 from contextlib import contextmanager
 from typing import Any, Dict, List, Optional, TYPE_CHECKING, Generator
 
@@ -149,14 +176,17 @@ class YtmService(_Service):
              except Exception as e:
                  logging.error(f"Failed to parse cookies for YTM: {e}")
 
+        # Instantiate HTTP2Session
+        self.http2_session = HTTP2Session()
+
         if auth and isinstance(auth, dict) and "authorization" in auth:
-             self.ytmusic = YTMusic(auth=auth)
+             self.ytmusic = YTMusic(auth=auth, requests_session=self.http2_session)
         else:
              # Fallback to public instance if auth generation failed
-             self.ytmusic = YTMusic()
+             self.ytmusic = YTMusic(requests_session=self.http2_session)
         
         # Explicit public instance for search/metadata (User Request: No cookies for search)
-        self.ytmusic_public = YTMusic()
+        self.ytmusic_public = YTMusic(requests_session=self.http2_session)
 
         # Persistent event loop for safer async operations if needed
         self._loop = asyncio.new_event_loop()

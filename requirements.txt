@@ -8,3 +8,4 @@ requests
 yt-dlp
 ytmusicapi
 py-yt-search
+httpx[http2]

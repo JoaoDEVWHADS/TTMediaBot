@@ -41,7 +41,7 @@ COPY requirements.txt .
 # Install Python dependencies (Cacheable)
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir "httpx>=0.28.1"
+    && pip install --no-cache-dir "httpx[http2]>=0.28.1"
 
 # Build argument to bust cache for core code and frequently-changing tools
 ARG CACHEBUST=1
@@ -53,7 +53,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -U pip setuptools wheel \
     && pip install --no-cache-dir -U -r requirements.txt \
     && pip install --no-cache-dir -U "yt-dlp[default] @ https://github.com/yt-dlp/yt-dlp/archive/master.tar.gz" \
-    && pip install --no-cache-dir "httpx>=0.28.1"
+    && pip install --no-cache-dir "httpx[http2]>=0.28.1"
 
 # Copy project files
 COPY . .

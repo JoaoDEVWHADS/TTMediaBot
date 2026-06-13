@@ -84,6 +84,9 @@ class YtService(_Service):
         # Pre-warming: establishing connections early
         threading.Thread(target=self._pre_warm, daemon=True).start()
 
+        # Connection Keep-Alive to prevent TCP/SSL handshake lag
+        threading.Thread(target=self._connection_keeper, daemon=True).start()
+
     def _pre_warm(self):
         # Wait a few seconds for Docker network interface to fully settle
         time.sleep(5)
@@ -339,3 +342,12 @@ class YtService(_Service):
         except Exception as e:
             logging.error(f"YT Search failed: {e}")
             raise errors.NothingFoundError("")
+
+    def _connection_keeper(self):
+        while True:
+            time.sleep(15)
+            try:
+                # Run search for a minimal query to keep TCP/SSL connection warm
+                self.search("music", limit=1)
+            except Exception:
+                pass
