@@ -142,6 +142,15 @@ perform_image_rebuild() {
                  rm -f "$STATE_FILE"
              fi
          fi
+
+         # Clean unused Docker resources & vacuum logs (Option 7 equivalent, but non-interactive)
+         echo ""
+         echo -e "${YELLOW}🧹 Cleaning up unused Docker resources and system logs...${NC}"
+         docker system prune -af --volumes
+         docker buildx prune -af
+         docker builder prune -af
+         journalctl --vacuum-time=1d
+         echo -e "${GREEN}✓ Cleanup completed!${NC}"
     else
          echo -e "${RED}Error building image!${NC}"
          exit 1
