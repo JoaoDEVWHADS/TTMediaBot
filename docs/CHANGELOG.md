@@ -4,6 +4,25 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ---
 
+## 🆕 v2.4.7 — "Auto-Cleanup & DLL Management" *(06/14/2026)*
+
+### 🐳 Docker & System Auto-Cleanup
+
+- **🧹 Automatic Non-Interactive Pruning:**
+  Added automatic Docker resources pruning to `update.sh` that executes immediately after the bot containers have successfully restarted and passed health checks.
+  This runs `docker system prune -af --volumes` and `docker build/buildx prune -af` silently in the background, freeing up massive disk space (e.g. 1.3GB+) from older layers and build caches without requiring user interaction.
+
+- **📜 System Journal Vacuuming:**
+  Integrated journal logs vacuuming (`journalctl --vacuum-time=1d`) at the end of the update flow to prevent host log files from bloating the VPS storage.
+
+### ⚙️ TeamTalk DLL Auto-Management
+
+- **📥 Automated Architecture-Aware DLL Updates:**
+  Added automatic downloading and extraction of TeamTalk DLL dependencies inside `update.sh`.
+  The script automatically detects if the host is running on an ARM architecture (aarch64/arm) to download the matching `ttarm.zip` library, or falls back to the standard `TeamTalk_DLL.zip` for x86_64 systems, facilitating seamless cross-platform updates.
+
+---
+
 ## 🆕 v2.4.6 — "Search Performance & Docker Optimization" *(06/13/2026)*
 
 ### ⚡ YouTube Music Search Speed Optimization
