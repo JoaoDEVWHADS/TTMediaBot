@@ -422,8 +422,46 @@ update_and_fix_permissions() {
                 exit 0
             fi
         fi
-    
     if [ "$UPDATE_PERFORMED" == "true" ] || [ "$REBUILD_REQUIRED" == "true" ]; then
+        echo "========================================="
+        echo "--- Updating TeamTalk_DLL ---"
+        echo "========================================="
+        
+        # Always remove existing folder to force a fresh download on update
+        rm -rf TeamTalk_DLL TeamTalk_DLL.zip
+        
+        DLL_URL="https://github.com/JoaoDEVWHADS/TTMediaBot/releases/download/downloadttdll/TeamTalk_DLL.zip"
+        ARCH=$(uname -m)
+        if [[ "$ARCH" == "aarch64" || "$ARCH" =~ ^arm ]]; then
+            echo "ℹ️ ARM architecture detected ($ARCH). Using ARM DLL..."
+            DLL_URL="https://github.com/JoaoDEVWHADS/TTMediaBot/releases/download/downloadttdll/ttarm.zip"
+        else
+            echo "ℹ️ x86_64/AMD64 architecture detected ($ARCH). Using x86 DLL..."
+            DLL_URL="https://github.com/JoaoDEVWHADS/TTMediaBot/releases/download/downloadttdll/TeamTalk_DLL.zip"
+        fi
+        DLL_FILE="TeamTalk_DLL.zip"
+        
+        echo "📥 Downloading TeamTalk_DLL from $DLL_URL..."
+        if command -v wget &> /dev/null; then
+            wget "$DLL_URL" -O "$DLL_FILE"
+        else
+            curl -L "$DLL_URL" -o "$DLL_FILE"
+        fi
+        
+        if [ $? -ne 0 ]; then
+            echo "❌ Error downloading TeamTalk_DLL."
+            rm -f "$DLL_FILE"
+        else
+            echo "✅ Download complete! Extracting..."
+            unzip -o "$DLL_FILE"
+            if [ $? -ne 0 ]; then
+                echo "❌ Error extracting TeamTalk_DLL."
+            else
+                echo "✅ Extraction complete!"
+            fi
+            rm -f "$DLL_FILE"
+        fi
+
         echo ""
         echo -e "${YELLOW}Fixing permissions...${NC}"
         
@@ -509,6 +547,7 @@ install_deps_light() {
     if ! command -v jq &> /dev/null; then apt-get install -y jq; fi
     if ! command -v git &> /dev/null; then apt-get install -y git; fi
     if ! command -v curl &> /dev/null; then apt-get install -y curl; fi
+    if ! command -v unzip &> /dev/null; then apt-get install -y unzip; fi
 }
 
 # --- MAIN EXECUTION WRAPPER ---
