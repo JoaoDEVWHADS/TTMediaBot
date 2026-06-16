@@ -219,7 +219,17 @@ class YtService(_Service):
             with YoutubeDL(config) as ydl:
                 ydl_duration = (time.perf_counter() - ydl_start) * 1000
                 logging.info(f"YT Get: YoutubeDL initialized in {ydl_duration:.2f}ms")
-                if not extra_info:
+                if extra_info:
+                     info = extra_info
+                     v_id = info.get("videoId") or info.get("contentId") or info.get("id")
+                     if "url" not in info and v_id:
+                         url = f"https://www.youtube.com/watch?v={v_id}"
+                         try:
+                             info = ydl.extract_info(url, process=False)
+                         except DownloadError as e:
+                             logging.error(f"YT Get: yt-dlp DownloadError for '{url}': {e}")
+                             raise errors.ServiceError(str(e))
+                else:
                     try:
                         info = ydl.extract_info(url, process=False)
                     except DownloadError as e:
@@ -235,8 +245,6 @@ class YtService(_Service):
                             if "Signature solving failed" in error_msg or "JavaScript runtime" in error_msg:
                                 logging.error("YT Get: Possible missing JavaScript runtime or challenge solver. Check if Node.js is correctly installed in the environment.")
                         raise errors.ServiceError(str(e))
-                else:
-                    info = extra_info
                 
                 if info is None:
                     raise errors.ServiceError("Failed to extract video info")
@@ -268,6 +276,37 @@ class YtService(_Service):
                     logging.info(f"YT Get (Playlist) finished in {duration:.2f}ms for {url}")
                     return tracks
                 if not process:
+                    # Fetch related videos for queueing if it's a single video!
+                    video_id = info.get("id") or info.get("videoId")
+                    if not video_id and url:
+                         if "v=" in url:
+                              video_id = url.split("v=")[1].split("&")[0]
+                         elif "youtu.be" in url:
+                              video_id = url.split("/")[-1]
+                    
+                    if video_id:
+                         try:
+                              # First, add the original video track
+                              original_title = info.get("title", self.bot.translator.translate("Unknown Title"))
+                              if "uploader" in info:
+                                   original_title += " - {}".format(info["uploader"])
+                              
+                              original_track = Track(
+                                   service=self.name,
+                                   url=f"https://www.youtube.com/watch?v={video_id}",
+                                   name=original_title,
+                                   type=TrackType.Dynamic,
+                                   extra_info=info
+                              )
+                              
+                              # Then fetch recommendations (limit to 20 matching YTM behavior)
+                              recs = self._get_recommendations(video_id, limit=20)
+                              duration = (time.perf_counter() - start_time) * 1000
+                              logging.info(f"YT Get (Watch Playlist) finished in {duration:.2f}ms for video_id {video_id}")
+                              return [original_track] + recs
+                         except Exception as e:
+                              logging.error(f"YT Watch Playlist failed: {e}")
+                    
                     duration = (time.perf_counter() - start_time) * 1000
                     logging.info(f"YT Get (No Process) finished in {duration:.2f}ms for {url}")
                     return [
@@ -294,11 +333,187 @@ class YtService(_Service):
                 else:
                     track_type = TrackType.Default
                 
+                # TRIGGER BACKGROUND AUTOPLAY FETCH (matching YTM behavior)
+                current_video_id = None
+                if extra_info:
+                     current_video_id = extra_info.get("id") or extra_info.get("videoId")
+                if not current_video_id and "id" in stream:
+                     current_video_id = stream["id"]
+                
+                if current_video_id:
+                     should_fetch = False
+                     try:
+                           if self.bot.player.track_list:
+                                last_track = self.bot.player.track_list[-1]
+                                last_video_id = None
+                                if last_track.extra_info:
+                                     last_video_id = last_track.extra_info.get('id') or last_track.extra_info.get('videoId')
+                                
+                                if not last_video_id and hasattr(last_track, '_url') and last_track._url:
+                                     l_url = last_track._url
+                                     if "v=" in l_url:
+                                          last_video_id = l_url.split("v=")[1].split("&")[0]
+                                     elif "youtu.be" in l_url:
+                                          last_video_id = l_url.split("/")[-1]
+                                
+                                if last_video_id and last_video_id == current_video_id:
+                                     should_fetch = True
+                     except Exception as e:
+                          logging.debug(f"[YT] Trace bot player state error: {e}")
+                     
+                     if should_fetch:
+                          try:
+                               self.bot.loop.create_task(self._fetch_autoplay_async(current_video_id))
+                          except Exception:
+                               threading.Thread(target=self._fetch_autoplay_sync, args=(current_video_id,), daemon=True).start()
+
                 duration = (time.perf_counter() - start_time) * 1000
                 logging.info(f"YT Get (Process) finished in {duration:.2f}ms for {title}")
                 return [
                     Track(service=self.name, url=url, name=title, format=format, type=track_type, extra_info=stream)
                 ]
+
+    def _get_recommendations(self, video_id: str, limit: int = 5) -> List[Track]:
+        try:
+             logging.info(f"[YT] Fetching recommendations for {video_id}")
+             url = f"https://www.youtube.com/watch?v={video_id}"
+             headers = {
+                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36",
+                 "Accept-Language": "en-US,en;q=0.9"
+             }
+             
+             import requests
+             import re
+             import json
+             import http.cookiejar
+             
+             jar = None
+             if self.config.cookiefile_path and os.path.isfile(self.config.cookiefile_path):
+                 try:
+                     jar = http.cookiejar.MozillaCookieJar(self.config.cookiefile_path)
+                     jar.load(ignore_discard=True, ignore_expires=True)
+                     logging.info(f"[YT] Recommendations: Loaded cookies from {self.config.cookiefile_path}")
+                 except Exception as e:
+                     logging.warning(f"[YT] Recommendations: Could not load cookies from {self.config.cookiefile_path}: {e}")
+                     jar = None
+
+             response = requests.get(url, headers=headers, cookies=jar, timeout=10)
+             if response.status_code != 200:
+                 logging.error(f"[YT] Recommendations fetch failed: HTTP {response.status_code}")
+                 return []
+                 
+             pattern = r"var ytInitialData = ({.*?});"
+             match = re.search(pattern, response.text)
+             if not match:
+                 pattern = r"window\[['\"]ytInitialData['\"].*? = ({.*?});"
+                 match = re.search(pattern, response.text)
+                 
+             if not match:
+                 logging.error("[YT] Recommendations fetch failed: Could not find ytInitialData")
+                 return []
+                 
+             data = json.loads(match.group(1))
+             
+             # Extract both compactVideoRenderer and lockupViewModel items
+             items = []
+             def find_videos_and_lockups(obj):
+                 if isinstance(obj, dict):
+                     if 'compactVideoRenderer' in obj:
+                         items.append(('video', obj['compactVideoRenderer']))
+                     elif 'lockupViewModel' in obj:
+                         items.append(('lockup', obj['lockupViewModel']))
+                     else:
+                         for v in obj.values():
+                             find_videos_and_lockups(v)
+                 elif isinstance(obj, list):
+                     for item in obj:
+                         find_videos_and_lockups(item)
+             
+             try:
+                 find_videos_and_lockups(data)
+             except Exception as ex:
+                 logging.debug(f"[YT] Recursive search error: {ex}")
+             
+             new_tracks = []
+             count = 0
+             for kind, item in items:
+                  if count >= limit:
+                      break
+                  if not item or not isinstance(item, dict):
+                      continue
+                      
+                  v_id = None
+                  title = ""
+                  channel = ""
+                  
+                  if kind == 'video':
+                      v_id = item.get('videoId')
+                      if not v_id:
+                          continue
+                      title_obj = item.get('title', {})
+                      if 'simpleText' in title_obj:
+                          title = title_obj['simpleText']
+                      elif 'runs' in title_obj and isinstance(title_obj['runs'], list) and len(title_obj['runs']) > 0:
+                          title = title_obj['runs'][0].get('text', '')
+                          
+                      channel_obj = item.get('longBylineText', {}) or item.get('shortBylineText', {})
+                      if 'runs' in channel_obj and isinstance(channel_obj['runs'], list) and len(channel_obj['runs']) > 0:
+                          channel = channel_obj['runs'][0].get('text', '')
+                  
+                  elif kind == 'lockup':
+                      v_id = item.get('contentId')
+                      # Filter out anything that is not a video/playlist (e.g. channels)
+                      content_type = item.get('contentType')
+                      if content_type != 'LOCKUP_CONTENT_TYPE_VIDEO':
+                          continue
+                      if not v_id:
+                          continue
+                      
+                      metadata = item.get('metadata', {}).get('lockupMetadataViewModel', {})
+                      title = metadata.get('title', {}).get('content', '')
+                      
+                      rows = metadata.get('metadata', {}).get('contentMetadataViewModel', {}).get('metadataRows', [])
+                      if len(rows) > 0:
+                          parts = rows[0].get('metadataParts', [])
+                          if len(parts) > 0:
+                              txt_obj = parts[0].get('text', {})
+                              if isinstance(txt_obj, dict):
+                                  channel = txt_obj.get('content', '')
+                              elif isinstance(txt_obj, str):
+                                  channel = txt_obj
+                  
+                  if not v_id:
+                      continue
+                      
+                  full_title = f"{title} - {channel}" if channel else title
+                  
+                  track = Track(
+                       service=self.name,
+                       name=full_title,
+                       url=f"https://www.youtube.com/watch?v={v_id}",
+                       type=TrackType.Dynamic,
+                       extra_info=item
+                  )
+                  new_tracks.append(track)
+                  count += 1
+             
+             return new_tracks
+        except Exception as e:
+             logging.error(f"[YT] Recommendations fetch error: {e}")
+             return []
+
+    async def _fetch_autoplay_async(self, video_id: str) -> None:
+         self._fetch_autoplay_sync(video_id)
+
+    def _fetch_autoplay_sync(self, video_id: str) -> None:
+         try:
+              new_tracks = self._get_recommendations(video_id, limit=5)
+              if new_tracks:
+                   logging.info(f"[YT] Adding {len(new_tracks)} autoplay tracks to queue")
+                   self.bot.player.track_list.extend(new_tracks)
+         except Exception as e:
+              logging.error(f"[YT] Autoplay fetch failed: {e}")
+
 
     def search(self, query: str, limit: Optional[int] = None) -> List[Track]:
         if limit is None:

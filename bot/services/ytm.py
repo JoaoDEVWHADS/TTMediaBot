@@ -77,7 +77,7 @@ class YtmService(_Service):
             start_time = time.perf_counter()
             
             # radio=False ensures we get the "Up Next" / Autoplay queue
-            watch_playlist = self.ytmusic_public.get_watch_playlist(videoId=video_id, limit=50, radio=False)
+            watch_playlist = (self.ytmusic or self.ytmusic_public).get_watch_playlist(videoId=video_id, limit=50, radio=False)
             tracks_data = watch_playlist.get("tracks", [])
             
             new_tracks: List[Track] = []
@@ -378,12 +378,16 @@ class YtmService(_Service):
                                  if last_track.extra_info and 'videoId' in last_track.extra_info:
                                       last_video_id = last_track.extra_info.get('videoId')
                                  
+                                 if not last_video_id and hasattr(last_track, '_url') and last_track._url:
+                                      l_url = last_track._url
+                                      if "v=" in l_url:
+                                           last_video_id = l_url.split("v=")[1].split("&")[0]
+                                      elif "youtu.be" in l_url:
+                                           last_video_id = l_url.split("/")[-1]
+                                 
                                  if last_video_id and last_video_id == current_video_id:
                                       should_fetch = True
                                       logging.info(f"[YTM] Autoplay trigger: Current track IS last track (ID match: {current_video_id})")
-                                 elif last_track.url == url:
-                                      should_fetch = True
-                                      logging.info(f"[YTM] Autoplay trigger: Current track IS last track (URL match)")
                        except Exception as e:
                             logging.debug(f"[YTM] Trace bot player state error: {e}")
                        
@@ -419,7 +423,7 @@ class YtmService(_Service):
 
         # 2. Get Watch Playlist (Autoplay)
         try:
-             watch_playlist = self.ytmusic_public.get_watch_playlist(videoId=video_id, limit=20, radio=False)
+             watch_playlist = (self.ytmusic or self.ytmusic_public).get_watch_playlist(videoId=video_id, limit=20, radio=False)
              tracks_data = watch_playlist.get("tracks", [])
              
              new_tracks: List[Track] = []
@@ -453,7 +457,7 @@ class YtmService(_Service):
     def _fetch_autoplay_sync(self, video_id: str) -> None:
          try:
               logging.info(f"[YTM] Fetching autoplay for {video_id}")
-              watch_playlist = self.ytmusic_public.get_watch_playlist(videoId=video_id, limit=5)
+              watch_playlist = (self.ytmusic or self.ytmusic_public).get_watch_playlist(videoId=video_id, limit=5)
               
               if 'tracks' in watch_playlist:
                    new_tracks = []

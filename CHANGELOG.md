@@ -4,6 +4,26 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ---
 
+## 🆕 v2.5.0 — "Personalized Autoplay & Deadlock Fix" *(06/16/2026)*
+
+### 📻 Personalized Autoplay & Recommendations (Cookies Integration)
+- **🆕 YouTube (`yt`) Autoplay Implementation:**
+  Fully implemented the Autoplay/Watch Playlist feature for the standard YouTube (`yt`) service from scratch (matching YTM behavior). This scrapes recommendations directly from YouTube watch pages and appends them to the queue when playing the last track or single videos.
+- **🍪 Authenticated Scraper for YouTube (`yt`):**
+  Added support for Netscape cookies (`cookies.txt`) inside the new `_get_recommendations` scraper by loading the cookie file using `http.cookiejar.MozillaCookieJar` and passing it to `requests.get()`. This enables personalized recommendation fetching for the standard YouTube service.
+- **🍪 Authenticated YTM Autoplay:**
+  Upgraded the YouTube Music (`ytm`) service to fetch autoplay playlists using the authenticated client `self.ytmusic` (initialized with cookies) instead of the public `self.ytmusic_public` client, enabling personalized suggestions and falling back dynamically to public requests if cookies are not present.
+
+### 🛡️ Deadlock & Extraction Bug Fixes
+- **🔒 Thread-Safe Lock Recursion Prevention:**
+  Resolved a critical deadlock where resolving dynamic tracks inside the background queue processor (`Thread-3`) would recursively call `last_track.url` in the autoplay validator. Since `threading.Lock` is non-reentrant, this caused the thread to block indefinitely. Fixed by parsing the video ID directly from the private `last_track._url` property, bypassing dynamic property resolution and lock acquisition.
+- **⚙️ Volatile Metadata Resolution Fix:**
+  Fixed a `Failed to fetch stream data` bug where recommended tracks passed a raw scraper node dictionary as `extra_info` directly into `ydl.process_ie_result`, causing crash exceptions. The bot now checks if `extra_info` is a recommendation dictionary and dynamically resolves full yt-dlp metadata first.
+- **🌀 Robust Recursive Parser:**
+  Upgraded the recommendation HTML parser to recursively traverse JSON looking for both classic `compactVideoRenderer` and modern `lockupViewModel` structures, keeping recommendations resilient to YouTube web updates.
+
+---
+
 ## 🆕 v2.4.9 — "Early Warning Update System" *(06/16/2026)*
 
 ### 📢 Pre-Update Notifications & i18n

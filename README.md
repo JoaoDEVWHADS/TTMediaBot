@@ -53,6 +53,17 @@ Switch between services using the `sv` command:
 > [!NOTE]
 > **Exclusive Feature:** YouTube Music support is exclusive to this fork and is not available in the original TTMediaBot project.
 
+## 📻 Personalized Autoplay & Recommendations
+
+This fork includes an advanced **Autoplay / Related Videos** system for both YouTube (`yt`) and YouTube Music (`ytm`) services, delivering a continuous music playback experience (similar to YouTube Music's "Radio" or standard YouTube's "Up Next" queue).
+
+### Features
+- **🆕 YouTube (`yt`) Implementation from Scratch:** Previously, the standard YouTube service did not support autoplay or recommendations. We have fully implemented it from scratch using a watch-page scraper that parses recommendations.
+- **🔒 YTM Authenticated & Safe Autoplay:** Modified the YouTube Music service to fetch recommendations using the authenticated client (cookies) rather than the public one, while fixing a critical deadlock bug in both services' queue validations.
+- **🔄 Zero-Interruption Playback:** When playing the last track in the queue, the bot automatically fetches and appends related tracks (5 tracks for Autoplay, or 20 tracks for dynamic queue lists) to keep the music going.
+- **🍪 Personalized Recommendations:** Both YouTube (`yt`) and YouTube Music (`ytm`) services fetch autoplay suggestions using the configured account cookies (`cookies.txt`). This ensures your autoplay experience is completely personalized and aligned with your account's listening history instead of pulling generic global lists.
+- **🛡️ Robust Autoplay Scraper:** Scrapes both the new YouTube layout structures (`lockupViewModel`) and classic layout structures (`compactVideoRenderer`) recursively from watch pages, parsing recommendations with complete thread safety and deadlock prevention.
+
 ## 🔗 Link-Based Downloading & Local Storage
 
 This fork includes an advanced link-based downloading system that allows users to queue media links, list them, manage them, and download them sequentially or in compressed archives.
