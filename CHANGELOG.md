@@ -4,6 +4,17 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ---
 
+## 🆕 v2.4.9 — "Early Warning Update System" *(06/16/2026)*
+
+### 📢 Pre-Update Notifications & i18n
+
+- **🔔 Early Warning Notification:**
+  Integrated a signaling mechanism using an `update_in_progress` trigger file. As soon as the VPS update or rebuild starts (when option `y` is selected in `update.sh`), the bot posts a warning message to the active TeamTalk channel: *"The bot is starting an update process and will restart shortly. It may go offline at any moment."*
+- **🌍 100% Translated warning:**
+  Fully translated and compiled this update warning message into all 8 supported languages (English, Portuguese, Spanish, Russian, Turkish, Arabic, Hungarian, Indonesian), ensuring native translation based on the bot's configured language.
+
+---
+
 ## 🆕 v2.4.8 — "Documentation Restructuring" *(06/16/2026)*
 
 ### 📋 Documentation & Layout Simplify

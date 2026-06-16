@@ -327,6 +327,17 @@ If you already have bots installed and just want to update the code without usin
 
 This script will update the repository, rebuild the image, and recreate containers, ensuring everything is up to date.
 
+### 📢 Early Warning Update System
+
+This fork features an **Early Warning Update System** designed to notify users in the TeamTalk channels when an update starts.
+
+* **How it works:** 
+  1. As soon as you run `update.sh` (or when `auto_updater.sh` runs automatically in the background) and confirm the update (by selecting `y`), the script sends an update signal to all active bot containers.
+  2. The bots instantly check this signal and post a localized message in the active TeamTalk channel: 
+     > *“The bot is starting an update process and will restart shortly. It may go offline at any moment.”*
+  3. The warning is posted **immediately when the Docker build starts**, giving users a 1-to-2 minute heads-up while the image compiles in the background before the containers are restarted.
+* **Localization:** The warning message automatically adapts to each bot's configured language. It is fully translated into all 8 supported languages (English, Portuguese, Spanish, Russian, Turkish, Arabic, Hungarian, Indonesian).
+
 ---
 
 ## 🍪 YouTube & YouTube Music Cookies Configuration
