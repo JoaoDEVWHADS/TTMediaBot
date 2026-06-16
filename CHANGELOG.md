@@ -10,6 +10,8 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 - **🧹 Reverted Multi-Language Restructuring:**
   Removed the `docs/` directory and all translated READMEs. Restored the comprehensive root `README.md` to its original state. Moved `CHANGELOG.md` back to the root directory for simpler and cleaner navigation.
+- **🗑️ Obsolete & Development Files Cleanup:**
+  Removed unused scripts inside `tools/` (`vk_auth.py`, `yam_auth.py`, `libmpv_win_downloader.py`, `ttsdk_downloader.py`), development configuration files (`pyrightconfig.json`, `development-requirements.txt`), and IDE type stubs (`typestubs/`) to keep the codebase minimal and clean.
 
 ---
 

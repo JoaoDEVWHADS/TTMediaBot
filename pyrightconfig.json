@@ -1,8 +1,0 @@
-{
-    "ignore": [
-        "mpv.py",
-        "TeamTalkPy"
-    ],
-    "stubPath": "typestubs",
-    "reportImportCycles": false,
-}
