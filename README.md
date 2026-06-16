@@ -349,7 +349,10 @@ This fork features an **Early Warning Update System** designed to notify users i
   2. **Graceful Shutdown Alert:** When the container receives the shutdown signal (`SIGTERM`) from Docker to restart or stop, it captures the signal and immediately posts a final localized notification to the active channel:
      > *“The bot is restarting now. See you in a moment!”*
      This ensures users know exactly when the bot is going offline.
-* **Localization:** Both warning messages automatically adapt to each bot's configured language. They are fully translated into all 8 supported languages (English, Portuguese, Spanish, Russian, Turkish, Arabic, Hungarian, Indonesian).
+  3. **Update Success Alert:** Once `update.sh` finishes restarting the Docker containers, it leaves a success marker. Upon booting back up, the bot detects this marker, posts a localized message:
+     > *“Update completed successfully! I am back online.”*
+     And deletes the marker, confirming to users that the bot is fully updated and operational.
+* **Localization:** All warning and success messages automatically adapt to each bot's configured language. They are fully translated into all 8 supported languages (English, Portuguese, Spanish, Russian, Turkish, Arabic, Hungarian, Indonesian).
 
 ---
 

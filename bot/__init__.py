@@ -112,6 +112,20 @@ class Bot:
             message = Message(text=command, user=startup_context_user, channel=self.ttclient.channel, type=MessageType.User)
             self.command_processor(message)
         
+        # Check for update success file
+        success_file = os.path.join(self.config_manager.config_dir, "update_success")
+        if os.path.exists(success_file):
+            try:
+                time.sleep(2)
+                msg = self.translator.translate("Update completed successfully! I am back online.")
+                self.ttclient.send_message(msg, type=2)
+            except Exception as e:
+                logging.error(f"Error sending update success message: {e}")
+            try:
+                os.remove(success_file)
+            except Exception:
+                pass
+
         # Periodic Pre-warming tracking
         self.last_pre_warm_time = time.time()
         self.pre_warm_interval = 50 # 50 seconds (User request: 'oi' every 50s)

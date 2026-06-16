@@ -123,6 +123,11 @@ perform_image_rebuild() {
          recreate_bot_containers
          
          if [ ! -z "$RUNNING_NAMES" ]; then
+             echo "$RUNNING_NAMES" | while read -r name; do
+                 if [ -n "$name" ] && [ -d "$BOTS_ROOT/$name" ]; then
+                     touch "$BOTS_ROOT/$name/update_success"
+                 fi
+             done
              echo -e "${YELLOW}Restarting active bots...${NC}"
              echo "$RUNNING_NAMES" | xargs docker start > /dev/null 2>&1
              
