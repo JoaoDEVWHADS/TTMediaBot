@@ -4,6 +4,15 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ---
 
+## 🆕 v2.4.8 — "Documentation Restructuring" *(06/16/2026)*
+
+### 📋 Documentation & Layout Simplify
+
+- **🧹 Reverted Multi-Language Restructuring:**
+  Removed the `docs/` directory and all translated READMEs. Restored the comprehensive root `README.md` to its original state. Moved `CHANGELOG.md` back to the root directory for simpler and cleaner navigation.
+
+---
+
 ## 🆕 v2.4.7 — "Auto-Cleanup & DLL Management" *(06/14/2026)*
 
 ### 🐳 Docker & System Auto-Cleanup
