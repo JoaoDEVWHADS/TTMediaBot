@@ -343,11 +343,13 @@ This script will update the repository, rebuild the image, and recreate containe
 This fork features an **Early Warning Update System** designed to notify users in the TeamTalk channels when an update starts.
 
 * **How it works:** 
-  1. As soon as you run `update.sh` (or when `auto_updater.sh` runs automatically in the background) and confirm the update (by selecting `y`), the script sends an update signal to all active bot containers.
-  2. The bots instantly check this signal and post a localized message in the active TeamTalk channel: 
+  1. **Pre-Update Alert:** As soon as you run `update.sh` (or when `auto_updater.sh` runs automatically in the background) and confirm the update (by selecting `y`), the script sends an update signal to all active bot containers. The bots instantly check this signal and post a localized message in the active TeamTalk channel: 
      > *“The bot is starting an update process and will restart shortly. It may go offline at any moment.”*
-  3. The warning is posted **immediately when the Docker build starts**, giving users a 1-to-2 minute heads-up while the image compiles in the background before the containers are restarted.
-* **Localization:** The warning message automatically adapts to each bot's configured language. It is fully translated into all 8 supported languages (English, Portuguese, Spanish, Russian, Turkish, Arabic, Hungarian, Indonesian).
+     This is posted **immediately when the Docker build starts**, giving users a 1-to-2 minute heads-up while the image compiles in the background.
+  2. **Graceful Shutdown Alert:** When the container receives the shutdown signal (`SIGTERM`) from Docker to restart or stop, it captures the signal and immediately posts a final localized notification to the active channel:
+     > *“The bot is restarting now. See you in a moment!”*
+     This ensures users know exactly when the bot is going offline.
+* **Localization:** Both warning messages automatically adapt to each bot's configured language. They are fully translated into all 8 supported languages (English, Portuguese, Spanish, Russian, Turkish, Arabic, Hungarian, Indonesian).
 
 ---
 

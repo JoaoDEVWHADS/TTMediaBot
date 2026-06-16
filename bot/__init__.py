@@ -1,6 +1,7 @@
 import os
 import logging
 import queue
+import signal
 import sys
 import time
 import threading
@@ -91,6 +92,10 @@ class Bot:
 
     def run(self):
         logging.debug("Starting")
+        try:
+            signal.signal(signal.SIGTERM, lambda signum, frame: self.close())
+        except Exception as e:
+            logging.warning(f"Could not register SIGTERM handler: {e}")
         self.player.run()
         self.tt_player_connector.start()
         self.command_processor.run()
@@ -163,6 +168,12 @@ class Bot:
 
     def close(self) -> None:
         logging.debug("Closing bot")
+        try:
+            msg = self.translator.translate("The bot is restarting now. See you in a moment!")
+            self.ttclient.send_message(msg, type=2)
+            time.sleep(0.5)
+        except Exception as e:
+            logging.error(f"Error sending shutdown message: {e}")
         self.player.close()
         self.ttclient.close()
         self.tt_player_connector.close()

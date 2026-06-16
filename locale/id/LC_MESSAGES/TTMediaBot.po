@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TTMediaBot VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-06-16 11:41+0000\n"
+"POT-Creation-Date: 2026-06-16 13:16+0000\n"
 "PO-Revision-Date: 2022-04-15 20:17+0700\n"
 "Last-Translator: \n"
 "Language: id_ID\n"
@@ -16,9 +16,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.18.0\n"
+"Generated-By: Babel 2.17.0\n"
 
-#: /home/ttbot/TTMediaBot/bot/__init__.py:136
+#: /home/admin/joao/TTMediaBot/bot/__init__.py:141
 msgid ""
 "The bot is starting an update process and will restart shortly. It may go"
 " offline at any moment."
@@ -26,7 +26,11 @@ msgstr ""
 "Bot sedang memulai proses pembaruan dan akan segera dimulai ulang. Bot "
 "dapat offline kapan saja."
 
-#: /home/ttbot/TTMediaBot/bot/app_vars.py:12
+#: /home/admin/joao/TTMediaBot/bot/__init__.py:172
+msgid "The bot is restarting now. See you in a moment!"
+msgstr "Bot sedang memulai ulang sekarang. Sampai jumpa lagi!"
+
+#: /home/admin/joao/TTMediaBot/bot/app_vars.py:12
 msgid ""
 "Hello! I am João Almeida. This is my fork of TTMediaBot for TeamTalk 5.\n"
 "This repository focuses on stability and support for YouTube Music.\n"
@@ -42,49 +46,49 @@ msgstr ""
 "Penulis Asli: Amir Gumerov, Vladislav Kopylov, Beqa Gozalishvili, Kirill "
 "Belousov.\n"
 
-#: /home/ttbot/TTMediaBot/bot/TeamTalk/__init__.py:173
+#: /home/admin/joao/TTMediaBot/bot/TeamTalk/__init__.py:173
 msgid "Send \"h\" for help"
 msgstr "Kirim \"h\" untuk bantuan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/__init__.py:144
+#: /home/admin/joao/TTMediaBot/bot/commands/__init__.py:144
 msgid "Unknown command. Send \"h\" for help."
 msgstr "Perintah tidak dikenal. Kirim \"h\" untuk bantuan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/__init__.py:150
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:724
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:730
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1130
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1213
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1285
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1359
-#: /home/ttbot/TTMediaBot/bot/modules/playlist_uploader.py:136
-#: /home/ttbot/TTMediaBot/bot/modules/playlist_uploader.py:150
-#: /home/ttbot/TTMediaBot/bot/modules/uploader.py:85
+#: /home/admin/joao/TTMediaBot/bot/commands/__init__.py:150
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:724
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:730
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1130
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1213
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1285
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1359
+#: /home/admin/joao/TTMediaBot/bot/modules/playlist_uploader.py:136
+#: /home/admin/joao/TTMediaBot/bot/modules/playlist_uploader.py:150
+#: /home/admin/joao/TTMediaBot/bot/modules/uploader.py:85
 #, python-brace-format
 msgid "Error: {}"
 msgstr "Kesalahan: {}."
 
-#: /home/ttbot/TTMediaBot/bot/commands/__init__.py:162
+#: /home/admin/joao/TTMediaBot/bot/commands/__init__.py:162
 msgid "You are banned"
 msgstr "Anda dilarang."
 
-#: /home/ttbot/TTMediaBot/bot/commands/__init__.py:166
+#: /home/admin/joao/TTMediaBot/bot/commands/__init__.py:166
 msgid "You are not in bot's channel"
 msgstr "Anda tidak berada di saluran bot."
 
-#: /home/ttbot/TTMediaBot/bot/commands/__init__.py:170
+#: /home/admin/joao/TTMediaBot/bot/commands/__init__.py:170
 msgid "Bot is locked"
 msgstr "Bot dikunci."
 
-#: /home/ttbot/TTMediaBot/bot/commands/__init__.py:174
+#: /home/admin/joao/TTMediaBot/bot/commands/__init__.py:174
 msgid "This command is blocked"
 msgstr "Perintah ini diblokir."
 
-#: /home/ttbot/TTMediaBot/bot/commands/__init__.py:198
+#: /home/admin/joao/TTMediaBot/bot/commands/__init__.py:198
 msgid "Unknown command"
 msgstr "Perintah tidak diketahui."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:21
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:21
 msgid ""
 "+/-COMMAND Blocks or unblocks commands. +COMMAND adds command to the "
 "blocklist. -COMMAND removes from it. Without a command shows the "
@@ -94,59 +98,59 @@ msgstr ""
 "perintah ke daftar blokir. -Perintah hapus perintah dari daftar perintah."
 " Tanpa argumen apapun, tampilkan daftar blokir."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:32
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:322
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:352
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:471
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:483
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:539
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1059
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1081
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1145
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:32
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:322
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:352
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:471
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:483
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:539
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1059
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1081
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1145
 msgid "The list is empty"
 msgstr "Daftar kosong."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:37
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:304
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:336
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:434
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:37
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:304
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:336
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:434
 msgid "Added"
 msgstr "Ditambahkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:39
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:39
 msgid "This command is already added"
 msgstr "Perintah ini sudah ditambahkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:45
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:310
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:342
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:446
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:45
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:310
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:342
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:446
 msgid "Deleted"
 msgstr "Dihapus."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:47
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:47
 msgid "This command is not blocked"
 msgstr "Perintah ini tidak diblokir."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:56
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:56
 msgid "GENDER Changes bot's gender. n neutral, m male, f female"
 msgstr ""
 "GENDER Mengubah gender bot. n netral, m laki-laki, f perempuanJENIS "
 "KELAMIN Mengubah jenis kelamin bot. n netral, m laki-laki, f perempuan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:70
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:70
 msgid "LANGUAGE Changes bot's language"
 msgstr "Bahasa ubah bahasa bot."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:78
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:78
 msgid "The language has been changed"
 msgstr "Bahasa telah diubah."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:80
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:80
 msgid "Incorrect language"
 msgstr "Bahasa tidak tersedia."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:83
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:83
 #, python-brace-format
 msgid ""
 "Current language: {current_language}. Available languages: "
@@ -155,11 +159,11 @@ msgstr ""
 "Bahasa saat ini: {current_language}. Bahasa yang tersedia: "
 "{available_languages}."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:93
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:93
 msgid "NICKNAME Changes bot's nickname"
 msgstr "NAMA PANGGILAN ubah nama panggilan bot."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:104
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:104
 msgid ""
 "r/f Clears bot's cache. r clears recents, f clears favorites, without an "
 "option clears the entire cache"
@@ -167,19 +171,19 @@ msgstr ""
 "r/f Membersihkan cache bot. r hapus daftar terbaru, f hapus daftar "
 "favorit, tanpa argumen apapun hapus seluruh cache."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:112
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:112
 msgid "Cache cleared"
 msgstr "Seluruh daftar cache dibersihkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:116
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:116
 msgid "Recents cleared"
 msgstr "Daftar cache terbaru dibersihkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:120
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:120
 msgid "Favorites cleared"
 msgstr "Daftar cache favorit dibersihkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:127
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:127
 msgid ""
 "Join channel. first argument is channel name or id, second argument is "
 "password, split argument \" | \", if password is undefined, don't type "
@@ -190,77 +194,77 @@ msgstr ""
 "garis fertikal (|), jika kata sandi tidak ditentukan, jangan ketik "
 "argumen kedua."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:146
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:146
 msgid "This channel does not exist"
 msgstr "Saluran ini tidak ada."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:160
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:160
 #, python-brace-format
 msgid "Error joining channel: {error}"
 msgstr "Terjadi kesalahan saat bergabung dengan saluran: {error}."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:208
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:208
 msgid "Enables or disables voice transmission"
 msgstr "Mengaktifkan atau menonaktifkan aktifasi suara."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:215
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:217
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:215
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:217
 msgid "Voice transmission enabled"
 msgstr "Aktifasi suara diaktifkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:222
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:222
 msgid "Voice transmission disabled"
 msgstr "Aktifasi suara dinonaktifkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:228
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:228
 msgid "Locks or unlocks the bot"
 msgstr "Kunci atau buka kunci bot."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:233
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:233
 msgid "Locked"
 msgstr "Terkunci."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:235
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:235
 msgid "Unlocked"
 msgstr "Tidak terkunci."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:242
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:242
 msgid "STATUS Changes bot's status"
 msgstr "STATUS ubah status bot."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:252
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:252
 msgid "Enables or disables event handling"
 msgstr "Mengaktifkan atau menonaktifkan penanganan acara."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:259
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:259
 msgid "Event handling is enabled"
 msgstr "Penanganan acara diaktifkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:261
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:261
 msgid "Event handling is disabled"
 msgstr "Penanganan acara dinonaktifkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:269
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:269
 msgid "Enables or disables sending of channel messages"
 msgstr "Mengaktifkan atau menonaktifkan mengirim pesan teks ke saluran."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:277
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:277
 msgid "Channel messages enabled"
 msgstr "Pesan teks ke saluran diaktifkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:279
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:279
 msgid "Channel messages disabled"
 msgstr "Pesan teks ke saluran dinonaktifkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:286
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:286
 msgid "Saves bot's configuration"
 msgstr "Simpan konfigurasi bot."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:290
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:290
 msgid "Configuration saved"
 msgstr "Konfigurasi disimpan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:297
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:297
 msgid ""
 "+/-USERNAME Manages a list of administrators. +USERNAME adds a user. "
 "-USERNAME removes it. Without an option shows the list"
@@ -269,16 +273,16 @@ msgstr ""
 "pengguna ke daftar administrator. -NAMAPENGGUNA hapus dari daftar "
 "administrator. Tampa argumen apapun tampilkan daftar administrator."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:313
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:313
 msgid "This user is not in the admin list"
 msgstr "Pengguna ini tidak ada dalam daftar administrator."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:319
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:349
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:319
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:349
 msgid "<Anonymous>"
 msgstr "<Anonim>"
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:329
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:329
 msgid ""
 "+/-USERNAME Manages a list of banned users. +USERNAME adds a user. "
 "-USERNAME removes it. Without an option shows the list"
@@ -288,36 +292,36 @@ msgstr ""
 "dari daftar pengguna yang dilarang. Tanpa argumen apapun tampilkan daftar"
 " pengguna yang dilarang."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:344
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:344
 msgid "This user is not banned"
 msgstr "Pengguna ini tidak dilarang."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:358
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:358
 msgid "Quits the bot"
 msgstr "Tutup bot."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:367
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:367
 msgid "Restarts the bot"
 msgstr "Mulai ulang bot."
 
-#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:382
+#: /home/admin/joao/TTMediaBot/bot/commands/admin_commands.py:382
 msgid "Returns current channel's ID"
 msgstr "Mengembalikan ID saluran saat ini"
 
-#: /home/ttbot/TTMediaBot/bot/commands/command.py:28
+#: /home/admin/joao/TTMediaBot/bot/commands/command.py:28
 msgid "help text not found"
 msgstr "teks bantuan tidak ditemukan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:20
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:20
 msgid "Shows command help"
 msgstr "Tampilkan bantuan perintah."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:29
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:29
 msgid "Shows information about the bot"
 msgstr "Tampilkan informasi tentang bot."
 
 # --- Search Results Mode (sr/sl/slc) ---
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:39
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:39
 msgid ""
 "QUERY Plays tracks found for the query. If no query is given, plays or "
 "pauses current track. When search results mode (sr) is active, shows a "
@@ -327,94 +331,94 @@ msgstr ""
 " saat ini. Dengan mode hasil pencarian (sr) aktif, menampilkan daftar "
 "bernomor"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:46
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:651
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:751
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:46
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:651
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:751
 msgid "Searching..."
 msgstr "Mencari..."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:55
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:55
 msgid "Search results:"
 msgstr "Hasil pencarian:"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:58
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:58
 msgid "Use 'sl NUMBER' to select a track"
 msgstr "Gunakan 'sl NOMOR' untuk memilih trek"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:67
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:67
 #, python-brace-format
 msgid "{nickname} requested {request}"
 msgstr "{nickname} meminta {request}."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:72
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:202
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:219
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:769
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:879
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:967
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:72
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:202
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:219
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:769
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:879
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:967
 #, python-brace-format
 msgid "Playing {}"
 msgstr "Memutar {}."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:76
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:659
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:758
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1121
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:76
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:659
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:758
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1121
 msgid "Nothing is found for your query"
 msgstr "Tidak ada yang ditemukan untuk kueri Anda."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:79
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:761
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:79
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:761
 msgid "The selected service is currently unavailable"
 msgstr "Layanan yang dipilih saat ini tidak tersedia."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:91
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:91
 msgid "URL Plays a stream from a given URL"
 msgstr "URL Memutar aliran dari URL yang diberikan"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:101
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:101
 #, python-brace-format
 msgid "{nickname} requested playing from a URL"
 msgstr "{nickname} meminta pemutaran dari URL"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:107
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:107
 msgid "Incorrect protocol"
 msgstr "Protokol salah"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:109
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:109
 msgid "Cannot process stream URL"
 msgstr "Tidak dapat memproses URL aliran"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:111
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:111
 msgid "The path cannot be found"
 msgstr "Jalur tidak ditemukan"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:119
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:119
 msgid "Stops playback"
 msgstr "Hentikan pemutaran."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:126
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:126
 #, python-brace-format
 msgid "{nickname} stopped playback"
 msgstr "{nickname} menghentikan pemutaran."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:132
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:165
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:184
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:208
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:225
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:374
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:383
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:436
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:454
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:500
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:561
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:582
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:866
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:132
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:165
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:184
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:208
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:225
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:374
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:383
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:436
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:454
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:500
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:561
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:582
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:866
 msgid "Nothing is playing"
 msgstr "Tidak ada yang diputar."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:139
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:139
 #, python-brace-format
 msgid ""
 "VOLUME Sets the volume to a value between 0 and {max_volume}. If no "
@@ -423,34 +427,34 @@ msgstr ""
 "VOLUME Menyetel volume ke nilai antara 0 dan {max_volume}. Jika tidak ada"
 " volume yang ditentukan, level volume saat ini ditampilkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:160
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:160
 #, python-brace-format
 msgid "STEP Seeks current track backward. the default step is {seek_step} seconds"
 msgstr "Mundur {seek_step} detik."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:179
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:179
 #, python-brace-format
 msgid "STEP Seeks current track forward. the default step is {seek_step} seconds"
 msgstr "Maju {seek_step} detik."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:197
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:197
 msgid "Plays next track"
 msgstr "Putar trek berikutnya."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:206
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:883
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:206
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:883
 msgid "No next track"
 msgstr "Tidak ada trek berikutnya."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:214
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:214
 msgid "Plays previous track"
 msgstr "Putar trek sebelumnya."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:223
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:223
 msgid "No previous track"
 msgstr "Tidak ada trek sebelumnya."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:232
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:232
 msgid ""
 "MODE Sets the playback mode. If no mode is specified, the current mode "
 "and a list of modes are displayed"
@@ -458,27 +462,27 @@ msgstr ""
 "MODE Mengatur mode pemutaran. Jika tidak ada mode yang ditentukan, mode "
 "saat ini dan daftar mode akan ditampilkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:237
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:237
 msgid "Single Track"
 msgstr "Trek tunggal"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:238
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:238
 msgid "Repeat Track"
 msgstr "Ulangi trek"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:239
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:239
 msgid "Track list"
 msgstr "Daftar trek"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:240
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:240
 msgid "Repeat track list"
 msgstr "Ulangi daftar trek"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:241
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:241
 msgid "Random"
 msgstr "Acak"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:244
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:244
 #, python-brace-format
 msgid ""
 "Current mode: {current_mode}\n"
@@ -487,16 +491,16 @@ msgstr ""
 "Mode saat ini: {current_mode}\n"
 "{mode}."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:262
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:262
 #, python-brace-format
 msgid "Current mode: {mode}"
 msgstr "Mode saat ini: {mode}."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:266
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:266
 msgid "Incorrect mode"
 msgstr "Mode salah"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:275
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:275
 msgid ""
 "SERVICE Selects the service to play from, sv SERVICE h returns additional"
 " help. If no service is specified, the current service and a list of "
@@ -506,7 +510,7 @@ msgstr ""
 "tambahan. Jika tidak ada layanan yang ditentukan, layanan saat ini dan "
 "daftar layanan yang tersedia akan ditampilkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:283
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:283
 #, python-brace-format
 msgid ""
 "Unknown service.\n"
@@ -515,7 +519,7 @@ msgstr ""
 "Layanan tidak dikenal.\n"
 "{}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:292
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:292
 #, python-brace-format
 msgid ""
 "Current service: {}\n"
@@ -524,12 +528,12 @@ msgstr ""
 "Layanan saat ini: {}\n"
 "Peringatan: {}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:294
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:294
 #, python-brace-format
 msgid "Current service: {}"
 msgstr "Layanan saat ini: {}."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:300
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:300
 #, python-brace-format
 msgid ""
 "Error: {error}\n"
@@ -538,26 +542,26 @@ msgstr ""
 "Kesalahan: {error}\n"
 "{service} dinonaktifkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:307
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:307
 #, python-brace-format
 msgid "{service} is disabled"
 msgstr "{service} dinonaktifkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:314
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:314
 msgid "This service has no additional help"
 msgstr "Layanan ini tidak memiliki bantuan tambahan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:331
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:331
 #, python-brace-format
 msgid "{} (Error)"
 msgstr "{} (Kesalahan)"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:335
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:335
 #, python-brace-format
 msgid "{} (Warning: {})"
 msgstr "{} (Peringatan: {})."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:342
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:342
 #, python-brace-format
 msgid ""
 "Current service: {current_service}\n"
@@ -570,31 +574,31 @@ msgstr ""
 "{available_services}\n"
 "kirim sv LAYANAN h untuk bantuan tambahan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:354
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:354
 msgid "NUMBER Selects track by number from the list of current results"
 msgstr "NOMOR Memilih trek dengan nomor dari daftar hasil saat ini."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:366
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:366
 msgid "Incorrect number"
 msgstr "Nomor salah."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:368
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:379
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:368
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:379
 #, python-brace-format
 msgid "Playing {} {}"
 msgstr "Memutar {} {}."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:372
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:448
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:481
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:520
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:834
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:951
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1088
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:372
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:448
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:481
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:520
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:834
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:951
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1088
 msgid "Out of list"
 msgstr "Daftar terlampaui."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:390
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:390
 msgid ""
 "SPEED Sets playback speed from 0.25 to 4. If no speed is given, shows "
 "current speed"
@@ -602,12 +606,12 @@ msgstr ""
 "KECEPATAN Mengatur kecepatan pemutaran dari 0,25 hingga 4. Jika tidak ada"
 " kecepatan yang ditetapkan, tampilkan kecepatan saat ini."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:395
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:395
 #, python-brace-format
 msgid "Current rate: {}"
 msgstr "Kecepatan saat ini: {}."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:409
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:409
 msgid ""
 "+/-NUMBER Manages favorite tracks. + adds the current track to favorites."
 " - removes a track requested from favorites. If a number is specified "
@@ -617,29 +621,29 @@ msgstr ""
 "favorit. -NOMOR hapus trek yang diminta dari daftar favorit. Jika nomor "
 "ditentukan setelah +/-, tambahkan/hapus trek dengan nomor itu."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:415
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:415
 msgid "This command is not available for guest users"
 msgstr "Perintah ini tidak tersedia untuk pengguna guest."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:452
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:452
 msgid "This track is not in favorites"
 msgstr "Lagu ini tidak ada di daftar favorit."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:461
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:526
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:461
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:526
 #, python-brace-format
 msgid "{number}: {track_name}"
 msgstr "{number}: {track_name}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:489
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:489
 msgid "Gets a direct link to the current track"
 msgstr "Dapatkan tautan langsung ke trek saat ini."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:498
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:498
 msgid "URL is not available"
 msgstr "URL tidak tersedia."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:507
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:507
 msgid ""
 "NUMBER Plays a track with  the given number from a list of recent tracks."
 " Without a number shows recent tracks"
@@ -647,53 +651,53 @@ msgstr ""
 "NOMOR PUTAR trek dengan nomor tertentu dari daftar trek terbaru. Tanpa "
 "nomor TAMPILKAN DAFTAR trek terbaru."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:532
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:532
 #, python-brace-format
 msgid "{number}: {track_url}"
 msgstr "{number}: {track_url}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:547
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:547
 msgid "Downloads the current track and uploads it to the channel."
 msgstr "Unduh trek saat ini dan unggah ke saluran.."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:557
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:557
 msgid "Downloading..."
 msgstr "Mengunduh..."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:559
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:580
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:559
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:580
 msgid "Live streams cannot be downloaded"
 msgstr "Streaming langsung tidak dapat diunduh."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:568
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:568
 msgid "Downloads the current track as video and uploads it to the channel."
 msgstr "Mengunduh trek saat ini sebagai video dan mengunggahnya ke saluran."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:578
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:578
 msgid "Downloading video..."
 msgstr "Mengunduh video..."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:588
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:588
 msgid "Makes the bot join your current channel"
 msgstr "Membuat bot bergabung ke saluran Anda saat ini"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:609
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:626
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:609
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:626
 #, python-brace-format
 msgid "Joining channel: {}"
 msgstr "Bergabung ke saluran: {}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:618
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:618
 #, python-brace-format
 msgid "Failed to join channel. Error: {}"
 msgstr "Gagal bergabung ke saluran. Kesalahan: {}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:629
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:629
 #, python-brace-format
 msgid "Failed to join channel: {}"
 msgstr "Gagal bergabung ke saluran: {}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:636
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:636
 msgid ""
 "Downloads all tracks from a playlist/album URL, zips them, and uploads to"
 " the channel."
@@ -701,22 +705,22 @@ msgstr ""
 "Mengunduh semua lagu dari URL playlist/album, mengompresnya dalam ZIP, "
 "dan mengunggahnya ke saluran."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:644
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:644
 #, python-brace-format
 msgid "Current progress: {}"
 msgstr "Kemajuan saat ini: {}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:648
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:648
 msgid "Please send the link to the playlist or album."
 msgstr "Silakan kirim tautan ke daftar putar atau album."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:667
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:667
 msgid "This command is for playlists and albums. For single tracks, use 'dl'."
 msgstr ""
 "Perintah ini untuk daftar putar dan album. Untuk lagu tunggal, gunakan "
 "'dl'."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:742
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:742
 msgid ""
 "QUERY Searches for a track and adds it to the queue. If nothing is "
 "playing, starts immediately"
@@ -724,51 +728,51 @@ msgstr ""
 "KUERI Mencari lagu dan menambahkannya ke antrean. Jika tidak ada yang "
 "diputar, langsung dimulai"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:778
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:778
 #, python-brace-format
 msgid "{nickname} added to queue: {track}"
 msgstr "{nickname} menambahkan ke antrean: {track}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:784
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:784
 #, python-brace-format
 msgid "Added to queue [{position}]: {track}"
 msgstr "Ditambahkan ke antrean [{position}]: {track}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:791
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:791
 msgid "Lists all tracks in the queue"
 msgstr "Daftar semua lagu dalam antrean"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:797
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:797
 msgid "The queue is empty"
 msgstr "Antrean kosong"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:805
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:805
 #, python-brace-format
 msgid "Queue ({count} track(s)):"
 msgstr "Antrean ({count} lagu):"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:815
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:815
 msgid "NUMBER Removes track number NUMBER from the queue"
 msgstr "NUMBER Menghapus lagu nomor NUMBER dari antrean"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:840
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:840
 #, python-brace-format
 msgid "Removed from queue: {track}"
 msgstr "Dihapus dari antrean: {track}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:847
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:847
 msgid "Clears the entire queue"
 msgstr "Membersihkan seluruh antrean"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:851
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:851
 msgid "The queue is already empty"
 msgstr "Antrean sudah kosong"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:854
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:854
 msgid "Queue cleared"
 msgstr "Antrean dibersihkan"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:861
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:861
 msgid ""
 "Skips current track and plays the next one from the queue. Falls back to "
 "normal next if queue is empty"
@@ -776,12 +780,12 @@ msgstr ""
 "Melewati lagu saat ini dan memutar lagu berikutnya dari antrean. Jika "
 "antrean kosong, beralih ke lagu berikutnya secara normal"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:872
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:872
 #, python-brace-format
 msgid "Playing next from queue: {}"
 msgstr "Memutar berikutnya dari antrean: {}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:896
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:896
 msgid ""
 "Toggles search results mode. When active, 'p QUERY' shows a numbered "
 "list. Use 'sr on' or 'sr off' to set explicitly. Save permanently with "
@@ -791,17 +795,17 @@ msgstr ""
 "daftar bernomor. Gunakan 'sr on' atau 'sr off'. Simpan permanen dengan "
 "'sc'"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:904
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:914
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:904
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:914
 msgid "Search results mode: ON"
 msgstr "Mode hasil pencarian: AKTIF"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:908
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:916
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:908
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:916
 msgid "Search results mode: OFF"
 msgstr "Mode hasil pencarian: NONAKTIF"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:928
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:928
 msgid ""
 "NUMBER Selects and plays result NUMBER from the last search list "
 "(requires search results mode to be active)"
@@ -809,11 +813,11 @@ msgstr ""
 "NOMOR Memilih dan memutar hasil NOMOR dari daftar pencarian terakhir "
 "(memerlukan mode hasil pencarian aktif)"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:947
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:947
 msgid "No search results available. Use 'p QUERY' to search first"
 msgstr "Tidak ada hasil pencarian. Gunakan 'p QUERY' untuk mencari terlebih dahulu"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:961
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:961
 #, python-brace-format
 msgid "{nickname} selected: {track}"
 msgstr "{nickname} memilih: {track}"
@@ -821,7 +825,7 @@ msgstr "{nickname} memilih: {track}"
 # | msgid "" "NUMBER Sets how many results are shown when search results mode
 # is
 # | " "active. Without a number shows current count. Resets to 5 on restart"
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:978
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:978
 #, fuzzy
 msgid ""
 "NUMBER Sets how many results are shown when search results mode is "
@@ -830,68 +834,68 @@ msgstr ""
 "NOMOR Mengatur berapa hasil yang ditampilkan dalam mode pencarian. Tanpa "
 "nomor menampilkan jumlah saat ini. Diatur ulang ke 5 saat restart"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:984
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:984
 #, python-brace-format
 msgid "Search results count: {count}"
 msgstr "Jumlah hasil pencarian: {count}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:994
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:994
 msgid "Invalid count. Please enter a number greater than 0"
 msgstr "Jumlah tidak valid. Masukkan angka lebih dari 0"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:999
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:999
 #, python-brace-format
 msgid "Search results count set to {count}"
 msgstr "Jumlah hasil pencarian diatur ke {count}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1007
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1007
 msgid "LINK Adds a link to the download list."
 msgstr "LINK Menambahkan tautan ke daftar unduhan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1019
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1019
 #, python-brace-format
 msgid "Added link to the list. Total: {count}"
 msgstr "Tautan ditambahkan ke daftar. Total: {count}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1028
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1028
 msgid "LINK1 LINK2 ... Adds multiple space-separated links to the download list."
 msgstr ""
 "LINK1 LINK2 ... Menambahkan beberapa tautan yang dipisahkan spasi ke "
 "daftar unduhan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1043
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1043
 #, python-brace-format
 msgid "Added {added_count} links. Total list size: {count}"
 msgstr "Berhasil menambahkan {added_count} tautan. Total ukuran daftar: {count}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1053
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1053
 msgid "Lists all links in the download list."
 msgstr "Menampilkan semua tautan dalam daftar unduhan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1072
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1072
 msgid "NUMBER_OR_LINK Removes a link from the download list by its index or URL."
 msgstr ""
 "NOMOR_ATAU_TAUTAN Menghapus tautan dari daftar unduhan berdasarkan indeks"
 " atau URL."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1097
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1097
 msgid "Link not found in the list"
 msgstr "Tautan tidak ditemukan dalam daftar"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1099
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1099
 #, python-brace-format
 msgid "Removed link: {link}"
 msgstr "Tautan yang dihapus: {link}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1106
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1106
 msgid "LINK Downloads a link directly and uploads it to the channel."
 msgstr "LINK Mengunduh tautan secara langsung dan mengunggahnya ke saluran."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1114
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1114
 msgid "Searching and downloading..."
 msgstr "Mencari dan mengunduh..."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1139
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1139
 msgid ""
 "Downloads all links in your list and uploads them to the channel. Can "
 "download normally or as a ZIP archive."
@@ -899,7 +903,7 @@ msgstr ""
 "Mengunduh semua tautan di daftar Anda dan mengunggahnya ke saluran. Bisa "
 "diunduh secara normal atau sebagai arsip ZIP."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1151
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1151
 msgid ""
 "How do you want to download these links?\n"
 "1. Download individually (Normal)\n"
@@ -911,74 +915,74 @@ msgstr ""
 "2. Kompres semua ke dalam file ZIP\n"
 "Jawab hanya dengan 1 atau 2."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1162
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1162
 #, python-brace-format
 msgid "Starting local download of {count} links..."
 msgstr "Memulai pengunduhan lokal {count} tautan..."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1165
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1165
 #, python-brace-format
 msgid "Starting download of {count} links..."
 msgstr "Memulai pengunduhan {count} tautan..."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1171
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1171
 #, python-brace-format
 msgid "Resolving and zipping locally {count} links..."
 msgstr "Mengurai dan mengompres secara lokal {count} tautan..."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1174
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1174
 #, python-brace-format
 msgid "Resolving and zipping {count} links..."
 msgstr "Mengurai dan mengompres {count} tautan..."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1176
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1176
 msgid "Invalid option. Please send 'ads' again to select."
 msgstr "Pilihan tidak valid. Silakan kirim 'ads' lagi untuk memilih."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1182
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1221
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1182
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1221
 #, python-brace-format
 msgid "Processing link {number}/{total}: {link}"
 msgstr "Memproses tautan {number}/{total}: {link}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1190
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1229
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1190
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1229
 #, python-brace-format
 msgid "Nothing is found for: {link}"
 msgstr "Tidak ada hasil yang ditemukan untuk: {link}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1199
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1199
 #, python-brace-format
 msgid "Error downloading {link}: {error}"
 msgstr "Gagal mengunduh {link}: {error}"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1249
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1366
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1249
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1366
 msgid "All downloads completed successfully!"
 msgstr "Semua unduhan selesai dengan sukses!"
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1254
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1371
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1254
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1371
 #, python-brace-format
 msgid "Downloads completed with {error_count} error(s)."
 msgstr "Unduhan selesai dengan {error_count} kesalahan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1263
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1293
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1263
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1293
 msgid "Resolving links..."
 msgstr "Mengurai tautan..."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1277
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1310
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1277
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1310
 msgid "Error: No valid tracks found to download."
 msgstr "Error: Tidak ada trek valid yang ditemukan untuk diunduh."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1330
-#: /home/ttbot/TTMediaBot/bot/modules/playlist_uploader.py:94
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1330
+#: /home/admin/joao/TTMediaBot/bot/modules/playlist_uploader.py:94
 msgid "Error: Failed to download any tracks from this playlist."
 msgstr "Kesalahan: Gagal mengunduh lagu apa pun dari daftar putar ini."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1382
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1382
 msgid ""
 "Toggles local download mode for the 'ads' command. When active, files are"
 " saved locally to the VPS instead of uploaded to TeamTalk."
@@ -986,67 +990,68 @@ msgstr ""
 "Beralih mode unduh lokal untuk perintah 'ads'. Saat aktif, file disimpan "
 "secara lokal di VPS alih-alih diunggah ke TeamTalk."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1388
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1388
 msgid "Local download mode (adsc) enabled."
 msgstr "Mode unduh lokal (adsc) diaktifkan."
 
-#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1390
+#: /home/admin/joao/TTMediaBot/bot/commands/user_commands.py:1390
 msgid "Local download mode (adsc) disabled."
 msgstr "Mode unduh lokal (adsc) dinonaktifkan."
 
-#: /home/ttbot/TTMediaBot/bot/connectors/tt_player_connector.py:36
+#: /home/admin/joao/TTMediaBot/bot/connectors/tt_player_connector.py:36
 #, python-brace-format
 msgid "Playing: {track_name}"
 msgstr "Memutar: {track_name}."
 
-#: /home/ttbot/TTMediaBot/bot/connectors/tt_player_connector.py:42
+#: /home/admin/joao/TTMediaBot/bot/connectors/tt_player_connector.py:42
 #, python-brace-format
 msgid "Playing: {stream_url}"
 msgstr "Memutar: {stream_url}."
 
-#: /home/ttbot/TTMediaBot/bot/connectors/tt_player_connector.py:53
+#: /home/admin/joao/TTMediaBot/bot/connectors/tt_player_connector.py:53
 #, python-brace-format
 msgid "Paused: {track_name}"
 msgstr "dijeda: {track_name}."
 
-#: /home/ttbot/TTMediaBot/bot/connectors/tt_player_connector.py:59
+#: /home/admin/joao/TTMediaBot/bot/connectors/tt_player_connector.py:59
 #, python-brace-format
 msgid "Paused: {stream_url}"
 msgstr "dijeda: {stream_url}."
 
-#: /home/ttbot/TTMediaBot/bot/modules/playlist_uploader.py:51
+#: /home/admin/joao/TTMediaBot/bot/modules/playlist_uploader.py:51
 #, python-brace-format
 msgid "Error: This playlist is too large (max {} tracks)."
 msgstr "Kesalahan: Daftar putar ini terlalu besar (maks {} lagu)."
 
-#: /home/ttbot/TTMediaBot/bot/modules/playlist_uploader.py:61
+#: /home/admin/joao/TTMediaBot/bot/modules/playlist_uploader.py:61
 #, python-brace-format
 msgid "Downloading playlist: {}"
 msgstr "Mengunduh daftar putar: {}"
 
-#: /home/ttbot/TTMediaBot/bot/modules/playlist_uploader.py:68
+#: /home/admin/joao/TTMediaBot/bot/modules/playlist_uploader.py:68
 #, python-brace-format
 msgid "Downloading track {}: {}"
 msgstr "Mengunduh lagu {}: {}"
 
-#: /home/ttbot/TTMediaBot/bot/modules/playlist_uploader.py:100
+#: /home/admin/joao/TTMediaBot/bot/modules/playlist_uploader.py:100
 msgid "Zipping tracks..."
 msgstr "Mengompres lagu..."
 
-#: /home/ttbot/TTMediaBot/bot/modules/playlist_uploader.py:115
+#: /home/admin/joao/TTMediaBot/bot/modules/playlist_uploader.py:115
 #, python-brace-format
 msgid "Uploading ZIP: {}"
 msgstr "Mengunggah ZIP: {}"
 
-#: /home/ttbot/TTMediaBot/bot/modules/uploader.py:64
+#: /home/admin/joao/TTMediaBot/bot/modules/uploader.py:64
 msgid "Error: Downloaded file not found."
 msgstr "Kesalahan: File yang diunduh tidak ditemukan."
 
-#: /home/ttbot/TTMediaBot/bot/services/yt.py:327
+#: /home/admin/joao/TTMediaBot/bot/services/yt.py:290
+#: /home/admin/joao/TTMediaBot/bot/services/yt.py:542
 msgid "Unknown Title"
 msgstr "Judul Tidak Diketahui"
 
-#: /home/ttbot/TTMediaBot/bot/services/ytm.py:357
+#: /home/admin/joao/TTMediaBot/bot/services/ytm.py:357
 msgid "Unknown"
 msgstr "Tidak Diketahui"
 

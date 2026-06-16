@@ -30,8 +30,10 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 - **🔔 Early Warning Notification:**
   Integrated a signaling mechanism using an `update_in_progress` trigger file. As soon as the VPS update or rebuild starts (when option `y` is selected in `update.sh`), the bot posts a warning message to the active TeamTalk channel: *"The bot is starting an update process and will restart shortly. It may go offline at any moment."*
+- **🛑 Graceful Shutdown Alert:**
+  Added signal handling for `SIGTERM`. When the container is stopping or restarting, the bot intercepts the termination signal and posts an immediate localized warning: *"The bot is restarting now. See you in a moment!"* to the active TeamTalk channel before shutting down.
 - **🌍 100% Translated warning:**
-  Fully translated and compiled this update warning message into all 8 supported languages (English, Portuguese, Spanish, Russian, Turkish, Arabic, Hungarian, Indonesian), ensuring native translation based on the bot's configured language.
+  Fully translated and compiled both the update starting and shutdown warning messages into all 8 supported languages (English, Portuguese, Spanish, Russian, Turkish, Arabic, Hungarian, Indonesian), ensuring native translation based on the bot's configured language.
 
 ---
 
