@@ -7,18 +7,24 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  TTMediaBot\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-23 22:38+0000\n"
+"POT-Creation-Date: 2026-06-16 11:38+0000\n"
 "PO-Revision-Date: 2021-07-17 13:41+0400\n"
 "Last-Translator: \n"
 "Language: tr\n"
 "Language-Team: TTMediaBot's developers\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.18.0\n"
 
-#: /root/joao/TTMediaBot/bot/app_vars.py:11
+#: /home/ttbot/TTMediaBot/bot/__init__.py:136
+msgid ""
+"The bot is starting an update process and will restart shortly. It may go"
+" offline at any moment."
+msgstr ""
+
+#: /home/ttbot/TTMediaBot/bot/app_vars.py:12
 msgid ""
 "Hello! I am João Almeida. This is my fork of TTMediaBot for TeamTalk 5.\n"
 "This repository focuses on stability and support for YouTube Music.\n"
@@ -32,49 +38,49 @@ msgstr ""
 "Orijinal Yazarlar: Amir Gumerov, Vladislav Kopylov, Beqa Gozalishvili, "
 "Kirill Belousov.\n"
 
-#: /root/joao/TTMediaBot/bot/TeamTalk/__init__.py:150
+#: /home/ttbot/TTMediaBot/bot/TeamTalk/__init__.py:173
 msgid "Send \"h\" for help"
 msgstr "Yardım için \"h\" gönderin"
 
-#: /root/joao/TTMediaBot/bot/commands/__init__.py:144
+#: /home/ttbot/TTMediaBot/bot/commands/__init__.py:144
 msgid "Unknown command. Send \"h\" for help."
 msgstr "Bilinmeyen komut. Yardım için \"h\" gönderin."
 
-#: /root/joao/TTMediaBot/bot/commands/__init__.py:150
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:724
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:730
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1130
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1213
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1285
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1359
-#: /root/joao/TTMediaBot/bot/modules/playlist_uploader.py:136
-#: /root/joao/TTMediaBot/bot/modules/playlist_uploader.py:150
-#: /root/joao/TTMediaBot/bot/modules/uploader.py:85
+#: /home/ttbot/TTMediaBot/bot/commands/__init__.py:150
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:724
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:730
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1130
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1213
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1285
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1359
+#: /home/ttbot/TTMediaBot/bot/modules/playlist_uploader.py:136
+#: /home/ttbot/TTMediaBot/bot/modules/playlist_uploader.py:150
+#: /home/ttbot/TTMediaBot/bot/modules/uploader.py:85
 #, python-brace-format
 msgid "Error: {}"
 msgstr "Hata: {}"
 
-#: /root/joao/TTMediaBot/bot/commands/__init__.py:162
+#: /home/ttbot/TTMediaBot/bot/commands/__init__.py:162
 msgid "You are banned"
 msgstr "Siz engellendiniz"
 
-#: /root/joao/TTMediaBot/bot/commands/__init__.py:166
+#: /home/ttbot/TTMediaBot/bot/commands/__init__.py:166
 msgid "You are not in bot's channel"
 msgstr "botun kanalında değilsiniz"
 
-#: /root/joao/TTMediaBot/bot/commands/__init__.py:170
+#: /home/ttbot/TTMediaBot/bot/commands/__init__.py:170
 msgid "Bot is locked"
 msgstr "Bot kilitli"
 
-#: /root/joao/TTMediaBot/bot/commands/__init__.py:174
+#: /home/ttbot/TTMediaBot/bot/commands/__init__.py:174
 msgid "This command is blocked"
 msgstr "Bu komut kilitli"
 
-#: /root/joao/TTMediaBot/bot/commands/__init__.py:198
+#: /home/ttbot/TTMediaBot/bot/commands/__init__.py:198
 msgid "Unknown command"
 msgstr "Bilinmeyen komut"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:20
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:21
 msgid ""
 "+/-COMMAND Blocks or unblocks commands. +COMMAND adds command to the "
 "blocklist. -COMMAND removes from it. Without a command shows the "
@@ -84,68 +90,68 @@ msgstr ""
 "listesine komut ekler. -KOMUT komutu engelleme listesinden kaldırır. "
 "Komut olmadan engellenen komut listesini gösterir"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:32
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:322
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:352
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:471
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:483
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:539
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1059
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1081
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1145
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:32
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:322
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:352
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:471
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:483
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:539
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1059
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1081
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1145
 msgid "The list is empty"
 msgstr "Liste boş"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:37
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:304
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:336
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:434
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:37
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:304
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:336
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:434
 msgid "Added"
 msgstr "Eklendi"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:39
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:39
 msgid "This command is already added"
 msgstr "Bu komut zaten eklendi"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:45
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:310
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:342
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:446
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:45
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:310
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:342
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:446
 msgid "Deleted"
 msgstr "Silindi"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:47
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:47
 msgid "This command is not blocked"
 msgstr "Bu komut kilitli değil"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:55
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:56
 msgid "GENDER Changes bot's gender. n neutral, m male, f female"
 msgstr "CİNSİYET Botun cinsiyetini değiştirir. n nötr, m erkek, f kadın"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:70
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:70
 msgid "LANGUAGE Changes bot's language"
 msgstr "DIL Botun dilini değiştirir"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:78
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:78
 msgid "The language has been changed"
 msgstr "Dil değiştirildi"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:80
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:80
 msgid "Incorrect language"
 msgstr "yanlış dil"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:82
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:83
 #, python-brace-format
 msgid ""
 "Current language: {current_language}. Available languages: "
 "{available_languages}"
 msgstr "Şu anki dil: {current_language}. Mevcut diller: {available_languages}"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:93
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:93
 msgid "NICKNAME Changes bot's nickname"
 msgstr "TAKMA AD Botun takma adını değiştirir"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:103
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:104
 msgid ""
 "r/f Clears bot's cache. r clears recents, f clears favorites, without an "
 "option clears the entire cache"
@@ -153,19 +159,19 @@ msgstr ""
 "r/f Botun önbelleğini temizler. r son çalınan parça listesini siler, f "
 "favorileri siler, seçenek olmadan tüm önbelleği temizler"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:112
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:112
 msgid "Cache cleared"
 msgstr "Önbellek temizlendi"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:116
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:116
 msgid "Recents cleared"
 msgstr "Son çalınan parça listesi temizlendi"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:120
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:120
 msgid "Favorites cleared"
 msgstr "Favoriler temizlendi"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:126
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:127
 msgid ""
 "Join channel. first argument is channel name or id, second argument is "
 "password, split argument \" | \", if password is undefined, don't type "
@@ -175,77 +181,77 @@ msgstr ""
 "argümanları \" | \" ile ayırın, şifre tanımlanmamışsa ikinci argümanı "
 "yazmayın"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:146
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:146
 msgid "This channel does not exist"
 msgstr "Bu kanal mevcut değil"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:160
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:160
 #, python-brace-format
 msgid "Error joining channel: {error}"
 msgstr "Kanala katılırken hata oluştu: {error}"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:208
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:208
 msgid "Enables or disables voice transmission"
 msgstr "Ses iletimini etkinleştirir veya devre dışı bırakır"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:215
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:217
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:215
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:217
 msgid "Voice transmission enabled"
 msgstr "Ses iletimi etkin"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:222
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:222
 msgid "Voice transmission disabled"
 msgstr "Ses iletimi devre dışı"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:228
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:228
 msgid "Locks or unlocks the bot"
 msgstr "Botu kilitler veya kilidini açar"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:233
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:233
 msgid "Locked"
 msgstr "Kilitlendi"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:235
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:235
 msgid "Unlocked"
 msgstr "Kilid açıldı"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:242
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:242
 msgid "STATUS Changes bot's status"
 msgstr "DURUM Botun durumunu değiştirir"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:252
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:252
 msgid "Enables or disables event handling"
 msgstr "Olay işlemeyi etkinleştirir veya devre dışı bırakır"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:259
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:259
 msgid "Event handling is enabled"
 msgstr "Olay işleme etkin"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:261
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:261
 msgid "Event handling is disabled"
 msgstr "Olay işleme devre dışı"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:268
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:269
 msgid "Enables or disables sending of channel messages"
 msgstr "Kanal mesajlarının gönderilmesini etkinleştirir veya devre dışı bırakır"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:277
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:277
 msgid "Channel messages enabled"
 msgstr "Kanal mesajları etkinleştirildi"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:279
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:279
 msgid "Channel messages disabled"
 msgstr "Kanal mesajları devre dışı bırakıldı"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:286
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:286
 msgid "Saves bot's configuration"
 msgstr "Botun konfigurasyonunu kaydeder"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:290
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:290
 msgid "Configuration saved"
 msgstr "Konfigurasyon kaydedildi"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:296
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:297
 msgid ""
 "+/-USERNAME Manages a list of administrators. +USERNAME adds a user. "
 "-USERNAME removes it. Without an option shows the list"
@@ -254,16 +260,16 @@ msgstr ""
 "ekler. -KULLANICI ADI kullanıcıyı kaldırır. Bir seçenek olmadan listeyi "
 "gösterir"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:312
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:313
 msgid "This user is not in the admin list"
 msgstr "Bu kullanıcı yönetici listesinde değil"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:319
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:349
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:319
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:349
 msgid "<Anonymous>"
 msgstr "<Anonim>"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:328
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:329
 msgid ""
 "+/-USERNAME Manages a list of banned users. +USERNAME adds a user. "
 "-USERNAME removes it. Without an option shows the list"
@@ -272,36 +278,36 @@ msgstr ""
 "ADI kullanıcı ekler. -KULLANICI ADI kullanıcıyı kaldırır. Bir seçenek "
 "olmadan listeyi gösterir"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:344
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:344
 msgid "This user is not banned"
 msgstr "Bu kullanıcı engellenmemiştir"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:358
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:358
 msgid "Quits the bot"
 msgstr "Botu kapatır"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:367
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:367
 msgid "Restarts the bot"
 msgstr "Botu yeniden başlatır"
 
-#: /root/joao/TTMediaBot/bot/commands/admin_commands.py:382
+#: /home/ttbot/TTMediaBot/bot/commands/admin_commands.py:382
 msgid "Returns current channel's ID"
 msgstr "Mevcut kanalın kimliğini (ID) döndürür"
 
-#: /root/joao/TTMediaBot/bot/commands/command.py:28
+#: /home/ttbot/TTMediaBot/bot/commands/command.py:28
 msgid "help text not found"
 msgstr "yardım metni bulunamadı"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:20
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:20
 msgid "Shows command help"
 msgstr "Komut yardımını gösterir"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:29
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:29
 msgid "Shows information about the bot"
 msgstr "Bot hakkında bilgi gösterir"
 
 # --- Search Results Mode (sr/sl/slc) ---
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:38
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:39
 msgid ""
 "QUERY Plays tracks found for the query. If no query is given, plays or "
 "pauses current track. When search results mode (sr) is active, shows a "
@@ -311,95 +317,95 @@ msgstr ""
 "oynatır veya duraklatır. Arama sonuçları modu (sr) aktifken numaralı "
 "liste gösterir"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:46
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:651
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:751
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:46
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:651
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:751
 msgid "Searching..."
 msgstr "Aranıyor..."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:55
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:55
 msgid "Search results:"
 msgstr "Arama sonuçları:"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:58
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:58
 msgid "Use 'sl NUMBER' to select a track"
 msgstr "Parça seçmek için 'sl NUMARA' kullanın"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:66
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:67
 #, python-brace-format
 msgid "{nickname} requested {request}"
 msgstr "{nickname} {request} istedi"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:72
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:202
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:219
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:769
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:879
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:967
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:72
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:202
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:219
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:769
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:879
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:967
 #, python-brace-format
 msgid "Playing {}"
 msgstr "Oynatılıyor {}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:76
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:659
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:758
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1121
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:76
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:659
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:758
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1121
 msgid "Nothing is found for your query"
 msgstr "Sorgunuz için hiçbir şey bulunamadı"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:78
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:760
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:79
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:761
 msgid "The selected service is currently unavailable"
 msgstr "Seçilen hizmet şu anda kullanılamıyor"
 
 # | msgid "URL Plays a stream from bot given URL"
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:91
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:91
 msgid "URL Plays a stream from a given URL"
 msgstr "URL Verilen bir URL'den akış oynatır"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:100
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:101
 #, python-brace-format
 msgid "{nickname} requested playing from a URL"
 msgstr "{nickname} bir URL'den oynatma istedi"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:107
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:107
 msgid "Incorrect protocol"
 msgstr "Geçersiz protokol"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:109
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:109
 msgid "Cannot process stream URL"
 msgstr "Akış URL'si işlenemiyor"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:111
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:111
 msgid "The path cannot be found"
 msgstr "Yol bulunamadı"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:119
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:119
 msgid "Stops playback"
 msgstr "Oynatmayı durdurur"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:126
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:126
 #, python-brace-format
 msgid "{nickname} stopped playback"
 msgstr "{nickname} oynatmayı durdurdu"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:132
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:165
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:184
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:208
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:225
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:374
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:383
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:436
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:454
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:500
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:561
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:582
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:866
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:132
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:165
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:184
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:208
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:225
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:374
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:383
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:436
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:454
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:500
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:561
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:582
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:866
 msgid "Nothing is playing"
 msgstr "Hiçbir şey çalmıyor"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:138
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:139
 #, python-brace-format
 msgid ""
 "VOLUME Sets the volume to a value between 0 and {max_volume}. If no "
@@ -408,7 +414,7 @@ msgstr ""
 "SES Sesi 0 ile {max_volume} arasında bir değere ayarlar. Ses düzeyi "
 "belirtilmemişse, geçerli ses düzeyi görüntülenir"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:159
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:160
 #, python-brace-format
 msgid "STEP Seeks current track backward. the default step is {seek_step} seconds"
 msgstr ""
@@ -416,7 +422,7 @@ msgstr ""
 "seconds[ADIM] Geçerli parçayı geriye doğru arar. varsayılan adım "
 "{seek_step} saniye"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:178
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:179
 #, python-brace-format
 msgid "STEP Seeks current track forward. the default step is {seek_step} seconds"
 msgstr ""
@@ -424,24 +430,24 @@ msgstr ""
 "seconds[ADIM] Mevcut parçayı ileriye doğru arar. varsayılan adım "
 "{seek_step} saniye"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:197
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:197
 msgid "Plays next track"
 msgstr "Sonraki parçayı çalar"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:206
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:883
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:206
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:883
 msgid "No next track"
 msgstr "Sonraki parça yok"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:214
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:214
 msgid "Plays previous track"
 msgstr "Önceki parçayı oynatır"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:223
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:223
 msgid "No previous track"
 msgstr "Önceki parça yok"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:231
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:232
 msgid ""
 "MODE Sets the playback mode. If no mode is specified, the current mode "
 "and a list of modes are displayed"
@@ -449,27 +455,28 @@ msgstr ""
 "MOD Oynatma modunu ayarlar. Mod belirtilmemişse, geçerli mod ve modların "
 "listesi görüntülenir"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:237
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:237
 msgid "Single Track"
 msgstr "Tek Parça"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:238
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:238
 msgid "Repeat Track"
 msgstr "Parçayı Tekrarlama modu"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:239
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:239
 msgid "Track list"
 msgstr "Parça listesi"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:240
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:240
 msgid "Repeat track list"
 msgstr "Parça listesini tekrarlama modu"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:241
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:241
 msgid "Random"
 msgstr "Rastgele"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:243
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:244
+#, python-brace-format
 msgid ""
 "Current mode: {current_mode}\n"
 "{modes}"
@@ -477,16 +484,16 @@ msgstr ""
 "Geçerli mod: {current_mode}\n"
 "{modes}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:262
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:262
 #, python-brace-format
 msgid "Current mode: {mode}"
 msgstr "Geçerli mod: {mode}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:266
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:266
 msgid "Incorrect mode"
 msgstr "Geçersiz mod"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:274
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:275
 msgid ""
 "SERVICE Selects the service to play from, sv SERVICE h returns additional"
 " help. If no service is specified, the current service and a list of "
@@ -496,7 +503,7 @@ msgstr ""
 "belirtilmezse, mevcut hizmet ve kullanılabilir hizmetlerin listesi "
 "görüntülenir"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:283
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:283
 #, python-brace-format
 msgid ""
 "Unknown service.\n"
@@ -505,7 +512,8 @@ msgstr ""
 "Bilinmeyen hizmet.\n"
 "{}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:291
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:292
+#, python-brace-format
 msgid ""
 "Current service: {}\n"
 "Warning: {}"
@@ -513,12 +521,12 @@ msgstr ""
 "Mevcut hizmet: {}\n"
 "Uyarı: {}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:294
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:294
 #, python-brace-format
 msgid "Current service: {}"
 msgstr "Mevcut hizmet: {}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:300
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:300
 #, python-brace-format
 msgid ""
 "Error: {error}\n"
@@ -527,24 +535,27 @@ msgstr ""
 "Hata: {error}\n"
 "{service} devre dışı bırakıldı"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:307
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:307
+#, python-brace-format
 msgid "{service} is disabled"
 msgstr "{service} devre dışı"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:313
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:314
 msgid "This service has no additional help"
 msgstr "Bu hizmetin ek yardımı yok"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:331
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:331
+#, python-brace-format
 msgid "{} (Error)"
 msgstr "{} (Hata)"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:335
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:335
 #, python-brace-format
 msgid "{} (Warning: {})"
 msgstr "{} (Uyarı: {})"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:341
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:342
+#, python-brace-format
 msgid ""
 "Current service: {current_service}\n"
 "Available:\n"
@@ -556,31 +567,31 @@ msgstr ""
 "{available_services}\n"
 "Ek yardım için sv HİZMET h gönderin"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:353
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:354
 msgid "NUMBER Selects track by number from the list of current results"
 msgstr "NUMARA Geçerli sonuçlar listesinden parçayı numaraya göre seçer"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:366
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:366
 msgid "Incorrect number"
 msgstr "Yanlış numara"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:368
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:379
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:368
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:379
 #, python-brace-format
 msgid "Playing {} {}"
 msgstr "Oynatılıyor {} {}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:372
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:448
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:481
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:520
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:834
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:951
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1088
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:372
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:448
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:481
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:520
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:834
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:951
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1088
 msgid "Out of list"
 msgstr "Liste dışı"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:389
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:390
 msgid ""
 "SPEED Sets playback speed from 0.25 to 4. If no speed is given, shows "
 "current speed"
@@ -588,12 +599,12 @@ msgstr ""
 "HIZ Oynatma hızını 0.25 ile 4 arasında ayarlar. Hız belirtilmezse, mevcut"
 " hız gösterilir"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:395
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:395
 #, python-brace-format
 msgid "Current rate: {}"
 msgstr "Geçerli hız: {}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:408
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:409
 msgid ""
 "+/-NUMBER Manages favorite tracks. + adds the current track to favorites."
 " - removes a track requested from favorites. If a number is specified "
@@ -603,28 +614,29 @@ msgstr ""
 "favorilerden istenen parçayı kaldırır. +/- sonra bir numara belirtilirse,"
 " o numaraya sahip bir parçayı ekler/kaldırır"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:414
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:415
 msgid "This command is not available for guest users"
 msgstr "Bu komut konuk kullanıcılar için mevcut değildir"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:452
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:452
 msgid "This track is not in favorites"
 msgstr "Bu parça favorilerde değil"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:461
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:526
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:461
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:526
+#, python-brace-format
 msgid "{number}: {track_name}"
 msgstr "{number}: {track_name}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:489
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:489
 msgid "Gets a direct link to the current track"
 msgstr "Geçerli parçaya doğrudan bir bağlantı alır"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:498
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:498
 msgid "URL is not available"
 msgstr "URL mevcut değil"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:506
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:507
 msgid ""
 "NUMBER Plays a track with  the given number from a list of recent tracks."
 " Without a number shows recent tracks"
@@ -632,49 +644,53 @@ msgstr ""
 "NUMARA Son parçaların listesinden verilen numaralı parçayı oynatır. "
 "Numara olmadan son parçaları gösterir"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:532
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:532
+#, python-brace-format
 msgid "{number}: {track_url}"
 msgstr "{number}: {track_url}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:546
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:547
 msgid "Downloads the current track and uploads it to the channel."
 msgstr "Mevcut parçayı indirir ve kanala yükler."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:557
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:557
 msgid "Downloading..."
 msgstr "İndiriliyor..."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:559
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:580
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:559
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:580
 msgid "Live streams cannot be downloaded"
 msgstr "Canlı akışlar indirilemiyor"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:567
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:568
 msgid "Downloads the current track as video and uploads it to the channel."
 msgstr "Mevcut parçayı video olarak indirir ve kanala yükler."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:578
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:578
 msgid "Downloading video..."
 msgstr "Video indiriliyor..."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:588
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:588
 msgid "Makes the bot join your current channel"
 msgstr "Botun mevcut kanalınıza katılmasını sağlar"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:609
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:626
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:609
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:626
+#, python-brace-format
 msgid "Joining channel: {}"
 msgstr "Kanala katılıyor: {}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:618
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:618
+#, python-brace-format
 msgid "Failed to join channel. Error: {}"
 msgstr "Kanala katılma başarısız oldu. Hata: {}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:629
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:629
+#, python-brace-format
 msgid "Failed to join channel: {}"
 msgstr "Kanala katılma başarısız oldu: {}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:635
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:636
 msgid ""
 "Downloads all tracks from a playlist/album URL, zips them, and uploads to"
 " the channel."
@@ -682,22 +698,23 @@ msgstr ""
 "Bir playlist/albüm URL'sindeki tüm parçaları indirir, ZIP'ler ve kanala "
 "yükler."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:644
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:644
+#, python-brace-format
 msgid "Current progress: {}"
 msgstr "Mevcut ilerleme: {}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:648
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:648
 msgid "Please send the link to the playlist or album."
 msgstr "Lütfen çalma listesi veya albüm bağlantısını gönderin."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:667
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:667
 msgid "This command is for playlists and albums. For single tracks, use 'dl'."
 msgstr ""
 "This command is for playlists and albums. For single tracks, use 'dl'.Bu "
 "komut çalma listeleri ve albümler içindir. Tekli parçalar için 'dl' "
 "kullanın."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:741
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:742
 msgid ""
 "QUERY Searches for a track and adds it to the queue. If nothing is "
 "playing, starts immediately"
@@ -705,47 +722,51 @@ msgstr ""
 "SORGU Bir parçayı arar ve sıraya ekler. Hiçbir şey çalmıyorsa, hemen "
 "başlar"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:777
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:778
+#, python-brace-format
 msgid "{nickname} added to queue: {track}"
 msgstr "{nickname} sıraya ekledi: {track}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:783
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:784
+#, python-brace-format
 msgid "Added to queue [{position}]: {track}"
 msgstr "Sıraya eklendi [{position}]: {track}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:791
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:791
 msgid "Lists all tracks in the queue"
 msgstr "Sıradaki tüm parçaları listeler"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:797
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:797
 msgid "The queue is empty"
 msgstr "Sıra boş"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:804
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:805
+#, python-brace-format
 msgid "Queue ({count} track(s)):"
 msgstr "Sıra ({count} parça):"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:814
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:815
 msgid "NUMBER Removes track number NUMBER from the queue"
 msgstr "NUMBER Sıradaki NUMBER numaralı parçayı kaldırır"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:839
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:840
+#, python-brace-format
 msgid "Removed from queue: {track}"
 msgstr "Sıradan kaldırıldı: {track}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:847
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:847
 msgid "Clears the entire queue"
 msgstr "Tüm sırayı temizler"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:851
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:851
 msgid "The queue is already empty"
 msgstr "Sıra zaten boş"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:854
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:854
 msgid "Queue cleared"
 msgstr "Sıra temizlendi"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:860
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:861
 msgid ""
 "Skips current track and plays the next one from the queue. Falls back to "
 "normal next if queue is empty"
@@ -753,28 +774,29 @@ msgstr ""
 "Mevcut parçayı atlar ve sıradaki parçayı çalar. Sıra boşsa, normal "
 "sonraki parçaya geçer"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:872
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:872
+#, python-brace-format
 msgid "Playing next from queue: {}"
 msgstr "Sıradaki parça çalınıyor: {}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:895
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:896
 msgid ""
 "Toggles search results mode. When active, 'p QUERY' shows a numbered "
 "list. Use 'sr on' or 'sr off' to set explicitly. Save permanently with "
 "'sc'"
 msgstr ""
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:904
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:914
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:904
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:914
 msgid "Search results mode: ON"
 msgstr "Arama sonuçları modu: AÇIK"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:908
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:916
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:908
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:916
 msgid "Search results mode: OFF"
 msgstr "Arama sonuçları modu: KAPALI"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:927
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:928
 msgid ""
 "NUMBER Selects and plays result NUMBER from the last search list "
 "(requires search results mode to be active)"
@@ -782,79 +804,89 @@ msgstr ""
 "NUMARA Son arama listesinden NUMARA sonucunu seçer ve oynatır (arama "
 "sonuçları modunun aktif olması gerekir)"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:946
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:947
 msgid "No search results available. Use 'p QUERY' to search first"
 msgstr "Mevcut arama sonucu yok. Önce 'p SORGU' ile arama yapın"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:960
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:961
+#, python-brace-format
 msgid "{nickname} selected: {track}"
 msgstr "{nickname} seçti: {track}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:977
+# | msgid "" "NUMBER Sets how many results are shown when search results mode
+# is
+# | " "active. Without a number shows current count. Resets to 5 on restart"
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:978
+#, fuzzy
 msgid ""
 "NUMBER Sets how many results are shown when search results mode is "
-"active. Without a number shows current count. Resets to 5 on restart"
+"active. Without a number shows current count. Resets to 1 on restart"
 msgstr ""
 "NUMARA Arama modunda kaç sonuç gösterileceğini ayarlar. Numara olmadan "
 "mevcut sayıyı gösterir. Yeniden başlatmada 5'e sıfırlanır"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:983
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:984
+#, python-brace-format
 msgid "Search results count: {count}"
 msgstr "Arama sonucu sayısı: {count}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:993
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:994
 msgid "Invalid count. Please enter a number greater than 0"
 msgstr "Geçersiz sayı. Lütfen 0'dan büyük bir sayı girin"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:998
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:999
+#, python-brace-format
 msgid "Search results count set to {count}"
 msgstr "Arama sonucu sayısı {count} olarak ayarlandı"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1006
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1007
 msgid "LINK Adds a link to the download list."
 msgstr "LINK İndirme listesine bir bağlantı ekler."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1019
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1019
+#, python-brace-format
 msgid "Added link to the list. Total: {count}"
 msgstr "Bağlantı listeye eklendi. Toplam: {count}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1027
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1028
 msgid "LINK1 LINK2 ... Adds multiple space-separated links to the download list."
 msgstr ""
 "LINK1 LINK2 ... İndirme listesine boşlukla ayrılmış birden fazla bağlantı"
 " ekler."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1043
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1043
+#, python-brace-format
 msgid "Added {added_count} links. Total list size: {count}"
 msgstr "{added_count} bağlantı eklendi. Toplam liste boyutu: {count}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1052
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1053
 msgid "Lists all links in the download list."
 msgstr "İndirme listesindeki tüm bağlantıları listeler."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1071
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1072
 msgid "NUMBER_OR_LINK Removes a link from the download list by its index or URL."
 msgstr ""
 "NUMARA_VEYA_BAGLANTI İndirme listesinden dizine veya URL'ye göre bir "
 "bağlantıyı kaldırır."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1097
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1097
 msgid "Link not found in the list"
 msgstr "Bağlantı listede bulunamadı"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1099
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1099
+#, python-brace-format
 msgid "Removed link: {link}"
 msgstr "Kaldırılan bağlantı: {link}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1105
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1106
 msgid "LINK Downloads a link directly and uploads it to the channel."
 msgstr "LINK Bir bağlantıyı doğrudan indirir ve kanala yükler."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1114
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1114
 msgid "Searching and downloading..."
 msgstr "Aranıyor ve indiriliyor..."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1138
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1139
 msgid ""
 "Downloads all links in your list and uploads them to the channel. Can "
 "download normally or as a ZIP archive."
@@ -862,7 +894,7 @@ msgstr ""
 "Listenizdeki tüm bağlantıları indirir ve kanala yükler. Normal olarak "
 "veya ZIP arşivi olarak indirilebilir."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1150
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1151
 msgid ""
 "How do you want to download these links?\n"
 "1. Download individually (Normal)\n"
@@ -874,66 +906,74 @@ msgstr ""
 "2. Hepsini bir ZIP dosyasında sıkıştır\n"
 "Sadece 1 veya 2 ile yanıt verin."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1162
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1162
+#, python-brace-format
 msgid "Starting local download of {count} links..."
 msgstr "{count} bağlantının yerel olarak indirilmesi başlatılıyor..."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1165
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1165
+#, python-brace-format
 msgid "Starting download of {count} links..."
 msgstr "{count} bağlantının indirilmesi başlatılıyor..."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1171
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1171
+#, python-brace-format
 msgid "Resolving and zipping locally {count} links..."
 msgstr "{count} bağlantı yerel olarak çözümleniyor ve ZIP'leniyor..."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1174
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1174
+#, python-brace-format
 msgid "Resolving and zipping {count} links..."
 msgstr "{count} bağlantı çözümleniyor ve ZIP'leniyor..."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1176
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1176
 msgid "Invalid option. Please send 'ads' again to select."
 msgstr "Geçersiz seçenek. Seçmek için lütfen 'ads' komutunu tekrar gönderin."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1182
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1221
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1182
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1221
+#, python-brace-format
 msgid "Processing link {number}/{total}: {link}"
 msgstr "Bağlantı işleniyor {number}/{total}: {link}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1190
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1229
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1190
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1229
+#, python-brace-format
 msgid "Nothing is found for: {link}"
 msgstr "Şunun için hiçbir şey bulunamadı: {link}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1199
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1199
+#, python-brace-format
 msgid "Error downloading {link}: {error}"
 msgstr "{link} indirilirken hata oluştu: {error}"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1249
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1366
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1249
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1366
 msgid "All downloads completed successfully!"
 msgstr "Tüm indirmeler başarıyla tamamlandı!"
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1254
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1371
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1254
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1371
+#, python-brace-format
 msgid "Downloads completed with {error_count} error(s)."
 msgstr "İndirmeler {error_count} hata ile tamamlandı."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1263
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1293
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1263
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1293
 msgid "Resolving links..."
 msgstr "Bağlantılar çözümleniyor..."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1277
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1310
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1277
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1310
 msgid "Error: No valid tracks found to download."
 msgstr "Hata: İndirilecek geçerli parça bulunamadı."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1330
-#: /root/joao/TTMediaBot/bot/modules/playlist_uploader.py:94
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1330
+#: /home/ttbot/TTMediaBot/bot/modules/playlist_uploader.py:94
 msgid "Error: Failed to download any tracks from this playlist."
 msgstr "Hata: Bu çalma listesinden herhangi bir parça indirilemedi."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1381
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1382
 msgid ""
 "Toggles local download mode for the 'ads' command. When active, files are"
 " saved locally to the VPS instead of uploaded to TeamTalk."
@@ -941,63 +981,67 @@ msgstr ""
 " 'ads' komutu için yerel indirme modunu değiştirir. Aktif olduğunda, "
 "dosyalar TeamTalk'a yüklenmek yerine yerel olarak VPS'ye kaydedilir."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1388
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1388
 msgid "Local download mode (adsc) enabled."
 msgstr "Yerel indirme modu (adsc) etkinleştirildi."
 
-#: /root/joao/TTMediaBot/bot/commands/user_commands.py:1390
+#: /home/ttbot/TTMediaBot/bot/commands/user_commands.py:1390
 msgid "Local download mode (adsc) disabled."
 msgstr "Yerel indirme modu (adsc) devre dışı bırakıldı."
 
-#: /root/joao/TTMediaBot/bot/connectors/tt_player_connector.py:35
+#: /home/ttbot/TTMediaBot/bot/connectors/tt_player_connector.py:36
 #, python-brace-format
 msgid "Playing: {track_name}"
 msgstr "Oynatılıyor: {track_name}"
 
-#: /root/joao/TTMediaBot/bot/connectors/tt_player_connector.py:41
+#: /home/ttbot/TTMediaBot/bot/connectors/tt_player_connector.py:42
 #, python-brace-format
 msgid "Playing: {stream_url}"
 msgstr "Oynatılıyor: {stream_url}"
 
-#: /root/joao/TTMediaBot/bot/connectors/tt_player_connector.py:52
+#: /home/ttbot/TTMediaBot/bot/connectors/tt_player_connector.py:53
 #, python-brace-format
 msgid "Paused: {track_name}"
 msgstr "Duraklatıldı: {track_name}"
 
-#: /root/joao/TTMediaBot/bot/connectors/tt_player_connector.py:58
+#: /home/ttbot/TTMediaBot/bot/connectors/tt_player_connector.py:59
 #, python-brace-format
 msgid "Paused: {stream_url}"
 msgstr "Duraklatıldı: {stream_url}"
 
-#: /root/joao/TTMediaBot/bot/modules/playlist_uploader.py:51
+#: /home/ttbot/TTMediaBot/bot/modules/playlist_uploader.py:51
+#, python-brace-format
 msgid "Error: This playlist is too large (max {} tracks)."
 msgstr "Hata: Bu çalma listesi çok büyük (maks {} parça)."
 
-#: /root/joao/TTMediaBot/bot/modules/playlist_uploader.py:61
+#: /home/ttbot/TTMediaBot/bot/modules/playlist_uploader.py:61
+#, python-brace-format
 msgid "Downloading playlist: {}"
 msgstr "Çalma listesi indiriliyor: {}"
 
-#: /root/joao/TTMediaBot/bot/modules/playlist_uploader.py:68
+#: /home/ttbot/TTMediaBot/bot/modules/playlist_uploader.py:68
+#, python-brace-format
 msgid "Downloading track {}: {}"
 msgstr "Parça indiriliyor {}: {}"
 
-#: /root/joao/TTMediaBot/bot/modules/playlist_uploader.py:100
+#: /home/ttbot/TTMediaBot/bot/modules/playlist_uploader.py:100
 msgid "Zipping tracks..."
 msgstr "Parçalar ZIP'leniyor..."
 
-#: /root/joao/TTMediaBot/bot/modules/playlist_uploader.py:115
+#: /home/ttbot/TTMediaBot/bot/modules/playlist_uploader.py:115
+#, python-brace-format
 msgid "Uploading ZIP: {}"
 msgstr "ZIP yükleniyor: {}"
 
-#: /root/joao/TTMediaBot/bot/modules/uploader.py:64
+#: /home/ttbot/TTMediaBot/bot/modules/uploader.py:64
 msgid "Error: Downloaded file not found."
 msgstr "Hata: İndirilen dosya bulunamadı."
 
-#: /root/joao/TTMediaBot/bot/services/yt.py:322
+#: /home/ttbot/TTMediaBot/bot/services/yt.py:327
 msgid "Unknown Title"
 msgstr "Bilinmeyen Başlık"
 
-#: /root/joao/TTMediaBot/bot/services/ytm.py:320
+#: /home/ttbot/TTMediaBot/bot/services/ytm.py:357
 msgid "Unknown"
 msgstr "Bilinmiyor"
 

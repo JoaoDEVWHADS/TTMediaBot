@@ -88,6 +88,18 @@ perform_image_rebuild() {
     STATE_FILE="/tmp/ttmediabot_last_running.txt"
     RUNNING_NAMES=$(docker ps --format "{{.Names}}" -f "label=role=ttmediabot")
     
+    # Signal running bots that an update has started
+    if [ ! -z "$RUNNING_NAMES" ]; then
+        echo -e "${YELLOW}Notifying running bots of the update...${NC}"
+        echo "$RUNNING_NAMES" | while read -r name; do
+            if [ -n "$name" ] && [ -d "$BOTS_ROOT/$name" ]; then
+                touch "$BOTS_ROOT/$name/update_in_progress"
+            fi
+        done
+        # Give the bots a brief moment to detect the file and send the warning message
+        sleep 1.5
+    fi
+    
     # Build the image with a commit hash label for version tracking
     CURRENT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
     echo "Building new image with version label: $CURRENT_HASH"

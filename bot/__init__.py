@@ -129,6 +129,19 @@ class Bot:
                 self.last_pre_warm_time = time.time()
                 threading.Thread(target=self._perform_periodic_pre_warm, daemon=True).start()
 
+            # Check for update trigger file
+            update_file = os.path.join(self.config_manager.config_dir, "update_in_progress")
+            if os.path.exists(update_file):
+                try:
+                    msg = self.translator.translate("The bot is starting an update process and will restart shortly. It may go offline at any moment.")
+                    self.ttclient.send_message(msg, type=2)
+                except Exception as e:
+                    logging.error(f"Error sending update warning: {e}")
+                try:
+                    os.remove(update_file)
+                except Exception:
+                    pass
+
             time.sleep(app_vars.loop_timeout)
 
     def _perform_periodic_pre_warm(self):
