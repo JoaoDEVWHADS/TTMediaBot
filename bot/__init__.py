@@ -79,6 +79,7 @@ class Bot:
         # JC command tracking
         self.jc_requested_by_user_id: Optional[int] = None
         self.default_channel = self.config.teamtalk.channel
+        self.is_updating = False
 
     def initialize(self):
         if self.config.logger.log:
@@ -151,6 +152,7 @@ class Bot:
             # Check for update trigger file
             update_file = os.path.join(self.config_manager.config_dir, "update_in_progress")
             if os.path.exists(update_file):
+                self.is_updating = True
                 try:
                     msg = self.translator.translate("The bot is starting an update process and will restart shortly. It may go offline at any moment.")
                     self.ttclient.send_message(msg, type=2)
@@ -182,12 +184,13 @@ class Bot:
 
     def close(self) -> None:
         logging.debug("Closing bot")
-        try:
-            msg = self.translator.translate("The bot is restarting now. See you in a moment!")
-            self.ttclient.send_message(msg, type=2)
-            time.sleep(0.5)
-        except Exception as e:
-            logging.error(f"Error sending shutdown message: {e}")
+        if getattr(self, "is_updating", False):
+            try:
+                msg = self.translator.translate("The bot is restarting now. See you in a moment!")
+                self.ttclient.send_message(msg, type=2)
+                time.sleep(0.5)
+            except Exception as e:
+                logging.error(f"Error sending shutdown message: {e}")
         self.player.close()
         self.ttclient.close()
         self.tt_player_connector.close()
