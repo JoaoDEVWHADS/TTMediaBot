@@ -49,7 +49,7 @@
         }
     },
     "services": {
-        "default_service": "ytm",
+        "default_service": "yt",
         "yt": {
             "enabled": true,
             "cookiefile_path": "",
