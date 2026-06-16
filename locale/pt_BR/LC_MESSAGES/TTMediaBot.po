@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  TTMediaBot\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-06-16 13:20+0000\n"
+"POT-Creation-Date: 2026-06-16 13:42+0000\n"
 "PO-Revision-Date: 2021-07-17 13:41+0400\n"
 "Last-Translator: \n"
 "Language: pt_BR\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: /home/admin/joao/TTMediaBot/bot/__init__.py:120
+#: /home/admin/joao/TTMediaBot/bot/__init__.py:121
 msgid "Update completed successfully! I am back online."
 msgstr "Atualização concluída com sucesso! Estou online novamente."
 
-#: /home/admin/joao/TTMediaBot/bot/__init__.py:155
+#: /home/admin/joao/TTMediaBot/bot/__init__.py:157
 msgid ""
 "The bot is starting an update process and will restart shortly. It may go"
 " offline at any moment."
@@ -30,9 +30,11 @@ msgstr ""
 "O bot está iniciando um processo de atualização e reiniciará em breve. "
 "Ele poderá ficar offline a qualquer momento."
 
-#: /home/admin/joao/TTMediaBot/bot/__init__.py:186
-msgid "The bot is restarting now. See you in a moment!"
-msgstr "O bot está reiniciando agora. Volto em um instante!"
+#: /home/admin/joao/TTMediaBot/bot/__init__.py:189
+msgid "The bot is restarting now to apply the update. See you in a moment!"
+msgstr ""
+"O bot está reiniciando agora para aplicar a atualização. Volto em um "
+"instante!"
 
 #: /home/admin/joao/TTMediaBot/bot/app_vars.py:12
 msgid ""

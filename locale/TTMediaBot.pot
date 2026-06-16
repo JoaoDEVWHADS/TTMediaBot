@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: TTMediaBot VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-06-16 13:20+0000\n"
+"POT-Creation-Date: 2026-06-16 13:42+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,18 +17,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: /home/admin/joao/TTMediaBot/bot/__init__.py:120
+#: /home/admin/joao/TTMediaBot/bot/__init__.py:121
 msgid "Update completed successfully! I am back online."
 msgstr ""
 
-#: /home/admin/joao/TTMediaBot/bot/__init__.py:155
+#: /home/admin/joao/TTMediaBot/bot/__init__.py:157
 msgid ""
 "The bot is starting an update process and will restart shortly. It may go"
 " offline at any moment."
 msgstr ""
 
-#: /home/admin/joao/TTMediaBot/bot/__init__.py:186
-msgid "The bot is restarting now. See you in a moment!"
+#: /home/admin/joao/TTMediaBot/bot/__init__.py:189
+msgid "The bot is restarting now to apply the update. See you in a moment!"
 msgstr ""
 
 #: /home/admin/joao/TTMediaBot/bot/app_vars.py:12

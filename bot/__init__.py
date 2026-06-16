@@ -186,7 +186,7 @@ class Bot:
         logging.debug("Closing bot")
         if getattr(self, "is_updating", False):
             try:
-                msg = self.translator.translate("The bot is restarting now. See you in a moment!")
+                msg = self.translator.translate("The bot is restarting now to apply the update. See you in a moment!")
                 self.ttclient.send_message(msg, type=2)
                 time.sleep(0.5)
             except Exception as e:

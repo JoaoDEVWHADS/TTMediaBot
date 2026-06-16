@@ -31,7 +31,7 @@ All notable updates to this fork are documented here, in reverse chronological o
 - **🔔 Early Warning Notification:**
   Integrated a signaling mechanism using an `update_in_progress` trigger file. As soon as the VPS update or rebuild starts (when option `y` is selected in `update.sh`), the bot posts a warning message to the active TeamTalk channel: *"The bot is starting an update process and will restart shortly. It may go offline at any moment."*
 - **🛑 Graceful Shutdown Alert:**
-  Added signal handling for `SIGTERM`. When the container is stopping or restarting, the bot intercepts the termination signal and posts an immediate localized warning: *"The bot is restarting now. See you in a moment!"* to the active TeamTalk channel before shutting down.
+  Added signal handling for `SIGTERM`. When the container is stopping or restarting, the bot intercepts the termination signal and posts an immediate localized warning: *"The bot is restarting now to apply the update. See you in a moment!"* to the active TeamTalk channel before shutting down.
 - **✅ Update Success Notification:**
   Integrated signaling logic where `update.sh` creates an `update_success` trigger file after a successful Docker container recreate. On boot, the bot checks for this file, announces: *"Update completed successfully! I am back online."*, and deletes the file.
 - **🌍 100% Translated warning:**

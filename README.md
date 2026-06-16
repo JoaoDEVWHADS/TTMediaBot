@@ -347,7 +347,7 @@ This fork features an **Early Warning Update System** designed to notify users i
      > *“The bot is starting an update process and will restart shortly. It may go offline at any moment.”*
      This is posted **immediately when the Docker build starts**, giving users a 1-to-2 minute heads-up while the image compiles in the background.
   2. **Graceful Shutdown Alert:** When the container receives the shutdown signal (`SIGTERM`) from Docker to restart or stop, it captures the signal and immediately posts a final localized notification to the active channel:
-     > *“The bot is restarting now. See you in a moment!”*
+     > *“The bot is restarting now to apply the update. See you in a moment!”*
      This ensures users know exactly when the bot is going offline.
   3. **Update Success Alert:** Once `update.sh` finishes restarting the Docker containers, it leaves a success marker. Upon booting back up, the bot detects this marker, posts a localized message:
      > *“Update completed successfully! I am back online.”*
