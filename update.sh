@@ -163,9 +163,9 @@ perform_image_rebuild() {
          # Clean unused Docker resources & vacuum logs (Option 7 equivalent, but non-interactive)
          echo ""
          echo -e "${YELLOW}🧹 Cleaning up unused Docker resources and system logs...${NC}"
-         docker system prune -af --volumes
-         docker buildx prune -af
-         docker builder prune -af
+         docker image prune -f
+         docker buildx prune -f
+         docker builder prune -f
          journalctl --vacuum-time=1d
          echo -e "${GREEN}✓ Cleanup completed!${NC}"
     else
@@ -237,7 +237,9 @@ update_and_fix_permissions() {
         # Check running version
         # Use 'tr -d' to ensure no weird whitespace/newlines break the comparison
         RUNNING_HASH=$(docker inspect ${BOT_IMAGE} --format '{{ index .Config.Labels "commit_hash" }}' 2>/dev/null | tr -d '[:space:]')
-        [ -z "$RUNNING_HASH" ] && RUNNING_HASH="none"
+        if [ -z "$RUNNING_HASH" ] || [ "$RUNNING_HASH" = "<novalue>" ] || [ "$RUNNING_HASH" = "<noopt>" ] || [[ "$RUNNING_HASH" == *"<no"* ]]; then
+            RUNNING_HASH="none"
+        fi
         
         # Basic State Detection (Image and Directories)
         IMAGE_EXISTS=$(docker images -q ${BOT_IMAGE} 2>/dev/null)

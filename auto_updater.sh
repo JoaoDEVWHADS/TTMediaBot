@@ -71,7 +71,9 @@ while true; do
     
     # Check what version is currently running in Docker
     RUNNING_HASH=$($SUDO docker inspect ttmediabot --format '{{ index .Config.Labels "commit_hash" }}' 2>/dev/null | tr -d '[:space:]')
-    [ -z "$RUNNING_HASH" ] && RUNNING_HASH="none"
+    if [ -z "$RUNNING_HASH" ] || [ "$RUNNING_HASH" = "<novalue>" ] || [ "$RUNNING_HASH" = "<noopt>" ] || [[ "$RUNNING_HASH" == *"<no"* ]]; then
+        RUNNING_HASH="none"
+    fi
 
     # 1. Update Detection Logic
     SHOULD_UPDATE=false

@@ -173,7 +173,8 @@ build_image() {
 
     if [[ "$(docker images -q ${BOT_IMAGE} 2> /dev/null)" == "" ]]; then
         echo "Image not found. Building image..."
-        docker build --build-arg CACHEBUST=$(date +%s) -t ${BOT_IMAGE} .
+        CURRENT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+        docker build --build-arg CACHEBUST=$(date +%s) --label "commit_hash=$CURRENT_HASH" -t ${BOT_IMAGE} .
         if [ $? -eq 0 ]; then
              echo -e "${GREEN}Image built successfully!${NC}"
         else
