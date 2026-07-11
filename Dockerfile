@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     ffmpeg \
     procps \
+    unzip \
     && ARCH=$(dpkg --print-architecture) \
     && if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "armhf" ]; then \
         apt-get install -y --no-install-recommends libportaudio2; \
@@ -24,6 +25,12 @@ RUN mkdir -p /etc/apt/keyrings \
     && apt-get update \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
+
+# Clone and compile the Node.js bgutil provider server
+RUN git clone --depth 1 https://github.com/Brainicism/bgutil-ytdlp-pot-provider.git /opt/bgutil-provider \
+    && cd /opt/bgutil-provider/server \
+    && npm ci \
+    && npx tsc
 
 # Create user
 RUN useradd -ms /bin/bash ttbot
@@ -57,6 +64,11 @@ RUN pip install --no-cache-dir -U pip setuptools wheel \
 
 # Copy project files
 COPY . .
+
+# Download and extract yt-dlp plugin for bgutil
+RUN curl -fsSL "https://github.com/jim60105/bgutil-ytdlp-pot-provider-rs/releases/latest/download/bgutil-ytdlp-pot-provider-rs.zip" -o /tmp/plugin.zip \
+    && unzip -o /tmp/plugin.zip -d /usr/local/lib/python3.10/site-packages/ \
+    && rm /tmp/plugin.zip
 
 # Make entrypoint executable
 RUN chmod +x entrypoint.sh

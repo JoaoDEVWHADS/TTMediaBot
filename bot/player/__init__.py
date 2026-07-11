@@ -107,6 +107,24 @@ class Player:
             except:
                 self.cache.recents.append(self.track_list[self.track_index].get_raw())
             self.cache_manager.save()
+            
+        # Apply headers dynamically if available in extra_info to prevent User-Agent/domain mismatches
+        extra_info = getattr(self.track, "extra_info", None) or {}
+        headers = extra_info.get("http_headers", {})
+        if headers:
+            try:
+                header_fields = [f"{k}: {v}" for k, v in headers.items() if k.lower() != "user-agent"]
+                self._player.user_agent = headers.get("User-Agent")
+                self._player.http_header_fields = header_fields
+                logging.debug(f"[Player] Dynamic headers applied to MPV")
+            except Exception as e:
+                logging.debug(f"[Player] Failed to apply dynamic headers to MPV: {e}")
+                
+        # Sleep for 3.2 seconds as required by YouTube's rate limiting/signature check delay
+        # to prevent HTTP 403 Forbidden errors when loading media segments.
+        logging.info("[Player] Sleeping 3.2 seconds to comply with YouTube signature delay...")
+        time.sleep(3.2)
+        
         self._player.pause = False
         self._player.play(arg)
         threading.Timer(1.0, self._prefetch_next_track).start()
