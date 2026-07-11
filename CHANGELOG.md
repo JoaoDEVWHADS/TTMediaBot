@@ -4,6 +4,22 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ---
 
+## 🆕 v2.5.1 — "Proof of Origin & Playback Rate Limit Bypass" *(07/11/2026)*
+
+### 🔒 Automated PO Token Integration (Anti-Bot Bypass)
+- **🤖 Built-in DroidGuard/PO Token Provider:**
+  Integrated the `bgutil-ytdlp-pot-provider` Node.js server directly inside the bot's Docker container. The server starts automatically in the background on port `4416` via `entrypoint.sh`.
+- **🔌 Global Plugin Integration:**
+  Embedded the `bgutil-pot` python plugin directly into Python's global `site-packages/yt_dlp_plugins/` directory during Docker image build. This ensures that any `yt-dlp` execution (either Python imports or command-line runs) automatically intercepts YouTube requests to sign them with valid PO Tokens.
+
+### ⏱️ Playback Rate Limit / 403 Forbidden Fix
+- **⏳ Complying with YouTube Signature Delay:**
+  Resolved a critical `HTTP 403 Forbidden` error caused by requesting signed `googlevideo.com` media streams too quickly after URL signature generation. Added a `3.2` seconds sleep delay in `_play` method inside `bot/player/__init__.py` (matching `yt-dlp`'s internal downloader delay).
+- **🌐 Dynamic Header Injection:**
+  Configured `mpv` player instance to dynamically inherit the exact `User-Agent` and HTTP header fields extracted by `yt-dlp` for each track to avoid query-header mismatches on YouTube CDN servers.
+
+---
+
 ## 🆕 v2.5.0 — "Personalized Autoplay & Deadlock Fix" *(06/16/2026)*
 
 ### 📻 Personalized Autoplay & Recommendations (Cookies Integration)
