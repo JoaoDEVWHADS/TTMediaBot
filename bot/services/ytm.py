@@ -208,11 +208,17 @@ class YtmService(_Service):
             "no_warnings": True,
             "nocheckcertificate": True,
             "geo_bypass": True,
-            "check_formats": False,
+            "check_formats": "selected",
+            "ignore_sleep": True,
             "noplaylist": True,
             "js_runtimes": {"node": {}},
+            "extractor_args": {
+                "youtube": {
+                    "player_client": ["tv_downgraded"]
+                }
+            },
             "allowed_extractors": ["youtube", "youtube:playlist", "youtube:search", "youtube:tab"],
-            "cachedir": False,
+            "cachedir": "data/cache",
             "lazy_playlist": True,
         }
 
@@ -304,6 +310,32 @@ class YtmService(_Service):
         duration = (time.perf_counter() - start_time) * 1000
         logging.info(f"YTM Download finished in {duration:.2f}ms for {track.name}")
 
+    def _extract_info_with_fallback(self, url: str, process: bool, config: dict) -> Any:
+        # 1. Try fast path with android_vr (no cookies)
+        config_vr = config.copy()
+        config_vr["extractor_args"] = {
+            "youtube": {
+                "player_client": ["android_vr"]
+            }
+        }
+        if "cookiefile" in config_vr:
+            del config_vr["cookiefile"]
+        
+        logging.info("YTM Get: Attempting fast extraction using android_vr client...")
+        try:
+            with YoutubeDL(config_vr) as ydl:
+                return ydl.extract_info(url, process=process)
+        except DownloadError as e:
+            error_msg = str(e)
+            is_auth_needed = "Sign in to confirm" in error_msg or "cookies" in error_msg.lower() or "confirm your age" in error_msg.lower()
+            if is_auth_needed:
+                logging.info("YTM Get: android_vr failed (auth required). Falling back to tv_downgraded with cookies...")
+            else:
+                logging.warning(f"YTM Get: android_vr failed ({error_msg[:100]}). Falling back to tv_downgraded with cookies...")
+            
+            with YoutubeDL(config) as ydl:
+                return ydl.extract_info(url, process=process)
+
     def get(
         self,
         url: str,
@@ -322,45 +354,45 @@ class YtmService(_Service):
                   if cookie_file:
                        config["cookiefile"] = cookie_file
                   
-                  with YoutubeDL(config) as ydl:
-                       # If we have extra_info, use it, otherwise extract from URL
-                       if extra_info:
-                            info = extra_info
-                            if "url" not in info and "videoId" in info:
-                                 url = f"https://www.youtube.com/watch?v={info['videoId']}"
-                                 try:
-                                     info = ydl.extract_info(url, process=False)
-                                 except DownloadError as e:
-                                     logging.error(f"YTM Get: yt-dlp DownloadError for '{url}': {e}")
-                                     raise errors.ServiceError(str(e))
-                       else:
+                  # If we have extra_info, use it, otherwise extract from URL
+                  if extra_info:
+                       info = extra_info
+                       if "url" not in info and "videoId" in info:
+                            url = f"https://www.youtube.com/watch?v={info['videoId']}"
                             try:
-                                info = ydl.extract_info(url, process=False)
+                                info = self._extract_info_with_fallback(url, False, config)
                             except DownloadError as e:
                                 logging.error(f"YTM Get: yt-dlp DownloadError for '{url}': {e}")
                                 raise errors.ServiceError(str(e))
-                       
-                       if info is None:
-                            raise errors.ServiceError("Failed to extract video info")
-
-                       # Process stream
+                  else:
                        try:
-                           stream = ydl.process_ie_result(info)
+                           info = self._extract_info_with_fallback(url, False, config)
                        except DownloadError as e:
-                           logging.error(f"YTM Get: Failed to process stream for '{url}': {e}")
+                           logging.error(f"YTM Get: yt-dlp DownloadError for '{url}': {e}")
                            raise errors.ServiceError(str(e))
-                       if "url" in stream:
-                            url = stream["url"]
-                       else:
-                            raise errors.ServiceError("No stream URL found in processed result")
-                       
-                       title = stream.get("title", self.bot.translator.translate("Unknown"))
-                       if "uploader" in stream:
-                            title += " - {}".format(stream["uploader"])
-                       format = "mp3"
-                       
-                       duration = (time.perf_counter() - start_time) * 1000
-                       logging.info(f"YTM Get (Process) finished in {duration:.2f}ms for {title}")
+                  
+                  if info is None:
+                       raise errors.ServiceError("Failed to extract video info")
+
+                  # Process stream
+                  with YoutubeDL(config) as ydl:
+                      try:
+                          stream = ydl.process_ie_result(info)
+                      except DownloadError as e:
+                          logging.error(f"YTM Get: Failed to process stream for '{url}': {e}")
+                          raise errors.ServiceError(str(e))
+                      if "url" in stream:
+                           url = stream["url"]
+                      else:
+                           raise errors.ServiceError("No stream URL found in processed result")
+                      
+                      title = stream.get("title", self.bot.translator.translate("Unknown"))
+                      if "uploader" in stream:
+                           title += " - {}".format(stream["uploader"])
+                      format = "mp3"
+                      
+                      duration = (time.perf_counter() - start_time) * 1000
+                      logging.info(f"YTM Get (Process) finished in {duration:.2f}ms for {title}")
                   
                   # TRIGGER BACKGROUND AUTOPLAY FETCH
                   current_video_id = None
