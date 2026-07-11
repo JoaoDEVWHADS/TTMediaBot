@@ -247,13 +247,13 @@ class YtService(_Service):
                  if "url" not in info and v_id:
                      url = f"https://www.youtube.com/watch?v={v_id}"
                      try:
-                         info = self._extract_info_with_fallback(url, False, config)
+                         info = self._extract_info_with_fallback(url, process, config)
                      except DownloadError as e:
                          logging.error(f"YT Get: yt-dlp DownloadError for '{url}': {e}")
                          raise errors.ServiceError(str(e))
             else:
                  try:
-                     info = self._extract_info_with_fallback(url, False, config)
+                     info = self._extract_info_with_fallback(url, process, config)
                  except DownloadError as e:
                      error_msg = str(e)
                      if "Sign in to confirm" in error_msg or "cookies" in error_msg.lower():
@@ -332,13 +332,8 @@ class YtService(_Service):
                     return [
                         Track(service=self.name, extra_info=info, type=TrackType.Dynamic)
                     ]
-                try:
-                    stream = ydl.process_ie_result(info)
-                except DownloadError as e:
-                    logging.error(f"YT Get: Failed to process stream for '{url}': {e}")
-                    raise errors.ServiceError(str(e))
-                except Exception:
-                    raise errors.ServiceError()
+                # Since process was True, info is already the processed stream!
+                stream = info
                 
                 if "url" in stream:
                     url = stream["url"]

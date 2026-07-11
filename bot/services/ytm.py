@@ -360,13 +360,13 @@ class YtmService(_Service):
                        if "url" not in info and "videoId" in info:
                             url = f"https://www.youtube.com/watch?v={info['videoId']}"
                             try:
-                                info = self._extract_info_with_fallback(url, False, config)
+                                info = self._extract_info_with_fallback(url, process, config)
                             except DownloadError as e:
                                 logging.error(f"YTM Get: yt-dlp DownloadError for '{url}': {e}")
                                 raise errors.ServiceError(str(e))
                   else:
                        try:
-                           info = self._extract_info_with_fallback(url, False, config)
+                           info = self._extract_info_with_fallback(url, process, config)
                        except DownloadError as e:
                            logging.error(f"YTM Get: yt-dlp DownloadError for '{url}': {e}")
                            raise errors.ServiceError(str(e))
@@ -374,25 +374,20 @@ class YtmService(_Service):
                   if info is None:
                        raise errors.ServiceError("Failed to extract video info")
 
-                  # Process stream
-                  with YoutubeDL(config) as ydl:
-                      try:
-                          stream = ydl.process_ie_result(info)
-                      except DownloadError as e:
-                          logging.error(f"YTM Get: Failed to process stream for '{url}': {e}")
-                          raise errors.ServiceError(str(e))
-                      if "url" in stream:
-                           url = stream["url"]
-                      else:
-                           raise errors.ServiceError("No stream URL found in processed result")
-                      
-                      title = stream.get("title", self.bot.translator.translate("Unknown"))
-                      if "uploader" in stream:
-                           title += " - {}".format(stream["uploader"])
-                      format = "mp3"
-                      
-                      duration = (time.perf_counter() - start_time) * 1000
-                      logging.info(f"YTM Get (Process) finished in {duration:.2f}ms for {title}")
+                  # Since process was True, info is already the processed stream!
+                  stream = info
+                  if "url" in stream:
+                       url = stream["url"]
+                  else:
+                       raise errors.ServiceError("No stream URL found in processed result")
+                  
+                  title = stream.get("title", self.bot.translator.translate("Unknown"))
+                  if "uploader" in stream:
+                       title += " - {}".format(stream["uploader"])
+                  format = "mp3"
+                  
+                  duration = (time.perf_counter() - start_time) * 1000
+                  logging.info(f"YTM Get (Process) finished in {duration:.2f}ms for {title}")
                   
                   # TRIGGER BACKGROUND AUTOPLAY FETCH
                   current_video_id = None
