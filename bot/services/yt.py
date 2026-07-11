@@ -198,32 +198,6 @@ class YtService(_Service):
         
         raise last_error or errors.ServiceError("Max retries exceeded")
 
-    def _extract_info_with_fallback(self, url: str, process: bool, config: dict) -> Any:
-        # 1. Try fast path with android_vr (no cookies)
-        config_vr = config.copy()
-        config_vr["extractor_args"] = {
-            "youtube": {
-                "player_client": ["android_vr"]
-            }
-        }
-        if "cookiefile" in config_vr:
-            del config_vr["cookiefile"]
-        
-        logging.info("YT Get: Attempting fast extraction using android_vr client...")
-        try:
-            with YoutubeDL(config_vr) as ydl:
-                return ydl.extract_info(url, process=process)
-        except DownloadError as e:
-            error_msg = str(e)
-            is_auth_needed = "Sign in to confirm" in error_msg or "cookies" in error_msg.lower() or "confirm your age" in error_msg.lower()
-            if is_auth_needed:
-                logging.info("YT Get: android_vr failed (auth required). Falling back to tv_downgraded with cookies...")
-            else:
-                logging.warning(f"YT Get: android_vr failed ({error_msg[:100]}). Falling back to tv_downgraded with cookies...")
-            
-            with YoutubeDL(config) as ydl:
-                return ydl.extract_info(url, process=process)
-
     def _get_inner(
         self,
         url: str,
@@ -241,33 +215,39 @@ class YtService(_Service):
                     "Proceeding without cookies — YouTube may block this request."
                 )
             
-            if extra_info:
-                 info = extra_info
-                 v_id = info.get("videoId") or info.get("contentId") or info.get("id")
-                 if "url" not in info and v_id:
-                     url = f"https://www.youtube.com/watch?v={v_id}"
-                     try:
-                         info = self._extract_info_with_fallback(url, process, config)
-                     except DownloadError as e:
-                         logging.error(f"YT Get: yt-dlp DownloadError for '{url}': {e}")
-                         raise errors.ServiceError(str(e))
-            else:
-                 try:
-                     info = self._extract_info_with_fallback(url, process, config)
-                 except DownloadError as e:
-                     error_msg = str(e)
-                     if "Sign in to confirm" in error_msg or "cookies" in error_msg.lower():
-                         logging.error(
-                             f"YT Get: YouTube requires authentication for '{url}'. "
-                             "Please provide a valid cookies.txt file. "
-                             "See: https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp"
-                         )
-                     else:
-                         logging.error(f"YT Get: yt-dlp DownloadError for '{url}': {error_msg}")
-                     raise errors.ServiceError(str(e))
-            
-            if info is None:
-                raise errors.ServiceError("Failed to extract video info")
+            ydl_start = time.perf_counter()
+            with YoutubeDL(config) as ydl:
+                ydl_duration = (time.perf_counter() - ydl_start) * 1000
+                logging.info(f"YT Get: YoutubeDL initialized in {ydl_duration:.2f}ms")
+                if extra_info:
+                     info = extra_info
+                     v_id = info.get("videoId") or info.get("contentId") or info.get("id")
+                     if "url" not in info and v_id:
+                         url = f"https://www.youtube.com/watch?v={v_id}"
+                         try:
+                             info = ydl.extract_info(url, process=False)
+                         except DownloadError as e:
+                             logging.error(f"YT Get: yt-dlp DownloadError for '{url}': {e}")
+                             raise errors.ServiceError(str(e))
+                else:
+                    try:
+                        info = ydl.extract_info(url, process=False)
+                    except DownloadError as e:
+                        error_msg = str(e)
+                        if "Sign in to confirm" in error_msg or "cookies" in error_msg.lower():
+                            logging.error(
+                                f"YT Get: YouTube requires authentication for '{url}'. "
+                                "Please provide a valid cookies.txt file. "
+                                "See: https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp"
+                            )
+                        else:
+                            logging.error(f"YT Get: yt-dlp DownloadError for '{url}': {error_msg}")
+                            if "Signature solving failed" in error_msg or "JavaScript runtime" in error_msg:
+                                logging.error("YT Get: Possible missing JavaScript runtime or challenge solver. Check if Node.js is correctly installed in the environment.")
+                        raise errors.ServiceError(str(e))
+                
+                if info is None:
+                    raise errors.ServiceError("Failed to extract video info")
 
                 info_type = None
                 if "_type" in info:
@@ -332,8 +312,13 @@ class YtService(_Service):
                     return [
                         Track(service=self.name, extra_info=info, type=TrackType.Dynamic)
                     ]
-                # Since process was True, info is already the processed stream!
-                stream = info
+                try:
+                    stream = ydl.process_ie_result(info)
+                except DownloadError as e:
+                    logging.error(f"YT Get: Failed to process stream for '{url}': {e}")
+                    raise errors.ServiceError(str(e))
+                except Exception:
+                    raise errors.ServiceError()
                 
                 if "url" in stream:
                     url = stream["url"]
