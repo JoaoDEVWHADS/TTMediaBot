@@ -18,5 +18,8 @@ fi
 
 echo "PulseAudio started successfully."
 
+# Start Node.js PO Token provider server in background
+node /opt/bgutil-provider/server/build/main.js &
+
 # Execute the passed command (the bot)
 exec "$@"
