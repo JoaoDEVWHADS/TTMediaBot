@@ -14,7 +14,7 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ### ⏱️ Playback Rate Limit / 403 Forbidden Fix
 - **⏳ Complying with YouTube Signature Delay:**
-  Resolved a critical `HTTP 403 Forbidden` error caused by requesting signed `googlevideo.com` media streams too quickly after URL signature generation. Added a `2.0` seconds sleep delay in `_play` method inside `bot/player/__init__.py` (matching `yt-dlp`'s internal downloader delay).
+  Resolved a critical `HTTP 403 Forbidden` error caused by requesting signed `googlevideo.com` media streams too quickly after URL signature generation. Added a `1.0` seconds sleep delay in `_play` method inside `bot/player/__init__.py` (matching `yt-dlp`'s internal downloader delay).
 - **🌐 Dynamic Header Injection:**
   Configured `mpv` player instance to dynamically inherit the exact `User-Agent` and HTTP header fields extracted by `yt-dlp` for each track to avoid query-header mismatches on YouTube CDN servers.
 
