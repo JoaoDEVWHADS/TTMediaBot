@@ -120,10 +120,11 @@ class Player:
             except Exception as e:
                 logging.debug(f"[Player] Failed to apply dynamic headers to MPV: {e}")
                 
-        # Sleep for 1.5 seconds as required by YouTube's rate limiting/signature check delay
+        # Sleep for 2.5 seconds as required by YouTube's rate limiting/signature check delay
         # to prevent HTTP 403 Forbidden errors when loading media segments.
-        logging.info("[Player] Sleeping 1.5 seconds to comply with YouTube signature delay...")
-        time.sleep(1.5)
+        # Matches yt-dlp's internal downloader delay.
+        logging.info("[Player] Sleeping 2.5 seconds to comply with YouTube signature delay...")
+        time.sleep(2.5)
         
         self._player.pause = False
         self._player.play(arg)
