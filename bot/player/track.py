@@ -2,6 +2,7 @@ from __future__ import annotations
 import copy
 import logging
 import os
+import time
 from threading import Lock
 from typing import Any, Dict, Optional, TYPE_CHECKING
 
@@ -24,6 +25,7 @@ class Track:
         format: str = "",
         extra_info: Optional[Dict[str, Any]] = None,
         type: TrackType = TrackType.Default,
+        extracted_at: float = 0.0,
     ) -> None:
         self.service = service
         self.url = url
@@ -31,6 +33,7 @@ class Track:
         self.format = format
         self.extra_info = extra_info
         self.type = type
+        self.extracted_at = extracted_at or time.perf_counter()
         self._lock = Lock()
         self._is_fetched = False
         self._fetch_failed = False

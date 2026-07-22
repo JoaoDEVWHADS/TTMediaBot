@@ -59,8 +59,8 @@ class YtService(_Service):
 
         self._ydl_config = {
             "skip_download": True,
-            "format": "bestaudio/best",
-            "format_sort": ["res:144", "codec:mp3", "codec:m4a", "codec:opus"],
+            "format": "ba[ext=m4a]/ba[ext=webm]/ba/bestaudio/best",
+            "format_sort": ["codec:opus", "codec:m4a", "codec:mp3", "res:144"],
             "youtube_include_dash_manifest": False,
             "youtube_include_hls_manifest": False,
             "socket_timeout": 10,
@@ -75,6 +75,12 @@ class YtService(_Service):
             "allowed_extractors": ["youtube", "youtube:playlist", "youtube:search", "youtube:tab"],
             "cachedir": False,
             "lazy_playlist": True,
+            "extractor_args": {
+                "youtube": {
+                    "player_client": ["tv_downgraded", "web"],
+                    "player_skip": ["android_vr", "android", "ios", "tv_simply"],
+                }
+            },
         }
 
         # Persistent event loop for faster async operations
@@ -370,7 +376,7 @@ class YtService(_Service):
                 duration = (time.perf_counter() - start_time) * 1000
                 logging.info(f"YT Get (Process) finished in {duration:.2f}ms for {title}")
                 return [
-                    Track(service=self.name, url=url, name=title, format=format, type=track_type, extra_info=stream)
+                    Track(service=self.name, url=url, name=title, format=format, type=track_type, extra_info=stream, extracted_at=time.perf_counter())
                 ]
 
     def _get_recommendations(self, video_id: str, limit: int = 5) -> List[Track]:
@@ -382,7 +388,7 @@ class YtService(_Service):
                  "Accept-Language": "en-US,en;q=0.9"
              }
              
-             import requests
+             import httpx
              import re
              import json
              import http.cookiejar
@@ -397,7 +403,8 @@ class YtService(_Service):
                      logging.warning(f"[YT] Recommendations: Could not load cookies from {self.config.cookiefile_path}: {e}")
                      jar = None
 
-             response = requests.get(url, headers=headers, cookies=jar, timeout=10)
+             with httpx.Client(http2=True, follow_redirects=True, timeout=10.0, cookies=jar) as client:
+                 response = client.get(url, headers=headers)
              if response.status_code != 200:
                  logging.error(f"[YT] Recommendations fetch failed: HTTP {response.status_code}")
                  return []

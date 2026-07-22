@@ -26,8 +26,9 @@ class Player:
         self.cache_manager = bot.cache_manager
         mpv_options = {
             "demuxer_lavf_o": "http_persistent=false",
-            "demuxer_max_back_bytes": 1048576,
-            "demuxer_max_bytes": 2097152,
+            "demuxer_max_back_bytes": 524288,
+            "demuxer_max_bytes": 262144,
+            "demuxer_readahead_secs": 2,
             "video": False,
             "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36",
             "ytdl": False,
@@ -120,11 +121,11 @@ class Player:
             except Exception as e:
                 logging.debug(f"[Player] Failed to apply dynamic headers to MPV: {e}")
                 
-        # Sleep for 2.5 seconds as required by YouTube's rate limiting/signature check delay
+        # Sleep for 1.4 seconds as required by YouTube's rate limiting/signature check delay
         # to prevent HTTP 403 Forbidden errors when loading media segments.
         # Matches yt-dlp's internal downloader delay.
-        logging.info("[Player] Sleeping 2.5 seconds to comply with YouTube signature delay...")
-        time.sleep(2.5)
+        logging.info("[Player] Sleeping 1.4 seconds to comply with YouTube signature delay...")
+        time.sleep(1.4)
         
         self._player.pause = False
         self._player.play(arg)

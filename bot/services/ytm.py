@@ -214,6 +214,12 @@ class YtmService(_Service):
             "allowed_extractors": ["youtube", "youtube:playlist", "youtube:search", "youtube:tab"],
             "cachedir": False,
             "lazy_playlist": True,
+            "extractor_args": {
+                "youtube": {
+                    "player_client": ["tv_downgraded", "web"],
+                    "player_skip": ["android_vr", "android", "ios", "tv_simply"],
+                }
+            },
         }
 
         # Pre-warming for YTM
@@ -405,6 +411,7 @@ class YtmService(_Service):
                             type=TrackType.Default,
                             format=format,
                             extra_info=stream,
+                            extracted_at=time.perf_counter(),
                        )
                   ]
 

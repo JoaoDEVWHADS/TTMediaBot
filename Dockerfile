@@ -59,7 +59,7 @@ COPY requirements.txt .
 # Always ensure latest libraries and yt-dlp on every build
 RUN pip install --no-cache-dir -U pip setuptools wheel \
     && pip install --no-cache-dir -U -r requirements.txt \
-    && pip install --no-cache-dir -U "yt-dlp[default] @ https://github.com/yt-dlp/yt-dlp/archive/master.tar.gz" \
+    && pip install --no-cache-dir -U --pre "yt-dlp[default]" \
     && pip install --no-cache-dir "httpx[http2]>=0.28.1"
 
 # Copy project files
