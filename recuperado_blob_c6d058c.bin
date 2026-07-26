@@ -1,0 +1,635 @@
+# Arabic translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-05-10 11:43+0000\n"
+"PO-Revision-Date: 2026-05-10 11:43+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ar\n"
+"Language-Team: ar <LL@li.org>\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : "
+"n%100>=3 && n%100<=10 ? 3 : n%100>=0 && n%100<=2 ? 4 : 5)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: bot/app_vars.py:11
+msgid ""
+msgstr "مرحباً! أنا جواو ألميدا. هذا هو مشروعي المطور (fork) لـ TTMediaBot لـ TeamTalk 5.\\nيركز هذا المستودع على الاستقرار ودعم YouTube Music.\\nالمستودع: https://github.com/JoaoDEVWHADS/TTMediaBot\\nالمؤلفون الأصليون: أمير جوميروف، فلاديسلاف كوبيلوف، بيكا جوزاليشفيلي، كيريل بيلوسوف.\\n"
+
+#: bot/TeamTalk/__init__.py:150
+msgid "Send \"h\" for help"
+msgstr "أرسل \"h\" للمساعدة"
+
+#: bot/commands/__init__.py:121
+msgid "Unknown command. Send \"h\" for help."
+msgstr "أمر غير معروف. أرسل \"h\" للمساعدة."
+
+#: bot/commands/__init__.py:127 bot/commands/user_commands.py:688
+#: bot/commands/user_commands.py:694 bot/modules/playlist_uploader.py:138
+#: bot/modules/playlist_uploader.py:149 bot/modules/playlist_uploader.py:164
+#: bot/modules/uploader.py:69 bot/modules/uploader.py:80
+msgid "Error: {}"
+msgstr "خطأ: {}"
+
+#: bot/commands/__init__.py:139
+msgid "You are banned"
+msgstr "أنت محظور"
+
+#: bot/commands/__init__.py:143
+msgid "You are not in bot's channel"
+msgstr "أنت لست في قناة البوت"
+
+#: bot/commands/__init__.py:147
+msgid "Bot is locked"
+msgstr "البوت مقفل"
+
+#: bot/commands/__init__.py:151
+msgid "This command is blocked"
+msgstr "هذا الأمر محظور"
+
+#: bot/commands/__init__.py:175
+msgid "Unknown command"
+msgstr "أمر غير معروف"
+
+#: bot/commands/admin_commands.py:20
+msgid ""
+msgstr "+/-COMMAND يحظر أو يلغي حظر الأوامر. +COMMAND يضيف الأمر إلى القائمة السوداء. -COMMAND يزيله. بدون أمر يعرض القائمة."
+
+#: bot/commands/admin_commands.py:32 bot/commands/admin_commands.py:322
+#: bot/commands/admin_commands.py:352 bot/commands/user_commands.py:456
+#: bot/commands/user_commands.py:468 bot/commands/user_commands.py:524
+msgid "The list is empty"
+msgstr "القائمة فارغة"
+
+#: bot/commands/admin_commands.py:37 bot/commands/admin_commands.py:304
+#: bot/commands/admin_commands.py:336 bot/commands/user_commands.py:419
+msgid "Added"
+msgstr "تمت الإضافة"
+
+#: bot/commands/admin_commands.py:39
+msgid "This command is already added"
+msgstr "هذا الأمر مضاف بالفعل"
+
+#: bot/commands/admin_commands.py:45 bot/commands/admin_commands.py:310
+#: bot/commands/admin_commands.py:342 bot/commands/user_commands.py:431
+msgid "Deleted"
+msgstr "تم الحذف"
+
+#: bot/commands/admin_commands.py:47
+msgid "This command is not blocked"
+msgstr "هذا الأمر غير محظور"
+
+#: bot/commands/admin_commands.py:55
+msgid "GENDER Changes bot's gender. n neutral, m male, f female"
+msgstr "GENDER يغير جنس البوت. n محايد، m ذكر، f أنثى"
+
+#: bot/commands/admin_commands.py:70
+msgid "LANGUAGE Changes bot's language"
+msgstr "LANGUAGE يغير لغة البوت"
+
+#: bot/commands/admin_commands.py:78
+msgid "The language has been changed"
+msgstr "تم تغيير اللغة"
+
+#: bot/commands/admin_commands.py:80
+msgid "Incorrect language"
+msgstr "لغة غير صحيحة"
+
+#: bot/commands/admin_commands.py:82
+msgid ""
+msgstr "اللغة الحالية: {current_language}. اللغات المتاحة: {available_languages}"
+
+#: bot/commands/admin_commands.py:93
+msgid "NICKNAME Changes bot's nickname"
+msgstr "NICKNAME يغير اسم البوت"
+
+#: bot/commands/admin_commands.py:103
+msgid ""
+msgstr "r/f يمسح ذاكرة التخزين المؤقت للبوت. r يمسح الأخيرة، f يمسح المفضلة، بدون خيار يمسح الذاكرة بالكامل"
+
+#: bot/commands/admin_commands.py:112
+msgid "Cache cleared"
+msgstr "تم مسح ذاكرة التخزين المؤقت"
+
+#: bot/commands/admin_commands.py:116
+msgid "Recents cleared"
+msgstr "تم مسح القائمة الأخيرة"
+
+#: bot/commands/admin_commands.py:120
+msgid "Favorites cleared"
+msgstr "تم مسح المفضلة"
+
+#: bot/commands/admin_commands.py:126
+msgid ""
+msgstr "الانضمام للقناة. الوسيط الأول هو اسم القناة أو معرفها، الوسيط الثاني هو كلمة المرور، افصل بينهما بـ \" | \""
+
+#: bot/commands/admin_commands.py:146
+msgid "This channel does not exist"
+msgstr "هذه القناة غير موجودة"
+
+#: bot/commands/admin_commands.py:160
+msgid "Error joining channel: {error}"
+msgstr "خطأ في الانضمام للقناة: {error}"
+
+#: bot/commands/admin_commands.py:208
+msgid "Enables or disables voice transmission"
+msgstr "تفعيل أو تعطيل نقل الصوت"
+
+#: bot/commands/admin_commands.py:215 bot/commands/admin_commands.py:217
+msgid "Voice transmission enabled"
+msgstr "تم تفعيل نقل الصوت"
+
+#: bot/commands/admin_commands.py:222
+msgid "Voice transmission disabled"
+msgstr "تم تعطيل نقل الصوت"
+
+#: bot/commands/admin_commands.py:228
+msgid "Locks or unlocks the bot"
+msgstr "قفل أو إلغاء قفل البوت"
+
+#: bot/commands/admin_commands.py:233
+msgid "Locked"
+msgstr "مقفل"
+
+#: bot/commands/admin_commands.py:235
+msgid "Unlocked"
+msgstr "تم إلغاء القفل"
+
+#: bot/commands/admin_commands.py:242
+msgid "STATUS Changes bot's status"
+msgstr "STATUS يغير حالة البوت"
+
+#: bot/commands/admin_commands.py:252
+msgid "Enables or disables event handling"
+msgstr "تفعيل أو تعطيل معالجة الأحداث"
+
+#: bot/commands/admin_commands.py:259
+msgid "Event handling is enabled"
+msgstr "معالجة الأحداث مفعلة"
+
+#: bot/commands/admin_commands.py:261
+msgid "Event handling is disabled"
+msgstr "معالجة الأحداث معطلة"
+
+#: bot/commands/admin_commands.py:268
+msgid "Enables or disables sending of channel messages"
+msgstr "تفعيل أو تعطيل إرسال رسائل القناة"
+
+#: bot/commands/admin_commands.py:277
+msgid "Channel messages enabled"
+msgstr "رسائل القناة مفعلة"
+
+#: bot/commands/admin_commands.py:279
+msgid "Channel messages disabled"
+msgstr "رسائل القناة معطلة"
+
+#: bot/commands/admin_commands.py:286
+msgid "Saves bot's configuration"
+msgstr "يحفظ إعدادات البوت"
+
+#: bot/commands/admin_commands.py:290
+msgid "Configuration saved"
+msgstr "تم حفظ الإعدادات"
+
+#: bot/commands/admin_commands.py:296
+msgid ""
+msgstr "+/-USERNAME يدير قائمة المسؤولين. +USERNAME يضيف مستخدماً. -USERNAME يزيله. بدون خيار يعرض القائمة"
+
+#: bot/commands/admin_commands.py:312
+msgid "This user is not in the admin list"
+msgstr "هذا المستخدم ليس في قائمة المسؤولين"
+
+#: bot/commands/admin_commands.py:319 bot/commands/admin_commands.py:349
+msgid "<Anonymous>"
+msgstr "<مجهول>"
+
+#: bot/commands/admin_commands.py:328
+msgid ""
+msgstr "+/-USERNAME يدير قائمة المحظورين. +USERNAME يضيف مستخدماً. -USERNAME يزيله. بدون خيار يعرض القائمة"
+
+#: bot/commands/admin_commands.py:344
+msgid "This user is not banned"
+msgstr "هذا المستخدم غير محظور"
+
+#: bot/commands/admin_commands.py:358
+msgid "Quits the bot"
+msgstr "الخروج من البوت"
+
+#: bot/commands/admin_commands.py:367
+msgid "Restarts the bot"
+msgstr "إعادة تشغيل البوت"
+
+#: bot/commands/admin_commands.py:382
+msgid "Returns current channel's ID"
+msgstr "يعيد معرف القناة الحالية"
+
+#: bot/commands/command.py:28
+msgid "help text not found"
+msgstr "نص المساعدة غير موجود"
+
+#: bot/commands/user_commands.py:17
+msgid "Shows command help"
+msgstr "يعرض مساعدة الأوامر"
+
+#: bot/commands/user_commands.py:26
+msgid "Shows information about the bot"
+msgstr "يعرض معلومات عن البوت"
+
+#: bot/commands/user_commands.py:35
+msgid ""
+msgstr "QUERY يشغل المسارات الموجودة للاستعلام. إذا لم يتم تقديم استعلام، يشغل أو يوقف المسار الحالي"
+
+#: bot/commands/user_commands.py:43 bot/commands/user_commands.py:615
+#: bot/commands/user_commands.py:715
+msgid "Searching..."
+msgstr "جاري البحث..."
+
+#: bot/commands/user_commands.py:51
+msgid "{nickname} requested {request}"
+msgstr "{nickname} طلب {request}"
+
+#: bot/commands/user_commands.py:57 bot/commands/user_commands.py:187
+#: bot/commands/user_commands.py:204 bot/commands/user_commands.py:733
+#: bot/commands/user_commands.py:843
+msgid "Playing {}"
+msgstr "تشغيل {}"
+
+#: bot/commands/user_commands.py:61 bot/commands/user_commands.py:623
+#: bot/commands/user_commands.py:722
+msgid "Nothing is found for your query"
+msgstr "لم يتم العثور على شيء للاستعلام الخاص بك"
+
+#: bot/commands/user_commands.py:63 bot/commands/user_commands.py:724
+msgid "The selected service is currently unavailable"
+msgstr "الخدمة المختارة غير متاحة حالياً"
+
+#: bot/commands/user_commands.py:76
+msgid "URL Plays a stream from a given URL"
+msgstr "URL يشغل بثاً من رابط معين"
+
+#: bot/commands/user_commands.py:85
+msgid "{nickname} requested playing from a URL"
+msgstr "{nickname} طلب التشغيل من رابط"
+
+#: bot/commands/user_commands.py:92
+msgid "Incorrect protocol"
+msgstr "بروتوكول غير صحيح"
+
+#: bot/commands/user_commands.py:94
+msgid "Cannot process stream URL"
+msgstr "لا يمكن معالجة رابط البث"
+
+#: bot/commands/user_commands.py:96
+msgid "The path cannot be found"
+msgstr "لا يمكن العثور على المسار"
+
+#: bot/commands/user_commands.py:104
+msgid "Stops playback"
+msgstr "إيقاف التشغيل"
+
+#: bot/commands/user_commands.py:111
+msgid "{nickname} stopped playback"
+msgstr "{nickname} أوقف التشغيل"
+
+#: bot/commands/user_commands.py:117 bot/commands/user_commands.py:150
+#: bot/commands/user_commands.py:169 bot/commands/user_commands.py:193
+#: bot/commands/user_commands.py:210 bot/commands/user_commands.py:359
+#: bot/commands/user_commands.py:368 bot/commands/user_commands.py:421
+#: bot/commands/user_commands.py:439 bot/commands/user_commands.py:485
+#: bot/commands/user_commands.py:546 bot/commands/user_commands.py:830
+msgid "Nothing is playing"
+msgstr "لا يوجد شيء قيد التشغيل"
+
+#: bot/commands/user_commands.py:123
+msgid ""
+msgstr "VOLUME يضبط الصوت على قيمة بين 0 و {max_volume}. إذا لم يتم تحديد مستوى الصوت، يتم عرض المستوى الحالي"
+
+#: bot/commands/user_commands.py:144
+msgid "STEP Seeks current track backward. the default step is {seek_step} seconds"
+msgstr "STEP يبحث في المسار الحالي للخلف. الخطوة الافتراضية هي {seek_step} ثانية"
+
+#: bot/commands/user_commands.py:163
+msgid "STEP Seeks current track forward. the default step is {seek_step} seconds"
+msgstr "STEP يبحث في المسار الحالي للأمام. الخطوة الافتراضية هي {seek_step} ثانية"
+
+#: bot/commands/user_commands.py:182
+msgid "Plays next track"
+msgstr "يشغل المسار التالي"
+
+#: bot/commands/user_commands.py:191 bot/commands/user_commands.py:847
+msgid "No next track"
+msgstr "لا يوجد مسار تالي"
+
+#: bot/commands/user_commands.py:199
+msgid "Plays previous track"
+msgstr "يشغل المسار السابق"
+
+#: bot/commands/user_commands.py:208
+msgid "No previous track"
+msgstr "لا يوجد مسار سابق"
+
+#: bot/commands/user_commands.py:216
+msgid ""
+msgstr "MODE يضبط وضع التشغيل. إذا لم يتم تحديد وضع، يتم عرض الوضع الحالي وقائمة بالأوضاع المتاحة"
+
+#: bot/commands/user_commands.py:222
+msgid "Single Track"
+msgstr "مسار واحد"
+
+#: bot/commands/user_commands.py:223
+msgid "Repeat Track"
+msgstr "تكرار المسار"
+
+#: bot/commands/user_commands.py:224
+msgid "Track list"
+msgstr "قائمة المسارات"
+
+#: bot/commands/user_commands.py:225
+msgid "Repeat track list"
+msgstr "تكرار قائمة المسارات"
+
+#: bot/commands/user_commands.py:226
+msgid "Random"
+msgstr "عشوائي"
+
+#: bot/commands/user_commands.py:228
+msgid ""
+msgstr ""
+"الوضع الحالي: {current_mode}\n"
+"{modes}"
+
+#: bot/commands/user_commands.py:247
+msgid "Current mode: {mode}"
+msgstr "الوضع الحالي: {mode}"
+
+#: bot/commands/user_commands.py:251
+msgid "Incorrect mode"
+msgstr "وضع غير صحيح"
+
+#: bot/commands/user_commands.py:259
+msgid ""
+msgstr "SERVICE يختار الخدمة للتشغيل منها، sv SERVICE h يعيد مساعدة إضافية. إذا لم يتم تحديد خدمة، يتم عرض الخدمة الحالية وقائمة بالخدمات المتاحة"
+
+#: bot/commands/user_commands.py:268
+msgid ""
+msgstr ""
+"خدمة غير معروفة.\n"
+"{}"
+
+#: bot/commands/user_commands.py:276
+msgid ""
+msgstr ""
+"الخدمة الحالية: {}\n"
+"تحذير: {}"
+
+#: bot/commands/user_commands.py:279
+msgid "Current service: {}"
+msgstr "الخدمة الحالية: {}"
+
+#: bot/commands/user_commands.py:285
+msgid ""
+msgstr ""
+"خطأ: {error}\n"
+"{service} معطل"
+
+#: bot/commands/user_commands.py:292
+msgid "{service} is disabled"
+msgstr "{service} معطل"
+
+#: bot/commands/user_commands.py:298
+msgid "This service has no additional help"
+msgstr "هذه الخدمة ليس لها مساعدة إضافية"
+
+#: bot/commands/user_commands.py:316
+msgid "{} (Error)"
+msgstr "{} (خطأ)"
+
+#: bot/commands/user_commands.py:320
+msgid "{} (Warning: {})"
+msgstr "{} (تحذير: {})"
+
+#: bot/commands/user_commands.py:326
+msgid ""
+msgstr ""
+"الخدمة الحالية: {current_service}\n"
+"المتاحة:\n"
+"{available_services}\n"
+"أرسل sv SERVICE h للحصول على مساعدة إضافية"
+
+#: bot/commands/user_commands.py:338
+msgid "NUMBER Selects track by number from the list of current results"
+msgstr "NUMBER يختار المسار بالرقم من قائمة النتائج الحالية"
+
+#: bot/commands/user_commands.py:351
+msgid "Incorrect number"
+msgstr "رقم غير صحيح"
+
+#: bot/commands/user_commands.py:353 bot/commands/user_commands.py:364
+msgid "Playing {} {}"
+msgstr "تشغيل {} {}"
+
+#: bot/commands/user_commands.py:357 bot/commands/user_commands.py:433
+#: bot/commands/user_commands.py:466 bot/commands/user_commands.py:505
+#: bot/commands/user_commands.py:798
+msgid "Out of list"
+msgstr "خارج القائمة"
+
+#: bot/commands/user_commands.py:374
+msgid ""
+msgstr "SPEED يضبط سرعة التشغيل من 0.25 إلى 4. إذا لم يتم تحديد سرعة، يعرض السرعة الحالية"
+
+#: bot/commands/user_commands.py:380
+msgid "Current rate: {}"
+msgstr "المعدل الحالي: {}"
+
+#: bot/commands/user_commands.py:393
+msgid ""
+msgstr "+/-NUMBER يدير المسارات المفضلة. + يضيف المسار الحالي للمفضلة. - يزيل مساراً من المفضلة. إذا تم تحديد رقم بعد +/-، يضيف/يزيل المسار بهذا الرقم"
+
+#: bot/commands/user_commands.py:399
+msgid "This command is not available for guest users"
+msgstr "هذا الأمر غير متاح للمستخدمين الضيوف"
+
+#: bot/commands/user_commands.py:437
+msgid "This track is not in favorites"
+msgstr "هذا المسار ليس في المفضلة"
+
+#: bot/commands/user_commands.py:446 bot/commands/user_commands.py:511
+msgid "{number}: {track_name}"
+msgstr "{number}: {track_name}"
+
+#: bot/commands/user_commands.py:474
+msgid "Gets a direct link to the current track"
+msgstr "يحصل على رابط مباشر للمسار الحالي"
+
+#: bot/commands/user_commands.py:483
+msgid "URL is not available"
+msgstr "الرابط غير متاح"
+
+#: bot/commands/user_commands.py:491
+msgid ""
+msgstr "NUMBER يشغل مساراً بالرقم المعطى من قائمة المسارات الأخيرة. بدون رقم يعرض المسارات الأخيرة"
+
+#: bot/commands/user_commands.py:517
+msgid "{number}: {track_url}"
+msgstr "{number}: {track_url}"
+
+#: bot/commands/user_commands.py:531
+msgid "Downloads the current track and uploads it to the channel."
+msgstr "ينزل المسار الحالي ويرفعه للقناة."
+
+#: bot/commands/user_commands.py:542
+msgid "Downloading..."
+msgstr "جاري التنزيل..."
+
+#: bot/commands/user_commands.py:544
+msgid "Live streams cannot be downloaded"
+msgstr "لا يمكن تنزيل البث المباشر"
+
+#: bot/commands/user_commands.py:552
+msgid "Makes the bot join your current channel"
+msgstr "يجعل البوت ينضم لقناتك الحالية"
+
+#: bot/commands/user_commands.py:573 bot/commands/user_commands.py:590
+msgid "Joining channel: {}"
+msgstr "الانضمام للقناة: {}"
+
+#: bot/commands/user_commands.py:582
+msgid "Failed to join channel. Error: {}"
+msgstr "فشل الانضمام للقناة. خطأ: {}"
+
+#: bot/commands/user_commands.py:593
+msgid "Failed to join channel: {}"
+msgstr "فشل الانضمام للقناة: {}"
+
+#: bot/commands/user_commands.py:599
+msgid ""
+msgstr "ينزل جميع المسارات من رابط قائمة تشغيل/ألبوم، ويضغطها في ملف ZIP، ويرفعها للقناة."
+
+#: bot/commands/user_commands.py:608
+msgid "Current progress: {}"
+msgstr "التقدم الحالي: {}"
+
+#: bot/commands/user_commands.py:612
+msgid "Please send the link to the playlist or album."
+msgstr "يرجى إرسال رابط قائمة التشغيل أو الألبوم."
+
+#: bot/commands/user_commands.py:631
+msgid "This command is for playlists and albums. For single tracks, use 'dl'."
+msgstr "هذا الأمر لقوائم التشغيل والألبومات. للمسارات المفردة، استخدم 'dl'."
+
+#: bot/commands/user_commands.py:705
+msgid ""
+msgstr "QUERY يبحث عن مسار ويضيفه إلى قائمة الانتظار. إذا لم يكن هناك شيء قيد التشغيل، يبدأ فوراً"
+
+#: bot/commands/user_commands.py:741
+msgid "{nickname} added to queue: {track}"
+msgstr "{nickname} أضاف إلى قائمة الانتظار: {track}"
+
+#: bot/commands/user_commands.py:747
+msgid "Added to queue [{position}]: {track}"
+msgstr "تمت الإضافة إلى قائمة الانتظار [{position}]: {track}"
+
+#: bot/commands/user_commands.py:755
+msgid "Lists all tracks in the queue"
+msgstr "يسرد جميع المسارات في قائمة الانتظار"
+
+#: bot/commands/user_commands.py:761
+msgid "The queue is empty"
+msgstr "قائمة الانتظار فارغة"
+
+#: bot/commands/user_commands.py:768
+msgid "Queue ({count} track(s)):"
+msgstr "قائمة الانتظار ({count} مسار/مسارات):"
+
+#: bot/commands/user_commands.py:778
+msgid "NUMBER Removes track number NUMBER from the queue"
+msgstr "NUMBER يزيل المسار رقم NUMBER من قائمة الانتظار"
+
+#: bot/commands/user_commands.py:803
+msgid "Removed from queue: {track}"
+msgstr "تمت الإزالة من قائمة الانتظار: {track}"
+
+#: bot/commands/user_commands.py:811
+msgid "Clears the entire queue"
+msgstr "يمسح قائمة الانتظار بالكامل"
+
+#: bot/commands/user_commands.py:815
+msgid "The queue is already empty"
+msgstr "قائمة الانتظار فارغة بالفعل"
+
+#: bot/commands/user_commands.py:818
+msgid "Queue cleared"
+msgstr "تم مسح قائمة الانتظار"
+
+#: bot/commands/user_commands.py:824
+msgid ""
+msgstr "يتخطى المسار الحالي ويشغل المسار التالي من قائمة الانتظار. يعود إلى التالي العادي إذا كانت القائمة فارغة"
+
+#: bot/commands/user_commands.py:836
+msgid "Playing next from queue: {}"
+msgstr "تشغيل التالي من قائمة الانتظار: {}"
+
+#: bot/connectors/tt_player_connector.py:35
+msgid "Playing: {track_name}"
+msgstr "تشغيل: {track_name}"
+
+#: bot/connectors/tt_player_connector.py:41
+msgid "Playing: {stream_url}"
+msgstr "تشغيل: {stream_url}"
+
+#: bot/connectors/tt_player_connector.py:52
+msgid "Paused: {track_name}"
+msgstr "تم الإيقاف المؤقت: {track_name}"
+
+#: bot/connectors/tt_player_connector.py:58
+msgid "Paused: {stream_url}"
+msgstr "تم الإيقاف المؤقت: {stream_url}"
+
+#: bot/modules/playlist_uploader.py:51
+msgid "Error: This playlist is too large (max {} tracks)."
+msgstr "خطأ: قائمة التشغيل هذه كبيرة جداً (الحد الأقصى {} مساراً)."
+
+#: bot/modules/playlist_uploader.py:61
+msgid "Downloading playlist: {}"
+msgstr "جاري تنزيل قائمة التشغيل: {}"
+
+#: bot/modules/playlist_uploader.py:68
+msgid "Downloading track {}: {}"
+msgstr "جاري تنزيل المسار {}: {}"
+
+#: bot/modules/playlist_uploader.py:94
+msgid "Error: Failed to download any tracks from this playlist."
+msgstr "خطأ: فشل تنزيل أي مسارات من قائمة التشغيل هذه."
+
+#: bot/modules/playlist_uploader.py:100
+msgid "Zipping tracks..."
+msgstr "جاري ضغط المسارات..."
+
+#: bot/modules/playlist_uploader.py:115
+msgid "Uploading ZIP: {}"
+msgstr "جاري رفع ملف ZIP: {}"
+
+#: bot/modules/playlist_uploader.py:139 bot/modules/uploader.py:70
+msgid "Max diskusage exceeded"
+msgstr "تم تجاوز الحد الأقصى لاستخدام القرص"
+
+#: bot/modules/playlist_uploader.py:150 bot/modules/uploader.py:81
+msgid "Not authorized to upload files to this channel"
+msgstr "غير مصرح لك برفع الملفات إلى هذه القناة"
+
+#: bot/services/yt.py:319
+msgid "Unknown Title"
+msgstr "عنوان غير معروف"
+
+#: bot/services/ytm.py:316
+msgid "Unknown"
+msgstr "غير معروف"
+
