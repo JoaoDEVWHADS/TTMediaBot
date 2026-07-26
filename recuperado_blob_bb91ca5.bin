@@ -1,0 +1,11 @@
+babel
+beautifulsoup4
+patool
+portalocker
+pydantic
+pyshorteners
+requests
+yt-dlp
+ytmusicapi
+py-yt-search
+httpx[http2]
