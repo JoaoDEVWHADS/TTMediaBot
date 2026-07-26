@@ -1,0 +1,168 @@
+import logging
+import time
+import random
+import sys
+
+import vlc
+
+from bot import errors
+from bot.player.enums import Mode, State
+from bot.player.track import Track
+from bot.player.thread import PlayerThread
+from bot.sound_devices import SoundDevice, SoundDeviceType
+
+
+class Player:
+    def __init__(self, config):
+        self.config = config
+        self._vlc_instance = vlc.Instance()
+        self._vlc_player = self._vlc_instance.media_player_new()
+        self._vlc_player.audio_set_volume(self.config['default_volume'])
+        self.max_volume = self.config['max_volume']
+        self.faded_volume = self.config['faded_volume']
+        self.faded_volume_timestamp = self.config['faded_volume_timestamp']
+        self.seek_step = config['seek_step']
+        self.track_list = []
+        self.track = Track()
+        self.track_index = -1
+        self.state = State.Stopped
+        self.mode = Mode.Single
+        self.thread = PlayerThread(self)
+
+    def run(self):
+        logging.debug('Starting player thread')
+        self.thread.start()
+        logging.debug('Player thread started')
+
+    def play(self, tracks=None):
+        if tracks:
+            self.track_list = tracks
+            if self.mode == Mode.Random:
+                self.track = random.choice(self.track_list)
+                self.track_index = self.track_list.index(self.track)
+            else:
+                self.track_index = 0
+                self.track = tracks[self.track_index]
+            self._play_with_vlc(self.track.url)
+        else:
+            self._vlc_player.play()
+        while self._vlc_player.get_state() != vlc.State.Playing and self._vlc_player.get_state() != vlc.State.Ended:
+            pass
+        self.state = State.Playing
+
+    def pause(self):
+        self.state = State.Paused
+        self._vlc_player.pause()
+
+    def stop(self):
+        self.state = State.Stopped
+        self._vlc_player.pause()
+        self.track_list = []
+        self.track = Track()
+        self.track_index = -1
+
+    def _play_with_vlc(self, arg):
+        self._vlc_player.set_media(self._vlc_instance.media_new(arg))
+        self._vlc_player.play()
+
+    def next(self):
+        track_index = self.track_index
+        if self.mode == Mode.Random:
+            track_index = random.randrange(0, len(self.track_list))
+        else:
+            track_index += 1
+        try:
+            self.play_by_index(track_index)
+        except errors.IncorrectTrackIndexError:
+            raise errors.NoNextTrackError()
+
+    def previous(self):
+        track_index = self.track_index
+        if self.mode == Mode.Random:
+            track_index = random.randrange(0, len(self.track_list))
+        else:
+            track_index -= 1
+        try:
+            self.play_by_index(track_index)
+        except errors.IncorrectTrackIndexError:
+            raise errors.NoPreviousTrackError
+
+    def play_by_index(self, index):
+        if self.state == State.Stopped:
+            raise errors.NothingIsPlayingError()
+        if index >= 0 and index < len(self.track_list):
+            self.track_index = index
+            self.track = self.track_list[self.track_index]
+            self._play_with_vlc(self.track.url)
+            if self.state == State.Paused:
+                while self._vlc_player.get_state() != vlc.State.Playing and self._vlc_player.get_state() != vlc.State.Ended:
+                    pass
+                self.state = State.Playing
+        else:
+            raise errors.IncorrectTrackIndexError()
+
+    def get_volume(self):
+        return self._vlc_player.audio_get_volume()
+
+    def set_volume(self, volume):
+        volume = volume if volume <= self.max_volume else self.max_volume
+        if self.faded_volume:
+            n = 1 if self._vlc_player.audio_get_volume() < volume else -1
+            for i in range(self._vlc_player.audio_get_volume(), volume, n):
+                self._vlc_player.audio_set_volume(i)
+                time.sleep(self.faded_volume_timestamp)
+        else:
+            self._vlc_player.audio_set_volume(volume)
+
+    def get_rate(self):
+        return self._vlc_player.get_rate()
+
+    def set_rate(self, arg):
+        self._vlc_player.set_rate(arg)
+
+    def seek_back(self, time_step=None):
+        time_step = time_step / 100 if time_step else self.seek_step / 100
+        pos = self._vlc_player.get_position() - time_step
+        if pos < 0:
+            pos = 0
+        elif pos > 1:
+            pos = 1
+        self._vlc_player.set_position(pos)
+
+    def seek_forward(self, time_step=None):
+        time_step = time_step / 100 if time_step else self.seek_step / 100
+        pos = self._vlc_player.get_position() + time_step
+        if pos < 0:
+            pos = 0
+        elif pos > 1:
+            pos = 1
+        self._vlc_player.set_position(pos)
+
+    def get_position(self):
+        if self.state != State.Stopped:
+            return self._vlc_player.get_position() * 100
+        else:
+            raise errors.NothingIsPlayingError()
+
+    def set_position(self, arg):
+        if arg >= 0 and arg <= 100:
+            self._vlc_player.set_position(arg)
+        else:
+            raise errors.IncorrectPositionError()
+
+    def get_output_devices(self):
+        if sys.platform == 'win32':
+            self._vlc_player.audio_output_set(b'waveout')
+        devices = []
+        mods = self._vlc_player.audio_output_device_enum()
+        if mods:
+            mod = mods
+            while mod:
+                mod = mod.contents
+                devices.append(SoundDevice(mod.description.decode('UTF-8'), mod.device, SoundDeviceType.Output))
+                mod = mod.next
+        vlc.libvlc_audio_output_device_list_release(mods)
+        return devices
+
+    def set_output_device(self, id):
+        self._vlc_player.audio_output_device_set(None, id)
