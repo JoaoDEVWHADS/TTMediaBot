@@ -1,0 +1,889 @@
+# Turkish translations for TTMediaBot.
+# Copyright (C) 2026 TTMediaBot-team
+# This file is distributed under the same license as the TTMediaBot project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version:  TTMediaBot\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-05-10 11:43+0000\n"
+"PO-Revision-Date: 2021-07-17 13:41+0400\n"
+"Last-Translator: \n"
+"Language: tr\n"
+"Language-Team: TTMediaBot's developers\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: bot/app_vars.py:11
+msgid ""
+"Hello! I am João Almeida. This is my fork of TTMediaBot for TeamTalk 5.\n"
+"This repository focuses on stability and support for YouTube Music.\n"
+"Repository: https://github.com/JoaoDEVWHADS/TTMediaBot\n"
+"Original Authors: Amir Gumerov, Vladislav Kopylov, Beqa Gozalishvili, "
+"Kirill Belousov.\n"
+msgstr ""
+"Merhaba! Ben João Almeida. Bu, TeamTalk 5 için TTMediaBot fork'umdur.\n"
+"Bu depo istikrar ve YouTube Music desteğine odaklanmaktadır.\n"
+"Depo: https://github.com/JoaoDEVWHADS/TTMediaBot\n"
+"Orijinal Yazarlar: Amir Gumerov, Vladislav Kopylov, Beqa Gozalishvili, "
+"Kirill Belousov.\n"
+
+#: bot/TeamTalk/__init__.py:150
+msgid "Send \"h\" for help"
+msgstr "Yardım için \"h\" gönderin"
+
+#: bot/commands/__init__.py:121
+msgid "Unknown command. Send \"h\" for help."
+msgstr "Bilinmeyen komut. Yardım için \"h\" gönderin."
+
+#: bot/commands/__init__.py:127 bot/commands/user_commands.py:688
+#: bot/commands/user_commands.py:694 bot/modules/playlist_uploader.py:138
+#: bot/modules/playlist_uploader.py:149 bot/modules/playlist_uploader.py:164
+#: bot/modules/uploader.py:69 bot/modules/uploader.py:80
+#, python-brace-format
+msgid "Error: {}"
+msgstr "Hata: {}"
+
+#: bot/commands/__init__.py:139
+msgid "You are banned"
+msgstr "Siz engellendiniz"
+
+#: bot/commands/__init__.py:143
+msgid "You are not in bot's channel"
+msgstr "botun kanalında değilsiniz"
+
+#: bot/commands/__init__.py:147
+msgid "Bot is locked"
+msgstr "Bot kilitli"
+
+#: bot/commands/__init__.py:151
+msgid "This command is blocked"
+msgstr "Bu komut kilitli"
+
+#: bot/commands/__init__.py:175
+msgid "Unknown command"
+msgstr "Bilinmeyen komut"
+
+#: bot/commands/admin_commands.py:20
+msgid ""
+"+/-COMMAND Blocks or unblocks commands. +COMMAND adds command to the "
+"blocklist. -COMMAND removes from it. Without a command shows the "
+"blocklist"
+msgstr ""
+"+/-KOMUT Komutları engeller veya engellemeyi kaldırır. +KOMUT engelleme "
+"listesine komut ekler. -KOMUT komutu engelleme listesinden kaldırır. "
+"Komut olmadan engellenen komut listesini gösterir"
+
+#: bot/commands/admin_commands.py:32 bot/commands/admin_commands.py:322
+#: bot/commands/admin_commands.py:352 bot/commands/user_commands.py:456
+#: bot/commands/user_commands.py:468 bot/commands/user_commands.py:524
+msgid "The list is empty"
+msgstr "Liste boş"
+
+#: bot/commands/admin_commands.py:37 bot/commands/admin_commands.py:304
+#: bot/commands/admin_commands.py:336 bot/commands/user_commands.py:419
+msgid "Added"
+msgstr "Eklendi"
+
+#: bot/commands/admin_commands.py:39
+msgid "This command is already added"
+msgstr "Bu komut zaten eklendi"
+
+#: bot/commands/admin_commands.py:45 bot/commands/admin_commands.py:310
+#: bot/commands/admin_commands.py:342 bot/commands/user_commands.py:431
+msgid "Deleted"
+msgstr "Silindi"
+
+#: bot/commands/admin_commands.py:47
+msgid "This command is not blocked"
+msgstr "Bu komut kilitli değil"
+
+#: bot/commands/admin_commands.py:55
+msgid "GENDER Changes bot's gender. n neutral, m male, f female"
+msgstr "CİNSİYET Botun cinsiyetini değiştirir. n nötr, m erkek, f kadın"
+
+#: bot/commands/admin_commands.py:70
+msgid "LANGUAGE Changes bot's language"
+msgstr "DIL Botun dilini değiştirir"
+
+#: bot/commands/admin_commands.py:78
+msgid "The language has been changed"
+msgstr "Dil değiştirildi"
+
+#: bot/commands/admin_commands.py:80
+msgid "Incorrect language"
+msgstr "yanlış dil"
+
+#: bot/commands/admin_commands.py:82
+#, python-brace-format
+msgid ""
+"Current language: {current_language}. Available languages: "
+"{available_languages}"
+msgstr "Şu anki dil: {current_language}. Mevcut diller: {available_languages}"
+
+#: bot/commands/admin_commands.py:93
+msgid "NICKNAME Changes bot's nickname"
+msgstr "TAKMA AD Botun takma adını değiştirir"
+
+#: bot/commands/admin_commands.py:103
+msgid ""
+"r/f Clears bot's cache. r clears recents, f clears favorites, without an "
+"option clears the entire cache"
+msgstr ""
+"r/f Botun önbelleğini temizler. r son çalınan parça listesini siler, f "
+"favorileri siler, seçenek olmadan tüm önbelleği temizler"
+
+#: bot/commands/admin_commands.py:112
+msgid "Cache cleared"
+msgstr "Önbellek temizlendi"
+
+#: bot/commands/admin_commands.py:116
+msgid "Recents cleared"
+msgstr "Son çalınan parça listesi temizlendi"
+
+#: bot/commands/admin_commands.py:120
+msgid "Favorites cleared"
+msgstr "Favoriler temizlendi"
+
+#: bot/commands/admin_commands.py:126
+msgid ""
+"Join channel. first argument is channel name or id, second argument is "
+"password, split argument \" | \", if password is undefined, don't type "
+"second argument"
+msgstr ""
+"Kanala katıl. ilk argüman kanal adı veya id'si, ikinci argüman şifredir, "
+"argümanları \" | \" ile ayırın, şifre tanımlanmamışsa ikinci argümanı "
+"yazmayın"
+
+#: bot/commands/admin_commands.py:146
+msgid "This channel does not exist"
+msgstr "Bu kanal mevcut değil"
+
+#: bot/commands/admin_commands.py:160
+#, python-brace-format
+msgid "Error joining channel: {error}"
+msgstr "Kanala katılırken hata oluştu: {error}"
+
+#: bot/commands/admin_commands.py:208
+msgid "Enables or disables voice transmission"
+msgstr "Ses iletimini etkinleştirir veya devre dışı bırakır"
+
+#: bot/commands/admin_commands.py:215 bot/commands/admin_commands.py:217
+msgid "Voice transmission enabled"
+msgstr "Ses iletimi etkin"
+
+#: bot/commands/admin_commands.py:222
+msgid "Voice transmission disabled"
+msgstr "Ses iletimi devre dışı"
+
+#: bot/commands/admin_commands.py:228
+msgid "Locks or unlocks the bot"
+msgstr "Botu kilitler veya kilidini açar"
+
+#: bot/commands/admin_commands.py:233
+msgid "Locked"
+msgstr "Kilitlendi"
+
+#: bot/commands/admin_commands.py:235
+msgid "Unlocked"
+msgstr "Kilid açıldı"
+
+#: bot/commands/admin_commands.py:242
+msgid "STATUS Changes bot's status"
+msgstr "DURUM Botun durumunu değiştirir"
+
+#: bot/commands/admin_commands.py:252
+msgid "Enables or disables event handling"
+msgstr "Olay işlemeyi etkinleştirir veya devre dışı bırakır"
+
+#: bot/commands/admin_commands.py:259
+msgid "Event handling is enabled"
+msgstr "Olay işleme etkin"
+
+#: bot/commands/admin_commands.py:261
+msgid "Event handling is disabled"
+msgstr "Olay işleme devre dışı"
+
+#: bot/commands/admin_commands.py:268
+msgid "Enables or disables sending of channel messages"
+msgstr "Kanal mesajlarının gönderilmesini etkinleştirir veya devre dışı bırakır"
+
+#: bot/commands/admin_commands.py:277
+msgid "Channel messages enabled"
+msgstr "Kanal mesajları etkinleştirildi"
+
+#: bot/commands/admin_commands.py:279
+msgid "Channel messages disabled"
+msgstr "Kanal mesajları devre dışı bırakıldı"
+
+#: bot/commands/admin_commands.py:286
+msgid "Saves bot's configuration"
+msgstr "Botun konfigurasyonunu kaydeder"
+
+#: bot/commands/admin_commands.py:290
+msgid "Configuration saved"
+msgstr "Konfigurasyon kaydedildi"
+
+#: bot/commands/admin_commands.py:296
+msgid ""
+"+/-USERNAME Manages a list of administrators. +USERNAME adds a user. "
+"-USERNAME removes it. Without an option shows the list"
+msgstr ""
+"+/-KULLANICI ADI Yöneticiler listesini yönetir. +KULLANICI ADI kullanıcı "
+"ekler. -KULLANICI ADI kullanıcıyı kaldırır. Bir seçenek olmadan listeyi "
+"gösterir"
+
+#: bot/commands/admin_commands.py:312
+msgid "This user is not in the admin list"
+msgstr "Bu kullanıcı yönetici listesinde değil"
+
+#: bot/commands/admin_commands.py:319 bot/commands/admin_commands.py:349
+msgid "<Anonymous>"
+msgstr "<Anonim>"
+
+#: bot/commands/admin_commands.py:328
+msgid ""
+"+/-USERNAME Manages a list of banned users. +USERNAME adds a user. "
+"-USERNAME removes it. Without an option shows the list"
+msgstr ""
+"+/-KULLANICI ADI Engellenmiş kullanıcılar listesini yönetir. +KULLANICI "
+"ADI kullanıcı ekler. -KULLANICI ADI kullanıcıyı kaldırır. Bir seçenek "
+"olmadan listeyi gösterir"
+
+#: bot/commands/admin_commands.py:344
+msgid "This user is not banned"
+msgstr "Bu kullanıcı engellenmemiştir"
+
+#: bot/commands/admin_commands.py:358
+msgid "Quits the bot"
+msgstr "Botu kapatır"
+
+#: bot/commands/admin_commands.py:367
+msgid "Restarts the bot"
+msgstr "Botu yeniden başlatır"
+
+#: bot/commands/admin_commands.py:382
+msgid "Returns current channel's ID"
+msgstr "Mevcut kanalın kimliğini (ID) döndürür"
+
+#: bot/commands/command.py:28
+msgid "help text not found"
+msgstr "yardım metni bulunamadı"
+
+#: bot/commands/user_commands.py:17
+msgid "Shows command help"
+msgstr "Komut yardımını gösterir"
+
+#: bot/commands/user_commands.py:26
+msgid "Shows information about the bot"
+msgstr "Bot hakkında bilgi gösterir"
+
+#: bot/commands/user_commands.py:35
+msgid ""
+"QUERY Plays tracks found for the query. If no query is given, plays or "
+"pauses current track"
+msgstr ""
+"İSTEK İstek için bulunan parçaları çalar. İstek verilmezse, mevcut "
+"parçayı oynatır veya duraklatır"
+
+#: bot/commands/user_commands.py:43 bot/commands/user_commands.py:615
+#: bot/commands/user_commands.py:715
+msgid "Searching..."
+msgstr "Aranıyor..."
+
+#: bot/commands/user_commands.py:51
+#, python-brace-format
+msgid "{nickname} requested {request}"
+msgstr "{nickname} {request} istedi"
+
+#: bot/commands/user_commands.py:57 bot/commands/user_commands.py:187
+#: bot/commands/user_commands.py:204 bot/commands/user_commands.py:733
+#: bot/commands/user_commands.py:843
+#, python-brace-format
+msgid "Playing {}"
+msgstr "Oynatılıyor {}"
+
+#: bot/commands/user_commands.py:61 bot/commands/user_commands.py:623
+#: bot/commands/user_commands.py:722
+msgid "Nothing is found for your query"
+msgstr "Sorgunuz için hiçbir şey bulunamadı"
+
+#: bot/commands/user_commands.py:63 bot/commands/user_commands.py:724
+msgid "The selected service is currently unavailable"
+msgstr "Seçilen hizmet şu anda kullanılamıyor"
+
+# | msgid "URL Plays a stream from bot given URL"
+#: bot/commands/user_commands.py:76
+msgid "URL Plays a stream from a given URL"
+msgstr "URL Verilen bir URL'den akış oynatır"
+
+#: bot/commands/user_commands.py:85
+#, python-brace-format
+msgid "{nickname} requested playing from a URL"
+msgstr "{nickname} bir URL'den oynatma istedi"
+
+#: bot/commands/user_commands.py:92
+msgid "Incorrect protocol"
+msgstr "Geçersiz protokol"
+
+#: bot/commands/user_commands.py:94
+msgid "Cannot process stream URL"
+msgstr "Akış URL'si işlenemiyor"
+
+#: bot/commands/user_commands.py:96
+msgid "The path cannot be found"
+msgstr "Yol bulunamadı"
+
+#: bot/commands/user_commands.py:104
+msgid "Stops playback"
+msgstr "Oynatmayı durdurur"
+
+#: bot/commands/user_commands.py:111
+#, python-brace-format
+msgid "{nickname} stopped playback"
+msgstr "{nickname} oynatmayı durdurdu"
+
+#: bot/commands/user_commands.py:117 bot/commands/user_commands.py:150
+#: bot/commands/user_commands.py:169 bot/commands/user_commands.py:193
+#: bot/commands/user_commands.py:210 bot/commands/user_commands.py:359
+#: bot/commands/user_commands.py:368 bot/commands/user_commands.py:421
+#: bot/commands/user_commands.py:439 bot/commands/user_commands.py:485
+#: bot/commands/user_commands.py:546 bot/commands/user_commands.py:830
+msgid "Nothing is playing"
+msgstr "Hiçbir şey çalmıyor"
+
+#: bot/commands/user_commands.py:123
+#, python-brace-format
+msgid ""
+"VOLUME Sets the volume to a value between 0 and {max_volume}. If no "
+"volume is specified, the current volume level is displayed"
+msgstr ""
+"SES Sesi 0 ile {max_volume} arasında bir değere ayarlar. Ses düzeyi "
+"belirtilmemişse, geçerli ses düzeyi görüntülenir"
+
+#: bot/commands/user_commands.py:144
+#, python-brace-format
+msgid "STEP Seeks current track backward. the default step is {seek_step} seconds"
+msgstr ""
+"[ADIM] Geçerli parçayı geriye doğru arar. varsayılan adım {seek_step} "
+"saniye"
+
+#: bot/commands/user_commands.py:163
+#, python-brace-format
+msgid "STEP Seeks current track forward. the default step is {seek_step} seconds"
+msgstr ""
+"[ADIM] Mevcut parçayı ileriye doğru arar. varsayılan adım {seek_step} "
+"saniye"
+
+#: bot/commands/user_commands.py:182
+msgid "Plays next track"
+msgstr "Sonraki parçayı çalar"
+
+#: bot/commands/user_commands.py:191 bot/commands/user_commands.py:847
+msgid "No next track"
+msgstr "Sonraki parça yok"
+
+#: bot/commands/user_commands.py:199
+msgid "Plays previous track"
+msgstr "Önceki parçayı oynatır"
+
+#: bot/commands/user_commands.py:208
+msgid "No previous track"
+msgstr "Önceki parça yok"
+
+#: bot/commands/user_commands.py:216
+msgid ""
+"MODE Sets the playback mode. If no mode is specified, the current mode "
+"and a list of modes are displayed"
+msgstr ""
+"MOD Oynatma modunu ayarlar. Mod belirtilmemişse, geçerli mod ve modların "
+"listesi görüntülenir"
+
+#: bot/commands/user_commands.py:222
+msgid "Single Track"
+msgstr "Tek Parça"
+
+#: bot/commands/user_commands.py:223
+msgid "Repeat Track"
+msgstr "Parçayı Tekrarlama modu"
+
+#: bot/commands/user_commands.py:224
+msgid "Track list"
+msgstr "Parça listesi"
+
+#: bot/commands/user_commands.py:225
+msgid "Repeat track list"
+msgstr "Parça listesini tekrarlama modu"
+
+#: bot/commands/user_commands.py:226
+msgid "Random"
+msgstr "Rastgele"
+
+#: bot/commands/user_commands.py:228
+msgid ""
+msgstr ""
+"Geçerli mod: {current_mode}\n"
+"{modes}"
+
+#: bot/commands/user_commands.py:247
+#, python-brace-format
+msgid "Current mode: {mode}"
+msgstr "Geçerli mod: {mode}"
+
+#: bot/commands/user_commands.py:251
+msgid "Incorrect mode"
+msgstr "Geçersiz mod"
+
+#: bot/commands/user_commands.py:259
+msgid ""
+msgstr "SERVICE Oynatılacak hizmeti seçer, sv SERVICE h ek yardım döndürür. Herhangi bir hizmet belirtilmemişse, mevcut hizmet ve kullanılabilir hizmetlerin listesi görüntülenir"
+
+#: bot/commands/user_commands.py:268
+#, python-brace-format
+msgid ""
+"Unknown service.\n"
+"{}"
+msgstr ""
+"Bilinmeyen hizmet.\n"
+"{}"
+
+#: bot/commands/user_commands.py:276
+msgid ""
+msgstr ""
+"Mevcut hizmet: {}\n"
+"Uyarı: {}"
+
+#: bot/commands/user_commands.py:279
+#, python-brace-format
+msgid "Current service: {}"
+msgstr "Mevcut hizmet: {}"
+
+#: bot/commands/user_commands.py:285
+#, python-brace-format
+msgid ""
+"Error: {error}\n"
+"{service} is disabled"
+msgstr ""
+"Hata: {error}\n"
+"{service} devre dışı bırakıldı"
+
+#: bot/commands/user_commands.py:292
+msgid "{service} is disabled"
+msgstr "{service} devre dışı"
+
+#: bot/commands/user_commands.py:298
+msgid "This service has no additional help"
+msgstr "Bu hizmetin ek yardımı yok"
+
+#: bot/commands/user_commands.py:316
+msgid "{} (Error)"
+msgstr "{} (Hata)"
+
+#: bot/commands/user_commands.py:320
+#, python-brace-format
+msgid "{} (Warning: {})"
+msgstr "{} (Uyarı: {})"
+
+#: bot/commands/user_commands.py:326
+msgid ""
+msgstr ""
+"Mevcut hizmet: {current_service}\n"
+"Mevcutlar:\n"
+"{available_services}\n"
+"ek yardım için sv SERVICE h gönderin"
+
+#: bot/commands/user_commands.py:338
+msgid "NUMBER Selects track by number from the list of current results"
+msgstr "NUMARA Geçerli sonuçlar listesinden parçayı numaraya göre seçer"
+
+#: bot/commands/user_commands.py:351
+msgid "Incorrect number"
+msgstr "Yanlış numara"
+
+#: bot/commands/user_commands.py:353 bot/commands/user_commands.py:364
+#, python-brace-format
+msgid "Playing {} {}"
+msgstr "Oynatılıyor {} {}"
+
+#: bot/commands/user_commands.py:357 bot/commands/user_commands.py:433
+#: bot/commands/user_commands.py:466 bot/commands/user_commands.py:505
+#: bot/commands/user_commands.py:798
+msgid "Out of list"
+msgstr "Liste dışı"
+
+# | msgid "" "SPEED Sets playback speed from bot.25 to 4. If no speed is
+# given,
+# | shows " "current speed"
+#: bot/commands/user_commands.py:374
+msgid ""
+msgstr "SPEED Oynatma hızını 0.25 ile 4 arasında ayarlar. Hız belirtilmezse mevcut hızı gösterir"
+
+#: bot/commands/user_commands.py:380
+#, python-brace-format
+msgid "Current rate: {}"
+msgstr "Geçerli hız: {}"
+
+#: bot/commands/user_commands.py:393
+msgid ""
+"+/-NUMBER Manages favorite tracks. + adds the current track to favorites."
+" - removes a track requested from favorites. If a number is specified "
+"after +/-, adds/removes a track with that number"
+msgstr ""
+"+/-NUMARA Favori parçaları yönetir. + mevcut parçayı favorilere ekler. - "
+"favorilerden istenen parçayı kaldırır. +/- sonra bir numara belirtilirse,"
+" o numaraya sahip bir parçayı ekler/kaldırır"
+
+#: bot/commands/user_commands.py:399
+msgid "This command is not available for guest users"
+msgstr "Bu komut konuk kullanıcılar için mevcut değildir"
+
+#: bot/commands/user_commands.py:437
+msgid "This track is not in favorites"
+msgstr "Bu parça favorilerde değil"
+
+#: bot/commands/user_commands.py:446 bot/commands/user_commands.py:511
+msgid "{number}: {track_name}"
+msgstr "{number}: {track_name}"
+
+#: bot/commands/user_commands.py:474
+msgid "Gets a direct link to the current track"
+msgstr "Geçerli parçaya doğrudan bir bağlantı alır"
+
+#: bot/commands/user_commands.py:483
+msgid "URL is not available"
+msgstr "URL mevcut değil"
+
+# | msgid "" "NUMBER Plays a track with  the given number from bot list of
+# | recent " "tracks. Without a number shows recent tracks"
+#: bot/commands/user_commands.py:491
+msgid ""
+msgstr "NUMBER Son parça listesinden verilen numaradaki parçayı oynatır. Numara belirtilmezse son parçaları gösterir"
+
+#: bot/commands/user_commands.py:517
+msgid "{number}: {track_url}"
+msgstr "{number}: {track_url}"
+
+#: bot/commands/user_commands.py:531
+msgid "Downloads the current track and uploads it to the channel."
+msgstr "Mevcut parçayı indirir ve kanala yükler."
+
+#: bot/commands/user_commands.py:542
+msgid "Downloading..."
+msgstr "İndiriliyor..."
+
+#: bot/commands/user_commands.py:544
+msgid "Live streams cannot be downloaded"
+msgstr "Canlı akışlar indirilemiyor"
+
+#: bot/commands/user_commands.py:552
+msgid "Makes the bot join your current channel"
+msgstr "Botun mevcut kanalınıza katılmasını sağlar"
+
+#: bot/commands/user_commands.py:573 bot/commands/user_commands.py:590
+msgid "Joining channel: {}"
+msgstr "Kanala katılıyor: {}"
+
+#: bot/commands/user_commands.py:582
+msgid "Failed to join channel. Error: {}"
+msgstr "Kanala katılma başarısız oldu. Hata: {}"
+
+#: bot/commands/user_commands.py:593
+msgid "Failed to join channel: {}"
+msgstr "Kanala katılma başarısız oldu: {}"
+
+#: bot/commands/user_commands.py:599
+msgid ""
+msgstr "Tüm parçaları indirir, ZIP yapar ve kanala yükler."
+
+#: bot/commands/user_commands.py:608
+msgid "Current progress: {}"
+msgstr "Mevcut ilerleme: {}"
+
+#: bot/commands/user_commands.py:612
+msgid "Please send the link to the playlist or album."
+msgstr "Lütfen çalma listesi veya albüm bağlantısını gönderin."
+
+#: bot/commands/user_commands.py:631
+msgid "This command is for playlists and albums. For single tracks, use 'dl'."
+msgstr "Bu komut çalma listeleri ve albümler içindir. Tekli parçalar için 'dl' kullanın."
+
+#: bot/commands/user_commands.py:705
+msgid ""
+msgstr "QUERY Bir parça arar ve sıraya ekler. Hiçbir şey çalmıyorsa hemen başlar"
+
+#: bot/commands/user_commands.py:741
+msgid "{nickname} added to queue: {track}"
+msgstr "{nickname} sıraya ekledi: {track}"
+
+#: bot/commands/user_commands.py:747
+msgid "Added to queue [{position}]: {track}"
+msgstr "Sıraya eklendi [{position}]: {track}"
+
+#: bot/commands/user_commands.py:755
+msgid "Lists all tracks in the queue"
+msgstr "Sıradaki tüm parçaları listeler"
+
+#: bot/commands/user_commands.py:761
+msgid "The queue is empty"
+msgstr "Sıra boş"
+
+#: bot/commands/user_commands.py:768
+msgid "Queue ({count} track(s)):"
+msgstr "Sıra ({count} parça):"
+
+#: bot/commands/user_commands.py:778
+msgid "NUMBER Removes track number NUMBER from the queue"
+msgstr "NUMBER Sıradaki NUMBER numaralı parçayı kaldırır"
+
+#: bot/commands/user_commands.py:803
+msgid "Removed from queue: {track}"
+msgstr "Sıradan kaldırıldı: {track}"
+
+#: bot/commands/user_commands.py:811
+msgid "Clears the entire queue"
+msgstr "Tüm sırayı temizler"
+
+#: bot/commands/user_commands.py:815
+msgid "The queue is already empty"
+msgstr "Sıra zaten boş"
+
+#: bot/commands/user_commands.py:818
+msgid "Queue cleared"
+msgstr "Sıra temizlendi"
+
+#: bot/commands/user_commands.py:824
+msgid ""
+msgstr "Mevcut parçayı atlar ve sıradaki bir sonrakini çalar. Sıra boşsa normal bir sonrakine geçer"
+
+#: bot/commands/user_commands.py:836
+msgid "Playing next from queue: {}"
+msgstr "Sıradaki parça çalınıyor: {}"
+
+#: bot/connectors/tt_player_connector.py:35
+#, python-brace-format
+msgid "Playing: {track_name}"
+msgstr "Oynatılıyor: {track_name}"
+
+#: bot/connectors/tt_player_connector.py:41
+#, python-brace-format
+msgid "Playing: {stream_url}"
+msgstr "Oynatılıyor: {stream_url}"
+
+#: bot/connectors/tt_player_connector.py:52
+#, python-brace-format
+msgid "Paused: {track_name}"
+msgstr "Duraklatıldı: {track_name}"
+
+#: bot/connectors/tt_player_connector.py:58
+#, python-brace-format
+msgid "Paused: {stream_url}"
+msgstr "Duraklatıldı: {stream_url}"
+
+#: bot/modules/playlist_uploader.py:51
+msgid "Error: This playlist is too large (max {} tracks)."
+msgstr "Hata: Bu çalma listesi çok büyük (maks {} parça)."
+
+#: bot/modules/playlist_uploader.py:61
+msgid "Downloading playlist: {}"
+msgstr "Çalma listesi indiriliyor: {}"
+
+#: bot/modules/playlist_uploader.py:68
+msgid "Downloading track {}: {}"
+msgstr "Parça indiriliyor {}: {}"
+
+#: bot/modules/playlist_uploader.py:94
+msgid "Error: Failed to download any tracks from this playlist."
+msgstr "Hata: Bu çalma listesinden herhangi bir parça indirilemedi."
+
+#: bot/modules/playlist_uploader.py:100
+msgid "Zipping tracks..."
+msgstr "Parçalar ZIP'leniyor..."
+
+#: bot/modules/playlist_uploader.py:115
+msgid "Uploading ZIP: {}"
+msgstr "ZIP yükleniyor: {}"
+
+#: bot/modules/playlist_uploader.py:139 bot/modules/uploader.py:70
+msgid "Max diskusage exceeded"
+msgstr "Maksimum disk kullanımı aşıldı"
+
+#: bot/modules/playlist_uploader.py:150 bot/modules/uploader.py:81
+msgid "Not authorized to upload files to this channel"
+msgstr "Bu kanala dosya yükleme yetkiniz yok"
+
+#: bot/services/yt.py:319
+msgid "Unknown Title"
+msgstr "Bilinmeyen Başlık"
+
+#: bot/services/ytm.py:316
+msgid "Unknown"
+msgstr "Bilinmiyor"
+
+#~ msgid "The cache file is already used by another instance of the bot."
+#~ msgstr "Önbellek dosyası, botun başka bir örneği tarafından zaten kullanılıyor."
+
+#~ msgid "Unknown user command"
+#~ msgstr "Bilinmeyen kullanıcı komutu"
+
+#~ msgid ""
+#~ "Changes the gender of the bot.\n"
+#~ "cg n changes to neutral.\n"
+#~ "cg m changes to male.\n"
+#~ "cg f changes to female."
+#~ msgstr ""
+#~ "Botun cinsiyetini değiştirir.\n"
+#~ "cg n nötr olarak değiştirir.\n"
+#~ "cg m erkek olarak değiştirir.\n"
+#~ "cg f kadın olarak değiştirir."
+
+#~ msgid ""
+#~ "cc without arguments clears the entire cache.\n"
+#~ "cc r cleares only recent tracks.\n"
+#~ "cc f cleares only favorites."
+#~ msgstr ""
+#~ "argümansız tüm önbelleği temizler.\n"
+#~ "cc r yalnızca son parçaları siler.\n"
+#~ "cc f sadece favorileri siler."
+
+#~ msgid "Sets task on time"
+#~ msgstr "Belirlenmiş bir zaman için görev ayarlar"
+
+#~ msgid ""
+#~ "Enables or disables channel messages "
+#~ "sent by the bot when requesting to"
+#~ " play music, stop current music, and"
+#~ " other events"
+#~ msgstr ""
+#~ "Müzik çalmak, mevcut müziği durdurmak ve"
+#~ " diğer etkinlikleri talep ederken bot "
+#~ "tarafından gönderilen kanal mesajlarını "
+#~ "etkinleştirir veya devre dışı bırakır"
+
+#~ msgid ""
+#~ "Shows a list of administrators.\n"
+#~ "ua +username adds this username in adminlist.\n"
+#~ "ua -username removes its username from adminlist."
+#~ msgstr ""
+#~ "Yöneticilerin listesini gösterir.\n"
+#~ "ua +kullanıcı adı, bu kullanıcı adını yönetici listesine ekler.\n"
+#~ "ua -kullanıcı adı, kullanıcı adını yönetici listesinden kaldırır."
+
+#~ msgid ""
+#~ "Shows a list of banned users.\n"
+#~ "ub +username add this user to banlist.\n"
+#~ "ub -username removes this user from banlist."
+#~ msgstr ""
+#~ "Engellenen kullanıcıların listesini gösterir.\n"
+#~ "ub +kullanıcı adı, bu kullanıcı adını"
+#~ " engellenmiş kullanıcılar listesine ekler.\n"
+#~ ""
+#~ "ub -kullanıcı adı, kullanıcı adını "
+#~ "engellenmiş kullanıcılar listesinden kaldırır."
+
+#~ msgid "Nothing is currently playing"
+#~ msgstr "Şu anda hiçbir şey çalmıyor"
+
+#~ msgid ""
+#~ "returns current rate, if argument is "
+#~ "not given, sets rate in float type"
+#~ " bitween 0.25 and 4.0, if argument"
+#~ " is given"
+#~ msgstr ""
+#~ "Bir argüman belirtilirse, 0.25 ile 4.0"
+#~ " arasında kayan nokta türü için hızı"
+#~ " ayarlar, argüman verilmezse, geçerli hızı"
+#~ " gösterir"
+
+#~ msgid "Sorry, guest users can not use this command"
+#~ msgstr "Üzgünüz, konuk kullanıcılar bu komutu kullanamaz"
+
+#~ msgid "Shows history of playing (64 last tracks)"
+#~ msgstr "(son 64 parça) için çalma geçmişini gösterir"
+
+#~ msgid "Must be integer"
+#~ msgstr "Tamsayı olmalı"
+
+#~ msgid "Blocks or unblocks commands."
+#~ msgstr "Komutları kilitler veya kilidini açar"
+
+#~ msgid "Changes the gender of the bot"
+#~ msgstr "Botun cinsiyetini değiştirir"
+
+#~ msgid ""
+#~ "Clears the entire cache. If an "
+#~ "argument is specified, only favorites or"
+#~ " the history of recently played "
+#~ "tracks are deleted"
+#~ msgstr ""
+#~ "Tüm önbelleği temizler. Bir argüman "
+#~ "belirtilirse, yalnızca favoriler veya en "
+#~ "son çalınan parçaların geçmişi silinir"
+
+#~ msgid "History cleared"
+#~ msgstr "Geçmiş temizlendi"
+
+#~ msgid "Clears cache"
+#~ msgstr "Önbelleği temizler"
+
+#~ msgid "Volume is locked"
+#~ msgstr "Ses kontrolü kilitli"
+
+#~ msgid "Volume is unlocked"
+#~ msgstr "Ses kontrolünün kilidi açıldı"
+
+#~ msgid "Locks or unlocks volume"
+#~ msgstr "Ses kontrolünü kilitler veya kilidini açar"
+
+#~ msgid "VOLUME Sets volume to a value from 0 to {max_volume}"
+#~ msgstr "SES Sesi 0 ile {max_volume} arasında bir değere ayarlar"
+
+#~ msgid "Requested file is uploading"
+#~ msgstr "İstenen dosya yükleniyor"
+
+#~ msgid "Incorrect position"
+#~ msgstr "Yanlış konum"
+
+#~ msgid "shows list of admin users, if user_name is given adds it to list"
+#~ msgstr ""
+#~ "Yönetici kullanıcıların listesini gösterir, "
+#~ "eğer kullanıcı adı verilirse listeye "
+#~ "ekler"
+
+#~ msgid "must be integer"
+#~ msgstr "Tamsayı olmalı"
+
+#~ msgid "Unable to perform a search. Please try again"
+#~ msgstr "Arama gerçekleştirilemiyor. Lütfen tekrar deneyin"
+
+#~ msgid ""
+#~ "The stream cannot be played\n"
+#~ "Additional error info:\n"
+#~ msgstr ""
+#~ "Akış oynatılamıyor\n"
+#~ "Ek hata bilgisi:\n"
+
+#~ msgid "not found"
+#~ msgstr "Bulunamadı"
+
+#~ msgid "List is empty"
+#~ msgstr "Liste boş"
+
+#~ msgid "Task scheduler"
+#~ msgstr "Görev Zamanlayıcısı"
+
+#~ msgid "The list is is empty"
+#~ msgstr "Liste boş"
+
+#~ msgid "You don't have Yandex Plus"
+#~ msgstr "Yandex Plus üyeliğiniz yok"
+
+#~ msgid "Cannot upload file to channel"
+#~ msgstr "Kanala dosya yüklenemiyor"
+
+#~ msgid "Token is not provided"
+#~ msgstr "Token sağlanmadı"
+
