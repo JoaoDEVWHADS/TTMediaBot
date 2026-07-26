@@ -1,0 +1,53 @@
+{
+    "general": {
+        "language": "ru"
+    },
+    "logger": {
+        "log": true,
+        "level": "INFO",
+        "format": "%(levelname)s [%(asctime)s]: %(message)s in %(threadName)s file: %(filename)s line %(lineno)d function %(funcName)s",
+        "file_name": "TTMediaBot.log",
+        "max_file_size": 0,
+        "backup_count": 0,
+    },
+    "sound_devices": {
+        "output_device": 0,
+        "input_device": 0,
+    },
+    "player": {
+        "default_volume": 50,
+        "max_volume": 100,
+        "faded_volume": true,
+        "faded_volume_timestamp": 0.025,
+        "seek_step": 5
+    },
+    "teamtalk": {
+        "hostname": "",
+        "tcp": 10333,
+        "udp": 10333,
+        "encrypted": false,
+        "nickname": "TTMediaBot",
+        "username": "",
+        "password": "",
+        "client_name": "TTMediaBot",
+        "channel": 1,
+        "channel_password": "",
+        "license_name": "",
+        "license_key": "",
+        "reconnection_attempts": -1,
+        "reconnection_timeout": 0
+        "users": {
+            "admins": ["admin"],
+            "banned_users": []
+        }
+    },
+    "services": {
+        "available_services": {
+            "vk": {
+                "token": ""
+            },
+            "yt": {}
+        },
+        "default_service": "vk"
+    }
+}
