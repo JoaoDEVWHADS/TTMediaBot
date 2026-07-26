@@ -1,0 +1,7 @@
+{
+    "ignore": [
+        "mpv.py"
+    ],
+    "stubPath": "typestubs",
+    "reportImportCycles": false,
+}
