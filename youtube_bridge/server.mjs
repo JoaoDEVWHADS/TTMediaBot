@@ -116,10 +116,7 @@ async function getSession(cookieFile) {
     retrieve_player: true
   });
 
-  const context = {
-    session,
-    poBinding: webSession.dataSyncId || null
-  };
+  const context = { session };
   sessionCache = { key, context };
   return context;
 }
@@ -272,11 +269,11 @@ async function resolveFormat(context, videoId, requestedClient, formatOptions) {
     ? ['YTMUSIC', 'MWEB']
     : ['MWEB'];
   const failures = [];
-  const { session, poBinding } = context;
+  const { session } = context;
 
   for (const client of clients) {
     try {
-      const poToken = await getPoToken(poBinding || videoId);
+      const poToken = await getPoToken(videoId);
       const info = await getPlayableInfo(session, videoId, client, poToken);
       if (!info?.streaming_data) {
         throw new Error(`no streaming data (${playabilityDescription(info)})`);
