@@ -8,7 +8,7 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ### 🏗️ Shared Multi-Bot YouTube Architecture
 - **🌐 One Backend for Every Bot:**
-  Replaced the per-bot Node.js bridge and PO-token provider with one managed `ttmediabot-youtube` container. Bot containers are now Python-only and connect to the shared bridge through the private Docker network.
+  Replaced the per-bot Node.js bridge and PO-token provider with one managed `ttmediabot-youtube` container. Bot containers are now Python-only and connect through their host network to the bridge published exclusively on `127.0.0.1:4417`.
 - **🍪 Per-Bot Authentication Isolation:**
   Added validated `bot_id` routing so each request uses only its corresponding `bots/<name>/cookies.txt`. Cookie-backed YouTube.js sessions are isolated and retained in a bounded 64-entry least-recently-used cache.
 - **⚡ Shared Resolution and Request Caches:**
@@ -96,9 +96,29 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ### ⏱️ Session Pre-Warming & Startup Acceleration
 - **🔥 Handshake Warmup:**
-  Implemented automatic session pre-warming during bot startup (`_pre_warm()`). Initializes the Innertube session and warms stream resolution before accepting user commands, eliminating initial search and play latency.
+  Implemented automatic session pre-warming during bot startup (`_pre_warm()`). Initializes the Innertube session and warms stream resolution to reduce initial search and playback latency.
 - **🔒 Dedicated Web Session Isolation:**
-  Ensured persistent search and stream sessions are properly isolated per bot instance to avoid session cross-contamination.
+  Separated the persistent search session from authenticated playback sessions to avoid cross-contamination between search and stream-resolution state.
+
+### 🛡️ Stream, Cookie, and Deployment Reliability
+- **🎧 MPV-Compatible Stream Selection:**
+  Corrected YouTube and YouTube Music client selection and audio-format resolution so the bridge returns deciphered URLs that `mpv` can consume directly.
+- **🔑 Authenticated PO-Token Sessions:**
+  Bound PO-token generation to the authenticated Innertube session used for stream extraction, improving protected-video reliability.
+- **🍪 Robust Netscape Cookie Parsing:**
+  Added support for spaced cookie configuration, selected the latest duplicate cookie value, and isolated cookie-backed bridge sessions per bot instance.
+- **📥 Exact Download Selection:**
+  Restricted download commands to the YouTube item explicitly requested by the user instead of accidentally expanding unrelated entries.
+- **⏭️ Rapid-Skip Protection:**
+  Prevented repeated tracks when users skip quickly while asynchronous resolution is still completing.
+- **🔐 Preserved Bot Ownership:**
+  Corrected rebuild and update flows so rewritten bot configurations retain the expected container user ownership.
+
+### 🔥 Warm-Up and Build Refinements
+- **♻️ Single Warm-Up Lifecycle:**
+  Avoided repeated session warm-ups and coordinated search and stream-resolution readiness with bot startup.
+- **📦 Reproducible Bridge Dependency Layer:**
+  Cached the selected upstream YouTube.js source and its package metadata in dedicated Docker build layers for faster, more consistent rebuilds.
 
 ### 🌐 Multi-Instance Dynamic Port Isolation
 - **🔀 Seed-Based Port Allocation:**
