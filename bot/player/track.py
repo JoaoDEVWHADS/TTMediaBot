@@ -3,6 +3,10 @@ import copy
 import logging
 import os
 import time
+from html.parser import HTMLParser
+from urllib.parse import parse_qs, urljoin, urlsplit
+
+import requests
 from threading import Lock
 from typing import Any, Dict, Optional, TYPE_CHECKING
 
@@ -11,6 +15,76 @@ from bot import utils
 
 if TYPE_CHECKING:
     from bot.services import Service
+
+
+class _AudioSourceParser(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.in_audio = False
+        self.sources = []
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag == "audio":
+            self.in_audio = True
+        if tag == "audio" or (tag == "source" and self.in_audio):
+            if attrs.get("src"):
+                self.sources.append(attrs["src"])
+
+    def handle_endtag(self, tag):
+        if tag == "audio":
+            self.in_audio = False
+
+
+def _resolve_audio_page(value: str):
+    """Resolve file-query audio pages without hard-coded hosts or endpoints."""
+    try:
+        parts = urlsplit(value)
+        if parts.scheme not in ("http", "https") or not parts.hostname:
+            return None
+        filename = parse_qs(parts.query).get("file", [""])[0]
+        basename = filename.replace("\\", "/").rsplit("/", 1)[-1]
+        title, extension = os.path.splitext(basename)
+        if extension.lower() not in (
+            ".mp3",
+            ".m4a",
+            ".ogg",
+            ".opus",
+            ".wav",
+            ".flac",
+            ".aac",
+        ):
+            return None
+        title = " ".join(title.split())
+        if not title:
+            return None
+
+        with requests.get(value, stream=True, timeout=(5, 10)) as response:
+            response.raise_for_status()
+            content_type = response.headers.get(
+                "Content-Type", ""
+            ).split(";", 1)[0].lower().strip()
+            if content_type.startswith("audio/"):
+                return response.url, title
+            if content_type not in ("text/html", "application/xhtml+xml"):
+                return None
+
+            body = bytearray()
+            for chunk in response.iter_content(chunk_size=8192):
+                body.extend(chunk)
+                if len(body) > 131072:
+                    return None
+
+            parser = _AudioSourceParser()
+            parser.feed(body.decode(response.encoding or "utf-8", errors="replace"))
+            for source in parser.sources:
+                url = urljoin(response.url, source)
+                parsed = urlsplit(url)
+                if parsed.scheme in ("http", "https") and parsed.hostname:
+                    return url, title
+    except (requests.RequestException, ValueError, TypeError, LookupError):
+        return None
+    return None
 
 
 class Track:
@@ -119,7 +193,13 @@ class Track:
 
     @url.setter
     def url(self, value: str) -> None:
-        self._url = value
+        media = _resolve_audio_page(value)
+        if media:
+            self._page_title = media[1]
+            self._url = media[0]
+            self._name = media[1]
+        else:
+            self._url = value
 
     @property
     def name(self) -> str:
@@ -130,7 +210,7 @@ class Track:
 
     @name.setter
     def name(self, value: str) -> None:
-        self._name = value
+        self._name = getattr(self, "_page_title", None) or value
 
     def get_meta(self) -> Dict[str, Any]:
         try:
