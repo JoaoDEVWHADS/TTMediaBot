@@ -23,7 +23,7 @@ This fork includes several modifications and optimizations:
   > [!NOTE]
   > On `x86_64` systems, the installation remains untouched and minimal. On `ARM` systems, the installer and Dockerfile conditionally install additional dependencies (such as `libportaudio2`) required by the ARM version of the TeamTalk SDK to run.
 - **Universal Linux Distribution Support:** The installer (`ttbotdocker.sh` / `install_git_clone.sh`) now dynamically supports automatically setting up Docker, `ffmpeg`, and dependencies on any major distribution (Ubuntu, Debian, CentOS, RHEL, Fedora, Rocky Linux, AlmaLinux, Raspbian, Arch, etc.) using the official universal installer and dynamic package manager fallbacks for `jq`.
-- **Docker Containerization:** The bot runs in Docker containers based on Debian 11 and Python 3.10, ensuring compatibility with legacy dependencies while maintaining stability
+- **Docker Containerization:** The image uses Debian Trixie, Python 3.13, Node.js 24, and current stable-distribution playback packages. The bundled TeamTalk 5.8.1 SDK retains isolated OpenSSL 1.1 compatibility libraries.
 - **Proven Stability:** Since I first encountered this bot in 2021, the adaptations made to work around YouTube's restrictions, combined with the optimizations from 2021/2022, have proven to be excellent and reliable
 
 ## 🆕 Latest Updates
@@ -323,7 +323,7 @@ Comprehensive bot management submenu with 13 options:
 
 #### 3. Rebuild Image / Update Code
 Updates the bot code and rebuilds the Docker image:
-- Rebuilds Docker image with `CACHEBUST` to ensure fresh code
+- Pulls the current base image and uses `CACHEBUST` before dependency installation to refresh system packages, the token provider, YouTube.js, and Python packages. Explicit rebuilds take longer because dependency layers are refreshed.
 - Recreates containers with new image
 - Restarts only previously running bots
 
