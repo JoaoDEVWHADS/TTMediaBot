@@ -32,6 +32,24 @@ To view the complete history of updates, including all new features, bug fixes, 
 
 > 📋 **[See full changelog →](CHANGELOG.md)**
 
+## 🐳 Docker Runtime Refresh & Player Compatibility
+
+The bot image was rebuilt on a modern stack, and the player is now compatible with current python-mpv / libmpv bindings.
+
+### What changed
+- **Base image:** Debian Trixie with Python 3.13 and Node.js 24 (was Bullseye / Python 3.10 / Node 22), using distribution-supported `libmpv2` and FFmpeg packages.
+- **TeamTalk SDK compatibility:** the bundled TeamTalk 5.8.1 SDK still needs OpenSSL 1.1. The image copies only `libssl.so.1.1` / `libcrypto.so.1.1` from a Bullseye stage into `/opt/teamtalk-compat` (exposed via `LD_LIBRARY_PATH`), isolated from Trixie's OpenSSL 3.x.
+- **Dependency refresh on rebuild:** `CACHEBUST` now runs before dependency installation and rebuild commands use `--pull`, so option **3** (Rebuild Image / Update Code) and `update.sh` refresh the base image, system packages, the PO-token provider, the YouTube.js bridge, and Python packages — rebuilds are intentionally slower.
+- **mpv binding:** the vendored `mpv.py` is replaced with the installed python-mpv 1.0.8 module after the source copy, aligning with the newer libmpv `loadfile` API.
+- **Player fix:** `end-file` events are parsed in both the legacy nested format and the new flat byte-string format (`{'event': b'end-file', 'reason': b'eof'}`), restoring automatic track advancement and one-shot YouTube stream error recovery. Missing track metadata no longer crashes the player.
+
+### Applying the update
+- Rebuild the image via **option 3** in `ttbotdocker.sh` or run `./update.sh`. Running bots keep the old image until containers are recreated.
+- The player compatibility fix and the new runtime are meant to ship together; rebuilding onto python-mpv 1.0.8 without the player fix breaks automatic track advancement.
+
+### Rollback
+- Rebuild from the commit before the Docker runtime merge (`277efc7`) if the new runtime misbehaves. No data migration is required.
+
 ## 🏗️ YouTube Backend Migration and Shared-Service Architecture
 
 ### Why `yt-dlp` was removed
@@ -585,6 +603,10 @@ TTMediaBot supports multiple languages. Change language using the `cl` admin com
 3. **Verify audio device configuration:**
    - Check `sound_devices` section in `config.json`
 
+4. **Track never advances / player stuck on one song:**
+   - Fixed by the python-mpv 1.0.8 compatibility update (flat `end-file` events)
+   - Rebuild the image with option **3** in `ttbotdocker.sh` or run `./update.sh`
+
 ### Container Won't Start
 
 **Symptoms:** Docker container exits immediately
@@ -654,7 +676,7 @@ cp -r bots bots_backup_$(date +%Y%m%d)
 **A:** Resource use depends on active playback, downloads, FFmpeg transcoding, and TeamTalk traffic. Bot containers share the same Docker image layers and one `ttmediabot-youtube` backend, so Node.js and image dependencies are not duplicated per bot. Each bot adds its Python/TeamTalk process, runtime memory, configuration, cache, logs, and downloaded files. Use `docker stats` for measurements on your host.
 
 ### Q: What happens if I update the repository code?
-**A:** Bot configurations in `bots/` are preserved. Use option `3` in `ttbotdocker.sh` for a manual rebuild or run `update.sh`; the supported workflow backs up bot data, synchronizes the repository, rebuilds the image, recreates and health-checks the shared YouTube service, then recreates bot containers while preserving their previous running/stopped state.
+**A:** Bot configurations in `bots/` are preserved. Use option `3` in `ttbotdocker.sh` for a manual rebuild or run `update.sh`; the supported workflow backs up bot data, synchronizes the repository, rebuilds the image, recreates and health-checks the shared YouTube service, then recreates bot containers while preserving their previous running/stopped state. Explicit rebuilds are intentionally slower because the base image is pulled and dependency layers (system packages, PO-token provider, YouTube.js, Python packages) are refreshed.
 
 ---
 

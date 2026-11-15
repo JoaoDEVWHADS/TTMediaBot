@@ -12,6 +12,27 @@ All notable updates to this fork are documented here, in reverse chronological o
 - Reset per-track HTTP headers when playback moves back to a plain direct URL.
 - Added regression tests for GETEM HTML/JavaScript extraction, direct URL fallback, and mpv header cleanup.
 
+## 🔧 Unreleased — Docker Runtime Refresh & Player Compatibility
+
+### 🎧 Player Compatibility (python-mpv 1.0.8)
+- **Flat End-File Events:** The player now accepts both the legacy nested `end-file` event mapping and the flat byte-string mapping returned by current python-mpv bindings (e.g. `{'event': b'end-file', 'reason': b'eof'}`). Previously this raised `AttributeError: 'bytes' object has no attribute 'get'`, interrupting automatic track advancement and stream-error handling.
+- **Reason Normalization:** `bytes`/`str` `eof` and `error` reasons are decoded and mapped to the `MpvEventEndFile.EOF`/`ERROR` enums; `stop`/`quit` and unknown reasons are still ignored with a log line.
+- **Missing Metadata Tolerance:** Non-string metadata values and a missing `media_title` no longer break metadata parsing; the current track name is preserved when neither is available.
+- **Regression Coverage:** Added `test_player_event_compat.py` covering flat/nested events, one-shot stream refresh on error (no retry loop), stop events, empty metadata, and a real libmpv EOF advancing to the next track. The test also passes on the legacy Python 3.10 / libmpv 0.32.0 binding.
+
+### 🐳 Docker Runtime Refresh
+- **Trixie Base Image:** The image was rebuilt on `python:3.13-slim-trixie` (Debian Trixie, Python 3.13, Node.js 24) with distribution-supported libmpv/FFmpeg packages, removing the Bullseye repository workaround and the `Check-Valid-Until=false` apt override from the previous build.
+- **Isolated OpenSSL 1.1 Compatibility:** The bundled TeamTalk 5.8.1 SDK still links OpenSSL 1.1; the build now copies only `libssl.so.1.1`/`libcrypto.so.1.1` from a Bullseye stage into `/opt/teamtalk-compat` and exposes it via `LD_LIBRARY_PATH`, leaving Trixie's OpenSSL 3.x untouched (no soname shadowing).
+- **Fresh Dependency Layers on Rebuild:** `CACHEBUST` now sits before dependency installation and rebuild commands (`ttbotdocker.sh`, `update.sh`) pass `--pull`; explicit rebuilds refresh the base image, system packages, the PO-token provider (`bgutil-ytdlp-pot-provider`), YouTube.js bridge, and Python packages. Explicit rebuilds intentionally take longer.
+- **Vendored mpv Binding Replaced After Copy:** The bundled `mpv.py` is overwritten with the installed python-mpv 1.0.8 module after `COPY . .`, so imports, the ctypes surface, and `libmpv2` stay aligned after the MPV `loadfile` argument change.
+- **Node.js 22 → 24:** Node.js updated via NodeSource (`node_24.x`) using the current NodeSource GPG key path (`deb.nodesource.com/gpgkey/nodesource.gpg.key`).
+- **Leaner Runtime:** `libmpv-dev` replaced by runtime-only `libmpv2`; duplicated dependency-installation layers were consolidated.
+
+### 📦 Upgrade Notes
+- **Apply with an explicit rebuild** (option **3** — Rebuild Image / Update Code in `ttbotdocker.sh`, or `update.sh`). Running containers keep the old image until rebuilt.
+- **Dependency Order:** The player compatibility fix (PR #3) ships in the same release window; rebuilding onto python-mpv 1.0.8 without it breaks automatic track advancement.
+- **Rollback:** Rebuild from the commit before merge `277efc7` (Merge PR #4) if the new runtime misbehaves; no data migration is required.
+
 ## 🆕 v2.8.0 — "Unified Music Discovery & Expiry-Aware Playback" *(08/31/2026)*
 
 ### 🎵 Unified YouTube.js Discovery
