@@ -14,7 +14,7 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ## 🔧 Unreleased — Docker Runtime Refresh & Player Compatibility
 
-> A huge shoutout and thanks to **mustafaelcicek** for contributing this whole update — the python-mpv player compatibility fix ([PR #3](https://github.com/JoaoDEVWHADS/TTMediaBot/pull/3)) and the Docker runtime refresh ([PR #4](https://github.com/JoaoDEVWHADS/TTMediaBot/pull/4)). All credits for this work go to him.
+> A huge shoutout and thanks to [**mustafaelcicek**](https://github.com/mustafaelcicek) for contributing this whole update — the python-mpv player compatibility fix ([PR #3](https://github.com/JoaoDEVWHADS/TTMediaBot/pull/3)) and the Docker runtime refresh ([PR #4](https://github.com/JoaoDEVWHADS/TTMediaBot/pull/4)). All credits for this work go to him.
 
 ### 🎧 Player Compatibility (python-mpv 1.0.8)
 - **Flat End-File Events:** The player now accepts both the legacy nested `end-file` event mapping and the flat byte-string mapping returned by current python-mpv bindings (e.g. `{'event': b'end-file', 'reason': b'eof'}`). Previously this raised `AttributeError: 'bytes' object has no attribute 'get'`, interrupting automatic track advancement and stream-error handling.
