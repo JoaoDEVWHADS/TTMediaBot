@@ -241,7 +241,7 @@ build_image() {
     if [[ "$(docker images -q ${BOT_IMAGE} 2> /dev/null)" == "" ]]; then
         echo "Image not found. Building image..."
         CURRENT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
-        docker build --build-arg CACHEBUST=$(date +%s) --label "commit_hash=$CURRENT_HASH" -t ${BOT_IMAGE} .
+        docker build --pull --build-arg CACHEBUST=$(date +%s) --label "commit_hash=$CURRENT_HASH" -t ${BOT_IMAGE} .
         if [ $? -eq 0 ]; then
              echo -e "${GREEN}Image built successfully!${NC}"
         else
@@ -275,7 +275,7 @@ force_rebuild_image() {
     
     echo -e "${YELLOW}Building new image (updating code and PIP libraries)...${NC}"
     CURRENT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
-    docker build --build-arg CACHEBUST=$(date +%s) --label "commit_hash=$CURRENT_HASH" -t ${BOT_IMAGE} .
+    docker build --pull --build-arg CACHEBUST=$(date +%s) --label "commit_hash=$CURRENT_HASH" -t ${BOT_IMAGE} .
     
     if [ $? -eq 0 ]; then
          echo -e "${GREEN}Image updated successfully!${NC}"

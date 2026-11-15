@@ -196,7 +196,7 @@ perform_image_rebuild() {
     # Build the image with a commit hash label for version tracking
     CURRENT_HASH=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
     echo "Building new image with version label: $CURRENT_HASH"
-    docker build --build-arg CACHEBUST=$(date +%s) --label "commit_hash=$CURRENT_HASH" -t ${BOT_IMAGE} .
+    docker build --pull --build-arg CACHEBUST=$(date +%s) --label "commit_hash=$CURRENT_HASH" -t ${BOT_IMAGE} .
     
     if [ $? -eq 0 ]; then
          echo -e "${GREEN}Image built successfully!${NC}"
