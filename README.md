@@ -34,6 +34,8 @@ To view the complete history of updates, including all new features, bug fixes, 
 
 ## 🐳 Docker Runtime Refresh & Player Compatibility
 
+> **Credits:** Both pieces of this update — the player compatibility fix and the Docker runtime refresh — were contributed by [mustafaelcicek](https://github.com/mustafaelcicek) in [PR #3](https://github.com/JoaoDEVWHADS/TTMediaBot/pull/3) and [PR #4](https://github.com/JoaoDEVWHADS/TTMediaBot/pull/4). All credits for this work go to him.
+
 The bot image was rebuilt on a modern stack, and the player is now compatible with current python-mpv / libmpv bindings.
 
 ### What changed
