@@ -220,6 +220,8 @@ Send these commands to the bot via private message (PM) or in the channel (if en
 | **slc** | `[number]` | Sets how many results are shown in `sr` mode. The volatile count defaults to 1 after every restart; no argument shows the current count. |
 | **a** | | Shows about info. |
 
+> **Credits:** The queue system commands (**qa**, **ql**, **qr**, **qc**, **qs**) were contributed by **ericoamico** in the v1.7.0 update. All credits for the queue system go to him.
+
 ### Admin Commands
 *Requires admin privileges defined in `config.json`.*
 
