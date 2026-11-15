@@ -654,7 +654,9 @@ class Player:
         stream_name = None
         title = None
         artist = None
-        for i in metadata:
+        for i in metadata or {}:
+            if not isinstance(metadata[i], str):
+                continue
             if i in stream_names:
                 stream_name = html.unescape(metadata[i])
             if "title" in i:
@@ -669,12 +671,23 @@ class Player:
 
     def on_end_file(self, event: Any) -> None:
         if isinstance(event, dict):
-            event_data = event.get("event") or {}
+            payload = event
         elif hasattr(event, "as_dict"):
-            event_data = event.as_dict().get("event") or {}
+            payload = event.as_dict()
         else:
-            event_data = getattr(event, "event", {}) or {}
+            payload = {"event": getattr(event, "event", {})}
+        # Older bindings nest event data; current python-mpv returns a flat
+        # mapping with byte-string event names and reasons.
+        nested = payload.get("event")
+        event_data = nested if isinstance(nested, dict) else payload
         reason = event_data.get("reason")
+        if isinstance(reason, bytes):
+            reason = reason.decode("utf-8", errors="replace")
+        if isinstance(reason, str):
+            reason = {
+                "eof": mpv.MpvEventEndFile.EOF,
+                "error": mpv.MpvEventEndFile.ERROR,
+            }.get(reason)
         if reason not in (mpv.MpvEventEndFile.EOF, mpv.MpvEventEndFile.ERROR):
             logging.info(
                 "[PlaybackTiming] end_file_ignored "
@@ -729,8 +742,8 @@ class Player:
             try:
                 new_name = self._parse_metadata(metadata)
                 if not new_name:
-                    new_name = html.unescape(self._player.media_title)
+                    new_name = html.unescape(self._player.media_title or "")
             except TypeError:
-                new_name = html.unescape(self._player.media_title)
+                new_name = html.unescape(self._player.media_title or "")
             if self.track.name != new_name and new_name:
                 self.track.name = new_name
