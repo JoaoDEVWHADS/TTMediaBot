@@ -585,7 +585,7 @@ All notable updates to this fork are documented here, in reverse chronological o
 
 ## 🆕 v1.7.0 — "Queue System" Update *(05/09/2026)*
 
-> A huge shoutout and massive credits to **ericoamico** for his incredible dedication and a full week of hard work in developing this amazing feature! All credits for the new queue system go to him.
+> A huge shoutout and massive credits to [**ericoamico**](https://github.com/ericoamico) for his incredible dedication and a full week of hard work in developing this amazing feature! All credits for the new queue system go to him. ([PR #1](https://github.com/JoaoDEVWHADS/TTMediaBot/pull/1))
 
 - **🗂️ Advanced Queue System:** You can now queue multiple tracks to play sequentially!
 - **➕ Add to Queue:** Use the `qa` command to search for a track and seamlessly add it to your queue.
