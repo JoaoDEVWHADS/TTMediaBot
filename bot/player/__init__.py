@@ -40,7 +40,7 @@ class Player:
             "demuxer_max_back_bytes": 8388608,
             "demuxer_readahead_secs": 20,
             "stream_buffer_size": 131072,
-            "network_timeout": 30,
+            "network_timeout": 120,
             "video": False,
             "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36",
             "ytdl": False,
