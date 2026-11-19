@@ -453,23 +453,21 @@ YouTube and YouTube Music have implemented restrictions that require authenticat
 
 ### How to Obtain Cookies
 
-1. **Login to your Google account** in your browser (Chrome, Edge, or Firefox)
+Use a **Firefox private window**. Cookies exported from Chrome (even from an Incognito window) can stop working within about half an hour, while cookies exported this way have kept working for days.
 
-2. **Install the Get cookies.txt extension:**
-   - Chrome/Edge: [Get cookies.txt LOCALLY](https://chrome.google.com/webstore/detail/get-cookiestxt/bgaddhkoddajcdgocldbbfleckgcbcid)
-   - Firefox: [cookies.txt](https://addons.mozilla.org/en-US/firefox/addon/cookies-txt/)
+1. **Install the [cookies.txt](https://addons.mozilla.org/en-US/firefox/addon/cookies-txt/) add-on** in Firefox.
 
-3. **Navigate to YouTube:** Go to `youtube.com`
+2. **Allow it in private windows:** open Add-ons and Themes (`Ctrl+Shift+A`), select **cookies.txt**, and set **Run in Private Windows** to **Allow**.
 
-4. **Export cookies:**
-   - Click on the **Extensions menu** in your browser
-   - Click on the **Get cookies.txt LOCALLY** extension icon
-   - Click **"Export All Cookies"**
-   - Click the **Download button**
-   - Your browser may ask where to save the file - choose a location you can access
-   - If not prompted, the file will be in your **Downloads** folder
+3. **Open a private window** (`Ctrl+Shift+P`), go to `youtube.com`, and sign in with the account the bot should use.
 
-5. **Place the file** in an accessible location on your server (e.g., `/root/cookies.txt`)
+4. **Export cookies:** use the cookies.txt add-on to export the cookies for the current site. The file is saved to your **Downloads** folder.
+
+5. **Close the private window without signing out**, and don't use that login anywhere else. Signing out, or using the same session in a normal browser, invalidates the exported cookies.
+
+6. **Place the file** in an accessible location on your server (e.g., `/root/cookies.txt`)
+
+> **If songs fail instantly or stop after about one minute,** the cookies have most likely stopped working. YouTube then treats the bot as signed out and only serves the first minute of each song, while every request still appears to succeed. Export a fresh set as described above.
 
 ### Getting the Cookies File Path
 
